@@ -10,7 +10,7 @@
 
 
             <div class="home-hero__content">
-                <h1>Bienvenue 👨‍🍳</h1>
+                <h1>Bienvenue</h1>
                 <p>Traiteur Passion — Cuisine de saison &amp; événements sur mesure</p>
 
                 <div class="home-hero__actions">
@@ -24,19 +24,19 @@
     <!-- Colonne droite : 3 cartes empilées -->
     <aside class="home-grid__side">
         <a class="home-tile motion-card" href="/menu" data-reveal="up" data-stagger
-            style="--tile-bg: url('/uploads/images/home/tile-carte.jpg');">
+            style="--tile-bg: url('/uploads/images/home/carteDuMomentIllu.jpg');">
             <span class="home-tile__label">CARTE DU MOMENT</span>
             <span class="home-tile__icon" aria-hidden="true">+</span>
         </a>
 
         <a class="home-tile motion-card" href="/devis" data-reveal="up" data-stagger
-            style="--tile-bg: url('/uploads/images/home/tile-plateaux.jpg');">
+            style="--tile-bg: url('/uploads/images/home/plateauxRepasIllu.jpg');">
             <span class="home-tile__label">PLATEAUX REPAS</span>
             <span class="home-tile__icon" aria-hidden="true">+</span>
         </a>
 
         <a class="home-tile motion-card" href="/contact" data-reveal="up" data-stagger
-            style="--tile-bg: url('/uploads/images/home/tile-decouvrir.jpg');">
+            style="--tile-bg: url('/uploads/images/home/nousDécouvrirIllu.webp');">
             <span class="home-tile__label">NOUS DÉCOUVRIR</span>
             <span class="home-tile__icon" aria-hidden="true">+</span>
         </a>
