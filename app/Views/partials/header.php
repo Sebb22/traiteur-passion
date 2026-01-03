@@ -1,7 +1,7 @@
 <header class="header">
     <div class="header__container">
-        <a href="/" class="header__logo">
-            Traiteur Passion
+        <a href="/" class="header__logo" aria-label="Traiteur Passion - Accueil">
+            <img src="/uploads/images/logos/logoNav.png" alt="Traiteur Passion" width="160" height="40" loading="eager">
         </a>
 
         <nav class="header__nav">

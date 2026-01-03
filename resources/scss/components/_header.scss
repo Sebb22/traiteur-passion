@@ -96,4 +96,19 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.30);
     border-bottom-color: rgba(255, 255, 255, 0.14);
   }
+  .header__logo {
+    display: inline-flex;
+    align-items: center;
+  }
   
+  .header__logo img {
+    display: block;
+    height: 7rem;      // ajuste si besoin (Framer ≈ 36–44px)
+    width: auto;
+  }
+  @media (max-width: 720px) {
+    .header__logo img {
+      height: 6rem;
+    }
+  }
+    
