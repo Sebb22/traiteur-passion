@@ -185,3 +185,112 @@
     text-align: center;
   }
 }
+/* =========================
+   RIGHT SIDE TILES (images)
+========================= */
+
+.home-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  min-height: 150px;
+
+  display: grid;
+  align-items: end;
+
+  background-image: var(--tile-bg);
+  background-size: cover;
+  background-position: center;
+
+  text-decoration: none;
+  color: var(--text);
+
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+
+.home-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.65),
+    rgba(0, 0, 0, 0.10) 60%,
+    rgba(0, 0, 0, 0.00)
+  );
+}
+
+.home-tile__label {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 14px;
+
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 6px 18px rgba(0,0,0,0.55);
+}
+
+.home-tile__icon {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(255,255,255,0.9);
+
+  transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
+}
+
+.home-tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,0.16);
+}
+
+.home-tile:hover .home-tile__icon {
+  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.36);
+  border-color: rgba(255,255,255,0.24);
+}
+
+/* Taille proche Framer : 1 grande + 2 moyennes (option) */
+.home-grid__side .home-tile:first-child {
+  min-height: 170px;
+}
+.home-grid__side .home-tile:nth-child(2),
+.home-grid__side .home-tile:nth-child(3) {
+  min-height: 150px;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .home-grid__side {
+    flex-direction: column;
+  }
+
+  .home-tile {
+    min-height: 170px;
+  }
+}

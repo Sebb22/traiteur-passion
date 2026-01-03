@@ -23,22 +23,23 @@
 
     <!-- Colonne droite : 3 cartes empilées -->
     <aside class="home-grid__side">
-        <article class="home-card motion-card" data-reveal="up" data-stagger>
-            <h2>Carte du moment</h2>
-            <p>Découvrez notre sélection actuelle, pensée selon les saisons.</p>
-            <a href="/menu">Voir la carte</a>
-        </article>
+        <a class="home-tile motion-card" href="/menu" data-reveal="up" data-stagger
+            style="--tile-bg: url('/uploads/images/home/tile-carte.jpg');">
+            <span class="home-tile__label">CARTE DU MOMENT</span>
+            <span class="home-tile__icon" aria-hidden="true">+</span>
+        </a>
 
-        <article class="home-card motion-card" data-reveal="up" data-stagger>
-            <h2>Plateaux repas</h2>
-            <p>Des solutions gourmandes pour vos déjeuners professionnels.</p>
-            <a href="/devis">Demander un devis</a>
-        </article>
+        <a class="home-tile motion-card" href="/devis" data-reveal="up" data-stagger
+            style="--tile-bg: url('/uploads/images/home/tile-plateaux.jpg');">
+            <span class="home-tile__label">PLATEAUX REPAS</span>
+            <span class="home-tile__icon" aria-hidden="true">+</span>
+        </a>
 
-        <article class="home-card motion-card" data-reveal="up" data-stagger>
-            <h2>Nous découvrir</h2>
-            <p>Notre savoir-faire, notre passion et nos engagements.</p>
-            <a href="/contact">Nous contacter</a>
-        </article>
+        <a class="home-tile motion-card" href="/contact" data-reveal="up" data-stagger
+            style="--tile-bg: url('/uploads/images/home/tile-decouvrir.jpg');">
+            <span class="home-tile__label">NOUS DÉCOUVRIR</span>
+            <span class="home-tile__icon" aria-hidden="true">+</span>
+        </a>
     </aside>
+
 </section>
