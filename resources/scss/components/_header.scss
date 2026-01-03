@@ -27,6 +27,7 @@
   }
   
   .header__link {
+    position: relative;
     color: var(--muted);
     padding: 10px 12px;
     border-radius: 10px;
@@ -35,7 +36,26 @@
       color: var(--text);
       background: rgba(255, 255, 255, 0.06);
     }
+  
+    &::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 6px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.65);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 220ms ease;
+      opacity: 0.75;
+    }
+  
+    &:hover::after {
+      transform: scaleX(1);
+    }
   }
+  
   
   .header__cta {
     padding: 10px 14px;
@@ -57,5 +77,23 @@
     .header__link {
       display: none; // on garde juste le CTA en mobile (simple pour v1)
     }
+  }
+  
+  a {
+    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+  }
+  
+  a:hover {
+    transform: translateY(-1px);
+  }
+
+  .header {
+    transition: background 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  }
+  
+  .header.is-scrolled {
+    background: rgba(10, 10, 12, 0.72);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.30);
+    border-bottom-color: rgba(255, 255, 255, 0.14);
   }
   

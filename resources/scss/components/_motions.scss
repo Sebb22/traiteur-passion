@@ -1,0 +1,44 @@
+@media (prefers-reduced-motion: reduce) {
+    * {
+      scroll-behavior: auto !important;
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+  
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(2px);
+    transition: opacity 650ms ease, transform 650ms ease, filter 650ms ease;
+    will-change: opacity, transform, filter;
+  }
+  
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  
+  /* Petites variantes */
+  [data-reveal="up"] { transform: translateY(16px); }
+  [data-reveal="down"] { transform: translateY(-16px); }
+  [data-reveal="fade"] { transform: none; filter: none; }
+  
+  /* Hover “lift” façon Framer */
+  .motion-card {
+    transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
+  }
+  
+  .motion-card:hover {
+    transform: translateY(-4px);
+  }
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(2px);
+    transition: opacity 650ms ease, transform 650ms ease, filter 650ms ease;
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform, filter;
+  }
+    
