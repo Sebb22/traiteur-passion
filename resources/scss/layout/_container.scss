@@ -1,10 +1,47 @@
 .header__container,
 main,
 .footer {
-  width: min(var(--container), calc(100% - 2 * var(--space-4)));
+  // width: min(var(--container), calc(100% - 2 * var(--space-4)));
   margin-inline: auto;
 }
 
 main {
-  padding-block: var(--space-7);
+  padding-block: var(--space-3);
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 1280px) {
+  body.page--noScroll {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video {
+  display: block;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+//pour debug elements
+* {
+  outline: 1px solid rgba(255, 0, 0, 0.15);
 }

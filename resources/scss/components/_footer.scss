@@ -1,6 +1,13 @@
 .footer {
-    padding-block: var(--space-6);
+    padding-block: var(--space-2);
     border-top: 1px solid var(--border);
     color: var(--muted);
+    display:none;
   }
   
+  @media (max-width: 1280px) {
+  footer,
+  .footer {
+    display: block;
+  }
+}

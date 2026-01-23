@@ -1,55 +1,80 @@
-@media (prefers-reduced-motion: reduce) {
-    * {
-      scroll-behavior: auto !important;
-      transition: none !important;
-      animation: none !important;
-    }
-  }
-  
-  [data-reveal] {
-    opacity: 0;
-    transform: translateY(14px);
-    filter: blur(2px);
-    transition: opacity 650ms ease, transform 650ms ease, filter 650ms ease;
-    will-change: opacity, transform, filter;
-  }
-  
-  [data-reveal].is-revealed {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-  
-  /* Petites variantes */
-  [data-reveal="up"] { transform: translateY(16px); }
-  [data-reveal="down"] { transform: translateY(-16px); }
-  [data-reveal="fade"] { transform: none; filter: none; }
-  
-  /* Hover “lift” façon Framer */
-  .motion-card {
-    transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
-  }
-  
-  .motion-card:hover {
-    transform: translateY(-4px);
-  }
-  [data-reveal] {
-    opacity: 0;
-    transform: translateY(14px);
-    filter: blur(2px);
-    transition: opacity 650ms ease, transform 650ms ease, filter 650ms ease;
-    transition-delay: var(--reveal-delay, 0ms);
-    will-change: opacity, transform, filter;
-  }
-    
+/* =========================================================
+   MOTION / REVEALS (single source of truth)
+========================================================= */
 
-  @media (prefers-reduced-motion: reduce) {
-    .home-hero__video {
-      display: none;
-    }
-  
-    .home-hero {
-      background: #111; // ou une image fallback
-    }
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  
+
+  /* si tu veux vraiment couper la vidéo */
+  .home-hero__video { display: none; }
+  .home-hero { background: #111; }
+}
+
+/* Base reveal */
+[data-reveal]{
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(2px);
+
+  transition:
+    opacity 650ms cubic-bezier(.2,.6,.2,1),
+    transform 650ms cubic-bezier(.2,.6,.2,1),
+    filter 650ms cubic-bezier(.2,.6,.2,1);
+
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+
+/* Visible state (CHOISIS UNE CLASSE, ici: is-revealed) */
+[data-reveal].is-revealed{
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Variantes */
+[data-reveal="up"]{
+  transform: translateY(16px);
+}
+
+[data-reveal="down"]{
+  transform: translateY(-16px);
+}
+
+[data-reveal="fade"]{
+  transform: none;
+  filter: none;
+}
+
+[data-reveal="scale"]{
+  transform: scale(.97);
+  filter: blur(1px);
+}
+
+/* Stagger: applique un delay basé sur --i */
+[data-reveal][data-stagger]{
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+
+/* Hover lift façon Framer (cards uniquement) */
+.motion-card{
+  transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
+  will-change: transform;
+}
+
+.motion-card:hover{
+  transform: translateY(-4px);
+}
+
+/* Reduced motion: pas de hover lift */
+@media (prefers-reduced-motion: reduce){
+  .motion-card:hover{ transform: none; }
+}

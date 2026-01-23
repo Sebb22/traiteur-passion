@@ -1,0 +1,414 @@
+/* =========================================================
+   HOME GRID
+========================================================= */
+
+.home-section {
+  min-height: 100vh;
+  height: 100vh;
+
+  /* modern browsers */
+  height: 100dvh;
+
+  padding: var(--space-2);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.home-grid {
+  height: 100%;
+  //width: min(var(--container, 1280px), calc(100% - 2 * var(--space-4)));
+  margin-inline: auto;
+
+  display: grid;
+  grid-template-columns: 1.8fr 385px;
+  gap: var(--space-4);
+
+  /* air autour, sans casser le 100vh */
+  padding: var(--space-6) var(--space-4);
+  box-sizing: border-box;
+}
+
+.home-grid__main {
+  min-width: 0;
+}
+
+.home-grid__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.home-grid__main,
+.home-hero__wrap,
+.home-hero {
+  height: 100%;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.home-hero__wrap {
+  position: relative;
+  height: 100%;
+}
+
+.home-hero {
+  position: relative;
+  height: 100%;
+  min-height: 520px;
+
+  display: grid;
+  align-items: center;
+  justify-items: start;
+
+  border-radius: var(--radius);
+  overflow: hidden; /* ✅ RIEN ne sort */
+}
+
+.home-hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+
+  transform: scale(1.06);
+  animation: heroZoom 14s ease-in-out infinite alternate;
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1.12); }
+}
+
+/* Logo décoratif */
+.home-hero__logo {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 2;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.home-hero__logo img {
+  height: 150px;
+  width: auto;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
+}
+
+/* Contenu glass */
+.home-hero__content {
+  position: relative;
+  z-index: 2;
+
+  padding: var(--space-5);
+  margin-inline: var(--space-6);
+  border-radius: 20px;
+
+  background: rgba(10, 11, 10, 0.55);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(239, 231, 210, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.home-hero__kicker {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.7);
+}
+
+.home-hero__title {
+  margin: 0;
+  font-size: clamp(30px, 3.2vw, 48px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.home-hero__titleLine {
+  display: block;
+}
+.home-hero__titleLine:first-child { font-weight: 700; }
+.home-hero__titleLine:last-child  {
+  margin-top: 6px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.home-hero__content p {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.home-hero__actions {
+  margin-top: var(--space-5);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   CORNER SLOT (capsule)
+========================================================= */
+
+.corner-slot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+  border-radius: var(--radius) 0 var(--radius) 0;
+
+  background: rgba(10, 11, 10, 0.88);
+  border: 1px solid rgba(239, 231, 210, 0.14);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+
+  z-index: 6;
+}
+
+/* HERO : capsule qui déborde */
+.corner-slot--hero {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  transform: none;
+  z-index: 3;
+}
+
+/* TILE : capsule à l’intérieur */
+.corner-slot--tile {
+  right: 0px;
+  bottom: 0px;
+  transform: none;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Boutons ronds (hero) */
+.corner-slot__btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(239, 231, 210, 0.14);
+
+  color: rgba(239, 231, 210, 0.9);
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Texte + plus (tiles) */
+.corner-slot__label {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.92);
+  white-space: nowrap;
+}
+
+.corner-slot__plus {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(239, 231, 210, 0.14);
+
+  color: rgba(239, 231, 210, 0.92);
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* =========================================================
+   TILES
+========================================================= */
+
+.home-tile {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.home-tile__media {
+  position: relative;
+  min-height: 150px;
+  height: 100%;
+  background: var(--tile-bg) center/cover no-repeat;
+  background-size: 102%;
+  transition: background-size 0.4s ease;
+}
+
+.home-tile__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.65),
+    rgba(0, 0, 0, 0.1) 60%,
+    rgba(0, 0, 0, 0)
+  );
+  z-index: 1;
+}
+
+.home-tile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(239, 231, 210, 0.18);
+}
+
+.home-tile:hover .home-tile__media {
+  background-size: 108%;
+}
+
+/* =========================================================
+   RESPONSIVE (3 états)
+========================================================= */
+
+/* ✅ VISUEL #2 : 850–1279
+   - page scrollable
+   - 1 colonne
+   - tiles en grille 3 colonnes sous le hero
+*/
+@media (max-width: 1279px) and (min-width: 850px) {
+  .home-section {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-3);
+  }
+
+ 
+  .home-hero {
+    min-height: 700px;
+  }
+
+  .home-grid__side {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+    min-height:350px;
+  }
+
+  .home-tile {
+    height: 100%;
+  }
+
+  .home-tile__media {
+    background-size: cover;
+    background-position: center;
+  }
+ 
+}
+
+/* ✅ VISUEL #3 : <850
+   - page scrollable
+   - 1 colonne
+   - tiles empilées
+   - hero centré + contenu centré
+*/
+@media (max-width: 849px) {
+  .home-section {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .home-grid__main,
+  .home-hero__wrap,
+  .home-hero {
+    height: auto;
+  }
+
+  .home-hero {
+    min-height: 653px ;
+    justify-items: center;
+  }
+
+  .home-hero__content {
+    margin-inline: 0;
+    width: min(92%, 520px);
+    padding: var(--space-4);
+    text-align: center;
+  }
+
+  .home-hero__actions {
+    gap: 10px;
+  }
+
+  .home-grid__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    height:auto;
+  }
+
+  .home-tile {
+    height: 375px;
+  }
+
+  .corner-slot {
+    padding: 8px 10px;
+    border-radius: 16px;
+  }
+
+  .corner-slot__btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .corner-slot__plus {
+    width: 26px;
+    height: 26px;
+  }
+
+  .corner-slot--hero {
+    right: 0px;
+    bottom: 0px;
+  }
+}
+
+/* ✅ micro-ajustements */
+@media (max-width: 420px) {
+  .home-hero { min-height: 600px; }
+  .home-tile { height: 375px; }
+}
