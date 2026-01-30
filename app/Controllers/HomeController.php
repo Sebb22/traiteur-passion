@@ -21,4 +21,9 @@ final class HomeController
     {
         View::render('pages/contact', ['title' => 'Traiteur Passion — Contact']);
     }
+
+    public function about(): void
+    {
+        View::render('pages/about', ['title' => 'Traiteur Passion — À propos']);
+    }
 }

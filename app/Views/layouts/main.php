@@ -24,20 +24,24 @@
         "areaServed": "Compiègne et alentours"
     }
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <?= Vite::styles() ?>
+    <link href="https://fonts.googleapis.com/css2?family=Forum&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <?php echo Vite::styles() ?>
 </head>
 
 <body class="page--noScroll">
     <?php require dirname(__DIR__) . '/partials/header.php'; ?>
 
-    <main>
-        <?= $content ?>
-    </main>
+
+    <?php echo $content ?>
+
 
     <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
 
-    <?= Vite::scripts() ?>
+    <?php echo Vite::scripts() ?>
 </body>
 
 </html>

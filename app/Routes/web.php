@@ -8,3 +8,4 @@ $router->get('/', 'HomeController@index');
 $router->get('/menu', 'HomeController@menu');
 $router->get('/contact', 'HomeController@contact');
 $router->get('/devis', 'QuoteController@show');
+$router->get('/a-propos', 'HomeController@about');

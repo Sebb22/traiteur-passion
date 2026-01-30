@@ -1,28 +1,33 @@
+/* =========================
+   CONTAINERS (global)
+========================= */
+
+/* conteneur centré pour le site (header/footer/pages classiques) */
 .header__container,
-main,
-.footer {
-  // width: min(var(--container), calc(100% - 2 * var(--space-4)));
+.footer,
+.siteContainer {
   margin-inline: auto;
+  /* si tu veux limiter la largeur : */
+  /* width: min(var(--container), calc(100% - 2 * var(--space-4))); */
 }
 
-main {
-  padding-block: var(--space-3);
+/* main “standard” (pages classiques) */
+.siteMain {
+  padding-block: var(--space-1);
+}
+
+/* optionnel : si tu veux garder ton scroll snap, fais-le opt-in */
+.snapY {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
 }
 
-html, body {
+/* reset */
+html,
+body {
   margin: 0;
   padding: 0;
 }
-
-@media (min-width: 1280px) {
-  body.page--noScroll {
-    height: 100%;
-    overflow: hidden;
-  }
-}
-
 
 *,
 *::before,
@@ -35,13 +40,15 @@ video {
   display: block;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* noScroll générique (utilisable partout) */
+@media (min-width: 1280px) {
+  body.page--noScroll {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
-//pour debug elements
-* {
-  outline: 1px solid rgba(255, 0, 0, 0.15);
-}
+/* debug (à activer/désactiver quand tu veux) */
+
+* { outline: 1px solid rgba(255, 0, 0, 0.15); }
+

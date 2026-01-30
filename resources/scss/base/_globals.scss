@@ -29,6 +29,9 @@
   --q-notch: 140px; // taille du décroché
   --q-bg: #0b0b0b; // fond page
   --q-outline: rgba(239, 231, 210, 0.12);
+  --font-title: 'Manrope', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
 }
 
 body {
@@ -45,4 +48,12 @@ body {
     var(--bg);
   color: var(--text);
  // padding-top: var(--header-h);
+}
+
+body {
+  font-family: var(--font-body);
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight:700;
 }

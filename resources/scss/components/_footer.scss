@@ -4,10 +4,19 @@
     color: var(--muted);
     display:none;
   }
-  
+  /*
   @media (max-width: 1280px) {
   footer,
   .footer {
     display: block;
   }
+    
+}
+*/
+
+.menuFooter{
+  margin-top: 18px;
+  padding: 22px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(239, 231, 210, 0.55);
 }

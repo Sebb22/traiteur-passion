@@ -1,0 +1,402 @@
+/* =========================================================
+   MENU SPLIT (Qitchen-like)
+========================================================= */
+
+@media (min-width: 981px) {
+  body.page--menu {
+    height: 100%;
+    overflow: hidden; /* ✅ le scroll est dans la colonne droite */
+  }
+}
+@media (min-width: 1280px) {
+  body.page--menu {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+.menuSplit {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  /* ✅ IMPORTANT : permet au contenu interne de scroller */
+  min-height: 0;
+}
+/* ✅ VISUEL #2 (850–1279) : centré en haut */
+
+
+/* LEFT */
+.menuSplit__left {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+@media (max-width: 1279px) {
+  .menuSplit__left {
+    position: relative;
+    height: 52vh; /* ou ce que tu veux */
+  }
+}
+
+.menuHero {
+  position: relative;
+  height: 100%;
+  border-radius: 22px;
+  margin: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
+}
+
+.menuHero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.04);
+  filter: saturate(0.95) contrast(1.02);
+}
+
+.menuHero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    900px 600px at 50% 35%,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.75)
+  );
+}
+
+.menuHero__title {
+  position: absolute;
+  left: 22px;
+  bottom: 18px;
+  z-index: 2;
+  margin: 0;
+  font-size: clamp(52px, 7vw, 92px);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.92);
+  text-shadow: 0 18px 70px rgba(0, 0, 0, 0.55);
+}
+@media (max-width: 1279px) {
+  .menuSplit {
+    grid-template-columns: 1fr;
+  }
+}
+/* RIGHT (scroll container) */
+.menuSplit__right {
+  min-height: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 18px 18px 18px 0; /* ✅ comme Qitchen : pas de padding à gauche */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.menuPanel {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 22px;
+  margin: 18px 18px 18px 0; /* ✅ cadre identique (gutter au centre) */
+  padding: 18px 18px 26px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
+
+  background: #0b0b0b;
+}
+
+/* ✅ même “voile” que l’image de gauche */
+.menuPanel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* vignette + halo (proche Qitchen) */
+  background:
+    radial-gradient(
+      900px 600px at 50% 22%,
+      rgba(255, 255, 255, 0.06),
+      rgba(0, 0, 0, 0)
+    ),
+    radial-gradient(
+      1100px 900px at 50% 50%,
+      rgba(0, 0, 0, 0.25),
+      rgba(0, 0, 0, 0.78)
+    );
+}
+.menuPanel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* footer dans la colonne droite */
+.menuFooter {
+  margin-top: 18px;
+  padding: 22px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(239, 231, 210, 0.55);
+}
+
+/* RESPONSIVE */
+@media (max-width: 980px) {
+  body.page--menu {
+    overflow: auto;
+  }
+
+  .menuSplit {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .menuSplit__left {
+    position: relative;
+    height: 52vh;
+  }
+
+  .menuSplit__right {
+    height: auto;
+    overflow: visible;
+    padding: 0 18px 18px;
+  }
+
+  .menuHero {
+    margin: 18px 18px 0;
+  }
+}
+.menuList {
+  padding: 18px 6px 0;
+  display: grid;
+  gap: 34px; /* plus proche Qitchen */
+}
+.menuItem {
+  display: grid;
+  grid-template-columns: 140px 1fr; /* thumb un peu plus large */
+  gap: 22px;
+  align-items: center;
+
+  padding: 0; /* ✅ pas de card */
+  border: 0; /* ✅ pas de card */
+  background: transparent; /* ✅ pas de card */
+  border-radius: 0;
+
+  transform: translateY(0);
+  transition:
+    transform 320ms ease,
+    filter 320ms ease;
+}
+
+.menuItem:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+}
+.menuItem__thumb {
+  width: 140px;
+  //height: 86px;
+  border-radius: 16px;
+  overflow: visible; /* ✅ important : on veut l’ombre */
+  background: transparent;
+  border: 0;
+
+  display: grid;
+  place-items: center;
+}
+
+.menuItem__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* ✅ comme Qitchen : on voit le plateau */
+  transform: translateZ(0) scale(1.02);
+  filter: drop-shadow(0 18px 45px rgba(0, 0, 0, 0.55));
+  opacity: 0.98;
+}
+.menuItem__top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.menuItem__name {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.86);
+}
+
+/* dotted leader + discret */
+.menuItem__dots {
+  height: 1px;
+  align-self: center;
+  opacity: 0.65;
+
+  background-image: radial-gradient(
+    rgba(239, 231, 210, 0.2) 1px,
+    transparent 1.6px
+  );
+  background-size: 7px 2px;
+  background-repeat: repeat-x;
+  background-position: left center;
+}
+
+.menuItem__price {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.72);
+}
+.menuItem__desc {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: rgba(239, 231, 210, 0.52);
+  max-width: 60ch;
+}
+@media (max-width: 520px) {
+  .menuItem {
+    grid-template-columns: 110px 1fr;
+    gap: 16px;
+  }
+  .menuItem__thumb {
+    width: 110px;
+    height: 72px;
+  }
+}
+/* =========================
+   SECTION TITLE (Qitchen-like)
+========================= */
+
+.menuSectionTitle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
+  //place-content: center;
+  gap: 18px;
+  padding: 26px 8px 12px;
+  text-align: center;
+}
+.menuSectionTitle__small{
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: center;
+    font-size: clamp(11px, 1.2vw, 13px);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.65);
+}
+.menuSectionTitle__text {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 28px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.82);
+}
+
+/* la ligne fine + dégradé doux */
+.menuSectionTitle__line {
+  position: relative;
+  height: 1px;
+   
+  flex: 1;
+  background: rgba(255,255,255,.14);
+ //width: min(50px, 100%);
+   //background: rgba(255,255,255,.14);
+  opacity: 0.9;
+}
+
+/* losanges “creux” */
+.menuSectionTitle__line::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translateY(-50%) rotate(45deg);
+  background: transparent; /* ✅ creux */
+  border: 1px solid rgba(239, 231, 210, 0.22);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset; /* micro contraste, optionnel */
+}
+
+/* ligne AVANT le titre → losange à droite */
+.menuSectionTitle__line:first-child::after {
+  left: 0;
+  transform: translate(50%, -50%) rotate(45deg);
+}
+
+/* ligne APRÈS le titre → losange à gauche */
+.menuSectionTitle__line:last-child::after {
+  right: 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+/* =========================
+   MENU TABS (Qitchen-like)
+========================= */
+
+.menuTabs{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 0 26px;
+}
+
+/* tab = pill sobre */
+.menuTabs__tab{
+  height: 32px;
+  padding: 0 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+
+  color: rgba(239,231,210,.65);
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+/* hover très subtil */
+.menuTabs__tab:hover{
+  background: rgba(255,255,255,.035);
+  border-color: rgba(239,231,210,.14);
+  color: rgba(239,231,210,.82);
+}
+
+/* état actif = légèrement plus présent */
+.menuTabs__tab.is-active{
+  background: rgba(239,231,210,.06);
+  border-color: rgba(239,231,210,.20);
+  color: rgba(239,231,210,.92);
+}
+
+/* pas d'effet "bouton" */
+.menuTabs__tab:active{
+  transform: none;
+}
+@media (hover: none){
+  .menuTabs__tab:hover{
+    background: rgba(255,255,255,.02);
+    border-color: rgba(255,255,255,.08);
+    color: rgba(239,231,210,.65);
+  }
+}
