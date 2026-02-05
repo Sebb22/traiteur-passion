@@ -56,13 +56,14 @@
 
 .home-hero {
   position: relative;
-  height: 100%;
-  min-height: 520px;
-
+  aspect-ratio: 16 / 9;
+  height: auto;
+  width: 100%;
   display: grid;
   align-items: center;
   justify-items: start;
 
+  background: #000;
   border-radius: var(--radius);
   overflow: hidden; /* ✅ RIEN ne sort */
 }
@@ -72,16 +73,22 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
 
-  transform: scale(1.06);
-  animation: heroZoom 14s ease-in-out infinite alternate;
+  object-fit: contain; // no crop
+  object-position: 50% 50%; // ✅ centré (desktop par défaut)
+
+  transform: none;
+  animation: none;
 }
 
 @keyframes heroZoom {
-  from { transform: scale(1.06); }
-  to   { transform: scale(1.12); }
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1.12);
+  }
 }
 
 /* Logo décoratif */
@@ -134,8 +141,10 @@
 .home-hero__titleLine {
   display: block;
 }
-.home-hero__titleLine:first-child { font-weight: 700; }
-.home-hero__titleLine:last-child  {
+.home-hero__titleLine:first-child {
+  font-weight: 700;
+}
+.home-hero__titleLine:last-child {
   margin-top: 6px;
   font-weight: 600;
   opacity: 0.9;
@@ -255,7 +264,9 @@
   border-radius: var(--radius);
   overflow: hidden;
 
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .home-tile__media {
@@ -311,16 +322,33 @@
     padding: var(--space-3) var(--space-3);
   }
 
- 
   .home-hero {
-    min-height: 700px;
+    width: 100%;
+    aspect-ratio: 16 / 9; // ✅ match vidéo
+    height: auto; // ✅ la hauteur découle du ratio
+    min-height: 0; // ✅ évite de forcer trop haut
+    max-height: 70dvh; // ✅ optionnel: limite si écran très haut
+    justify-items: center;
+    align-items: start;
+    background: #000; // ✅ bandes propres si besoin
   }
+  .home-hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 
+    object-fit: contain; // ✅ pas crop
+    object-position: 50% 0%; // ✅ collée en haut
+
+    transform: none; // ✅ stop zoom
+    animation: none; // ✅ stop zoom
+  }
   .home-grid__side {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4);
-    min-height:350px;
+    min-height: 350px;
   }
 
   .home-tile {
@@ -331,7 +359,6 @@
     background-size: cover;
     background-position: center;
   }
- 
 }
 
 /* ✅ VISUEL #3 : <850
@@ -343,7 +370,7 @@
 @media (max-width: 849px) {
   .home-section {
     height: auto;
-    min-height: 100dvh;
+    // min-height: 100dvh;
     overflow: visible;
   }
 
@@ -360,8 +387,14 @@
   }
 
   .home-hero {
-    min-height: 653px ;
+    width: 100%;
+    aspect-ratio: 16 / 9; // ✅ match vidéo
+    height: auto; // ✅ la hauteur découle du ratio
+    min-height: 0; // ✅ évite de forcer trop haut
+    max-height: 70dvh; // ✅ optionnel: limite si écran très haut
     justify-items: center;
+    align-items: start;
+    background: #000; // ✅ bandes propres si besoin
   }
 
   .home-hero__content {
@@ -379,9 +412,20 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
-    height:auto;
+    height: auto;
   }
+  .home-hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 
+    object-fit: contain; // ✅ pas crop
+    object-position: 50% 0%; // ✅ collée en haut
+
+    transform: none; // ✅ stop zoom
+    animation: none; // ✅ stop zoom
+  }
   .home-tile {
     height: 375px;
   }
@@ -409,6 +453,39 @@
 
 /* ✅ micro-ajustements */
 @media (max-width: 420px) {
-  .home-hero { min-height: 600px; }
-  .home-tile { height: 375px; }
+  .home-hero {
+    max-height: 60dvh;
+  }
+  .home-tile {
+    height: 375px;
+  }
 }
+
+/* Desktop (split 2 colonnes) */
+@media (min-width: 1280px) {
+  .home-hero {
+    height: 100%;
+    aspect-ratio: auto; // ✅ on enlève le 16/9 en desktop
+    width: 100%;
+    background: #000;
+  }
+
+  .home-hero__video {
+    object-fit: cover; // ✅ remplit le hero
+    object-position: 50% 50%; // ✅ centre
+  }
+}
+/*
+@media (min-width: 1280px) {
+  .home-hero {
+    height: 100%;
+    aspect-ratio: auto;
+    background: #000;
+  }
+
+  .home-hero__video {
+    object-fit: contain;      // ✅ zéro crop
+    object-position: 50% 50%; // ✅ centré
+  }
+}
+  */

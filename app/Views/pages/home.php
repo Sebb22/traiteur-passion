@@ -6,9 +6,9 @@
                 <section class="home-hero">
                     <video class="home-hero__video" autoplay muted loop playsinline preload="metadata"
                         poster="/uploads/images/home/hero-poster.jpg" aria-hidden="true">
-                        <source src="/uploads/videos/videoHome1.mp4" type="video/mp4">
+                        <source src="/uploads/videos/videoHome2.mp4" type="video/mp4">
                     </video>
-
+                    <!--
                     <div class="home-hero__logo" aria-hidden="true">
                         <img src="/uploads/images/logos/logo.png" alt="">
                     </div>
@@ -28,6 +28,8 @@
                             <a class="btn btn--ghost" href="/menu">Voir la carte</a>
                         </div>
                     </div>
+                    
+                    -->
                     <!-- SLOT HERO  -->
                     <div class="corner-slot corner-slot--hero" aria-label="Réseaux sociaux">
                         <a class="corner-slot__btn" href="#" aria-label="Facebook">f</a>

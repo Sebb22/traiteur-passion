@@ -400,3 +400,17 @@
     color: rgba(239,231,210,.65);
   }
 }
+
+.menuSplit__right {
+  height: 100dvh;
+  overflow: hidden; /* ✅ ne scroll plus */
+  padding: 18px 18px 18px 0;
+}
+
+.menuPanel--menu {
+  height: 100%;
+  overflow-y: auto;     /* ✅ scroll ici */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}

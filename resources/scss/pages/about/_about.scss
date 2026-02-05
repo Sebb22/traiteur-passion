@@ -1,9 +1,12 @@
 /* =========================================================
    ABOUT (Qitchen-like) – menuSplit + panel en cards
-   (version clean / sans doublons / prête pour le nouveau HTML)
+   CLEAN VERSION (no duplicates / single source of truth)
 ========================================================= */
 
-/* ---------- SPLIT ---------- */
+/* =========================================================
+   SPLIT LAYOUT
+========================================================= */
+
 .menuSplit--about {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
@@ -16,20 +19,19 @@
 .menuSplit--about .menuSplit__right {
   min-height: 100vh;
 }
-@media (max-width: 1279px) {
-  .menuSplit--about .menuSplit__left {
-    position: relative;
-    height: 52vh; /* ou ce que tu veux */
-  }
-}
-/* ---------- LEFT HERO ---------- */
+
+/* =========================================================
+   LEFT HERO
+========================================================= */
+
 .menuHero--about {
   position: relative;
   height: 100%;
   border-radius: 26px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+       
 }
 
 .menuHero--about .menuHero__img {
@@ -41,14 +43,13 @@
   transform: scale(1.02);
 }
 
-/* overlay sombre subtil comme Qitchen */
 .menuHero--about::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(80% 70% at 20% 80%, rgba(0,0,0,.55), transparent 55%),
-    linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05));
+    radial-gradient(80% 70% at 20% 80%, rgba(0, 0, 0, 0.55), transparent 55%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.05));
   pointer-events: none;
 }
 
@@ -61,34 +62,72 @@
 
   font-family: "Forum", serif;
   font-size: clamp(52px, 5.2vw, 96px);
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.92);
-  text-shadow: 0 10px 40px rgba(0,0,0,.55);
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
 }
 
-/* ---------- RIGHT PANEL (container) ---------- */
+/* =========================================================
+   RIGHT PANEL (container)
+========================================================= */
+
 .menuPanel--about {
   height: 100%;
   border-radius: 26px;
   padding: 16px;
   overflow: visible;
-
-  background: rgba(10,10,10,.55);
-  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(10, 10, 10, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
 
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 14px;
   align-content: start;
+
+  /* ✅ SINGLE SOURCE OF TRUTH */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "tabs     tabs"
+    "intro    galerie"
+    "intro    galerie"
+    "reviews  reviews"
+    "stats    stats"      /* ✅ FULL WIDTH */
+    "histoire histoire"   /* ✅ (option) full width aussi, plus clean */
+    "contact  contact"
+    "footer   footer";
 }
 
-/* tabs + footer en pleine largeur dans la grille */
-.menuTabs--about { grid-column: 1 / -1; }
-.menuFooter      { grid-column: 1 / -1; }
+/* zones */
+.menuTabs--about {
+  grid-area: tabs;
+}
+.aboutCard--intro {
+  grid-area: intro;
+}
+.aboutCard--galerie {
+  grid-area: galerie;
+}
+.aboutRatingsRow {
+  grid-area: reviews;
+}
+.aboutCard--stats {
+  grid-area: stats;
+}
+.aboutCard--histoire {
+  grid-area: histoire;
+}
+.aboutCard--contact {
+  grid-area: contact;
+}
+.menuFooter {
+  grid-area: footer;
+}
 
-/* ---------- TABS ---------- */
+/* =========================================================
+   TABS
+========================================================= */
+
 .menuTabs--about {
   position: sticky;
   top: 0;
@@ -99,59 +138,60 @@
   flex-wrap: wrap;
 
   padding: 10px 0 14px;
-  background: linear-gradient(to bottom, rgba(10,10,10,.85), rgba(10,10,10,0));
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0.85),
+    rgba(10, 10, 10, 0)
+  );
   backdrop-filter: blur(10px);
 }
 
 .menuTabs--about .menuTabs__tab {
   border-radius: 999px;
   padding: 8px 12px;
-  font-size: .9rem;
-  opacity: .85;
+  font-size: 0.9rem;
+  opacity: 0.85;
 
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .menuTabs--about .menuTabs__tab.is-active {
   opacity: 1;
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.18);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* =========================================================
-   CARDS (nouvelle base)
-   - si tu gardes menuSection: tu peux ajouter .aboutCard en plus
+   CARDS (base)
 ========================================================= */
 
-/* card générique */
 .aboutCard,
 .menuSection--about {
   border-radius: 22px;
   padding: 16px;
   margin: 0;
 
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0; /* ✅ évite les débordements en grid */
 }
 
-/* titre de card (remplace l'ancien header à lignes) */
 .aboutCard__title {
   font-family: "Forum", serif;
-  letter-spacing: .10em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   font-size: 1.05rem;
   margin: 0 0 10px;
-  opacity: .95;
+  opacity: 0.95;
 }
 
 .aboutCard__text {
   margin: 0 0 14px;
-  opacity: .82;
+  opacity: 0.82;
   max-width: 70ch;
 }
 
-/* actions (intro/cta) */
 .aboutActions {
   display: flex;
   gap: 10px;
@@ -159,105 +199,183 @@
 }
 
 /* =========================================================
-   PLACEMENT GRID (calé Qitchen)
-   -> fonctionne avec le nouveau HTML (aboutCard--*)
-   -> si tu restes sur ids: garde aussi les règles #intro etc.
+   GALERIE CARD: fait remplir le slider
 ========================================================= */
 
-/* Nouveau HTML recommandé */
-.aboutCard--intro   { grid-column: 1; grid-row: span 2; }
-.aboutCard--galerie { grid-column: 2; grid-row: span 3; }
+.aboutCard--galerie {
+  display: flex;
+  flex-direction: column;
+}
 
-.aboutCard--engagements { grid-column: 1; }
-.aboutCard--histoire    { grid-column: 2; grid-row: span 2; }
+.aboutCard--galerie .aboutSlider {
+  flex: 1;
+  min-height: 320px;
+  min-width: 0;
+}
 
-.aboutCard--contact { grid-column: 1; }
-
-/* Compat: si tu utilises encore tes <section id="..."> */
-#intro        { grid-column: 1; grid-row: span 2; }
-#galerie      { grid-column: 2; grid-row: span 3; }
-#engagements  { grid-column: 1; }
-#histoire     { grid-column: 2; grid-row: span 2; }
-#contact      { grid-column: 1; }
+.aboutCard--galerie .aboutSlider__viewport {
+  height: 100%;
+}
 
 /* =========================================================
-   RATING ROW (3 cards sœurs, pas une "section" qui contient)
+   REVIEWS (Google/Facebook/Presse)
 ========================================================= */
 
-/* row (wrapper) */
 .aboutRatingsRow {
-  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
 }
 
-/* card rating */
-.aboutRatingCard {
+.aboutReview {
   border-radius: 18px;
-  padding: 14px;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(255,255,255,.10);
-  text-align: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
+  
 }
 
-.aboutRatingCard__stars {
-  font-size: 13px;
-  letter-spacing: .22em;
-  opacity: .95;
-  margin-bottom: 10px;
+.aboutReview__link {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 14px 14px 12px;
+  color: inherit;
+  text-decoration: none;
+
+  background:
+    radial-gradient(
+      120% 120% at 20% 0%,
+      rgba(255, 255, 255, 0.06),
+      transparent 55%
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    opacity 0.18s ease;
 }
 
-.aboutRatingCard__title {
+.aboutReview__link:hover {
+  transform: translateY(-1px);
+  background:
+    radial-gradient(
+      120% 120% at 20% 0%,
+      rgba(255, 255, 255, 0.085),
+      transparent 55%
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.14), transparent);
+}
+
+.aboutReview__link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.22);
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+
+/* header en ligne (pas centré en colonne) */
+.aboutReview__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.aboutReview__source {
   font-family: "Forum", serif;
   text-transform: uppercase;
-  letter-spacing: .12em;
-  font-size: 1rem;
-  opacity: .92;
-  line-height: 1.1;
+  letter-spacing: 0.14em;
+  font-size: 0.95rem;
+  opacity: 0.92;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.aboutRatingCard__sub {
-  margin-top: 6px;
-  font-size: .85rem;
-  opacity: .70;
-  letter-spacing: .06em;
+.aboutReview__stars {
+  letter-spacing: 0.22em;
+  font-size: 12px;
+  opacity: 0.9;
+  flex: 0 0 auto;
+}
+
+.aboutReview__text {
+  margin: 0;
+  opacity: 0.82;
+  line-height: 1.55;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4; /* ✅ stable heights */
+  overflow: hidden;
+}
+
+.aboutReview__cta {
+  margin-top: auto;
+  padding-top: 6px;
+
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  opacity: 0.78;
 }
 
 /* =========================================================
-   ENGAGEMENTS (pills)
+   STATS (remplace engagements)
 ========================================================= */
 
-.aboutPills {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.aboutStats {
+  margin-top: 12px;
 
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
-.aboutPills__pill {
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(255,255,255,.10);
+.aboutStat {
+  border-radius: 16px;
+  padding: 14px 12px;
+
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  display: grid;
+  gap: 10px;
+  align-content: start;
+
+  min-width: 0;
 }
 
-.aboutPills__title {
-  font-family: "Forum", serif;
-  letter-spacing: .08em;
+.aboutStat__num {
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(239, 231, 210, 0.95);
+}
+
+.aboutStat__label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  display: block;
+  color: rgba(239, 231, 210, 0.78);
+  line-height: 1.25;
+
+  overflow-wrap: anywhere; /* ✅ sécurité anti casse weird */
 }
 
-.aboutPills__sub {
-  display: block;
-  margin-top: 4px;
-  opacity: .75;
-  font-size: .9rem;
+.aboutCard__text--muted {
+  margin-top: 12px;
+  color: rgba(239, 231, 210, 0.65);
+  font-size: 13px;
 }
 
 /* =========================================================
@@ -270,23 +388,24 @@
   margin: 0;
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
 .aboutFacts__item {
   border-radius: 18px;
   padding: 14px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
 }
 
 .aboutFacts__k {
   display: block;
-  opacity: .65;
-  letter-spacing: .08em;
+  opacity: 0.65;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .aboutFacts__v {
@@ -295,7 +414,7 @@
 }
 
 /* =========================================================
-   SLIDER (pleine largeur, dans une card)
+   SLIDER
 ========================================================= */
 
 .aboutSlider {
@@ -311,7 +430,9 @@
   outline: none;
 }
 
-.aboutSlider__viewport::-webkit-scrollbar { height: 0; }
+.aboutSlider__viewport::-webkit-scrollbar {
+  height: 0;
+}
 
 .aboutSlider__track {
   display: grid;
@@ -324,8 +445,8 @@
   scroll-snap-align: start;
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
   margin: 0;
   min-height: 300px;
 }
@@ -347,8 +468,8 @@
   height: 38px;
   border-radius: 999px;
 
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
 
   display: grid;
@@ -357,101 +478,48 @@
   font-size: 22px;
   line-height: 1;
   color: white;
-  opacity: .85;
-}
-.aboutSlider__btn {
-  transition: opacity .18s ease, transform .18s ease;
+  opacity: 0.85;
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .aboutSlider__btn.is-hidden {
   opacity: 0;
   pointer-events: none;
 }
-.aboutSlider__btn--prev { left: 10px; }
-.aboutSlider__btn--next { right: 10px; }
-.aboutSlider__btn:hover { opacity: 1; }
 
-@media (max-width: 900px) {
-  .aboutSlider__slide { min-height: 220px; }
+.aboutSlider__btn--prev {
+  left: 10px;
+}
+.aboutSlider__btn--next {
+  right: 10px;
+}
+.aboutSlider__btn:hover {
+  opacity: 1;
 }
 
 /* =========================================================
    FOOTER
 ========================================================= */
+
 .menuFooter {
-  opacity: .65;
+  opacity: 0.65;
   padding: 6px 2px 2px;
 }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-@media (max-width: 980px) {
-  .menuSplit--about { grid-template-columns: 1fr; }
 
-  .menuPanel--about { grid-template-columns: 1fr; }
-
-  .aboutRatingsRow  { grid-template-columns: 1fr; }
-
-  .aboutFacts { grid-template-columns: 1fr; }
-
-  /* si tu utilises les ids */
-  #intro, #galerie, #engagements, #histoire, #contact { grid-column: 1; grid-row: auto; }
-
-  /* si tu utilises les modifiers */
-  .aboutCard--intro,
-  .aboutCard--galerie,
-  .aboutCard--engagements,
-  .aboutCard--histoire,
-  .aboutCard--contact { grid-column: 1; grid-row: auto; }
-}
-
-
-/* ===== TOP ROW: INTRO & GALERIE même hauteur (desktop) ===== */
-.aboutCard--intro,
-#intro {
-  grid-column: 1;
-  grid-row: span 2;
-}
-
-.aboutCard--galerie,
-#galerie {
-  grid-column: 2;
-  grid-row: span 2; /* ✅ pareil que intro */
-}
-
-/* option : garantir que la galerie "remplit" la carte */
-.aboutCard--galerie,
-#galerie {
-  display: flex;
-  flex-direction: column;
-}
-
-.aboutCard--galerie .aboutSlider,
-#galerie .aboutSlider {
-  flex: 1;
-  min-height: 320px; /* ajuste si besoin */
-}
-
-/* si tu veux que la slide suive la hauteur dispo */
-.aboutCard--galerie .aboutSlider__slide,
-#galerie .aboutSlider__slide {
-  height: 100%;
-  min-height: 0;
-}
-
-
-/* =========================================================
-   RESPONSIVE – ABOUT
-   Objectif : hero compact + panel lisible + tabs scroll
-========================================================= */
-
-/* ---------- TABLET (<= 1100px) : split 1 colonne, mais conserve vibe ---------- */
+/* TABLET / <=1279 : split en 1 colonne */
 @media (max-width: 1279px) {
   .menuSplit--about {
     grid-template-columns: 1fr;
     gap: 14px;
     min-height: auto;
+    
   }
 
   .menuSplit--about .menuSplit__left,
@@ -459,7 +527,11 @@
     min-height: auto;
   }
 
-  /* Hero devient une "banner card" */
+  .menuSplit--about .menuSplit__left {
+    position: relative;
+    height: 52vh;
+  }
+
   .menuHero--about {
     height: clamp(260px, 42vw, 420px);
     border-radius: 22px;
@@ -470,66 +542,27 @@
     bottom: 12px;
     font-size: clamp(40px, 7vw, 72px);
   }
-
-  /* Panel : on garde la grille, mais plus aérée */
-  .menuPanel--about {
-    border-radius: 22px;
-    padding: 14px;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    overflow: visible;
-  }
-
-  /* intro + galerie : même taille mais en 2 colonnes encore */
-  .aboutCard--intro,
-  #intro { grid-column: 1; }
-
-  .aboutCard--galerie,
-  #galerie { grid-column: 2; }
-
-  .aboutRatingsRow {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  /* facts : passe en 2 colonnes */
-  .aboutFacts { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ---------- MOBILE (<= 980px) : 1 colonne dans le panel ---------- */
+/* MOBILE / <=980 : panel 1 colonne + tabs scroll */
 @media (max-width: 980px) {
-  .menuSplit--about {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .menuHero--about {
-    height: clamp(220px, 48vw, 340px);
-    border-radius: 20px;
-  }
-
   .menuPanel--about {
-    grid-template-columns: 1fr;
+    border-radius: 22px;
     padding: 12px;
-    gap: 12px;
+
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tabs"
+      "intro"
+      "galerie"
+      "reviews"
+      "stats"
+      "histoire"
+      "contact"
+      "footer";
   }
 
-  /* toutes les cards en full width */
-  .aboutCard--intro,
-  .aboutCard--galerie,
-  .aboutCard--engagements,
-  .aboutCard--histoire,
-  .aboutCard--contact,
-  #intro, #galerie, #engagements, #histoire, #contact {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  /* tabs : en scroll horizontal façon Framer/Qitchen */
   .menuTabs--about {
-    position: sticky;
-    top: 0;
-    padding: 10px 0 12px;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -537,23 +570,31 @@
     scrollbar-width: none;
   }
 
-  .menuTabs--about::-webkit-scrollbar { height: 0; }
+  .menuTabs--about::-webkit-scrollbar {
+    height: 0;
+  }
 
   .menuTabs--about .menuTabs__tab {
     flex: 0 0 auto;
     white-space: nowrap;
-    padding: 8px 12px;
-    font-size: .88rem;
+    font-size: 0.88rem;
   }
 
-  /* ratings : en colonne */
-  .aboutRatingsRow { grid-template-columns: 1fr; }
+  .aboutRatingsRow {
+    grid-template-columns: 1fr;
+  }
 
-  /* facts : 1 colonne */
-  .aboutFacts { grid-template-columns: 1fr; }
+  .aboutFacts {
+    grid-template-columns: 1fr;
+  }
 
-  /* slider : moins haut + flèches un poil plus petites */
-  .aboutSlider__slide { min-height: 220px; }
+  .aboutStats {
+    grid-template-columns: 1fr;
+  }
+
+  .aboutSlider__slide {
+    min-height: 220px;
+  }
 
   .aboutSlider__btn {
     width: 34px;
@@ -561,13 +602,16 @@
     font-size: 20px;
   }
 
-  .aboutSlider__btn--prev { left: 8px; }
-  .aboutSlider__btn--next { right: 8px; }
+  .aboutSlider__btn--prev {
+    left: 8px;
+  }
+  .aboutSlider__btn--next {
+    right: 8px;
+  }
 
-  /* typographie */
   .aboutCard__title {
     font-size: 1rem;
-    letter-spacing: .08em;
+    letter-spacing: 0.08em;
   }
 
   .aboutCard__text {
@@ -575,12 +619,12 @@
   }
 }
 
-/* ---------- SMALL MOBILE (<= 480px) : micro-ajustements ---------- */
+/* SMALL MOBILE / <=480 */
 @media (max-width: 480px) {
   .menuHero--about .menuHero__title {
     left: 12px;
     bottom: 10px;
-    letter-spacing: .04em;
+    letter-spacing: 0.04em;
   }
 
   .aboutCard,
@@ -588,1261 +632,122 @@
     padding: 14px;
     border-radius: 18px;
   }
-
-  .aboutRatingCard { padding: 12px; }
 }
 
-/* =========================================================
-   DESKTOP – lock : Intro & Galerie même largeur
-   (à mettre TOUT EN BAS pour override les anciens spans)
-========================================================= */
-@media (min-width: 981px) {
-  .menuPanel--about {
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* ✅ colonnes parfaitement égales */
-  }
-
-  /* top row : intro + galerie 50/50 */
-  .aboutCard--intro,
-  #intro {
-    grid-column: 1;
-    grid-row: span 2;
-  }
-
-  .aboutCard--galerie,
-  #galerie {
-    grid-column: 2;
-    grid-row: span 2; /* ✅ même hauteur que intro */
-    display: flex;
-    flex-direction: column;
-    min-width: 0; /* ✅ évite les débordements qui “poussent” la colonne */
-  }
-
-  /* IMPORTANT : retire toute contrainte de largeur qui fausse la perception */
-  .aboutCard__text {
-    max-width: none; /* ✅ sinon intro paraît plus étroite visuellement */
-  }
-
-  /* La galerie remplit bien sa card */
-  .aboutCard--galerie .aboutSlider,
-  #galerie .aboutSlider {
-    flex: 1;
-    min-height: 320px;
-    min-width: 0;
-  }
-
-  .aboutCard--galerie .aboutSlider__viewport,
-  #galerie .aboutSlider__viewport {
-    height: 100%;
-  }
-
-  .aboutCard--galerie .aboutSlider__slide,
-  #galerie .aboutSlider__slide {
-    height: 100%;
-    min-height: 0;
-  }
-}
-/* =========================================================
-   ABOUT – AVIS (Google / Facebook)
-========================================================= */
-
-.aboutReviews,
-.aboutRatingsRow {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 avis = 2 colonnes */
-  gap: 14px;
-}
-
-/* la carte avis */
-.aboutReview,
-.aboutRatingCard {
-  border-radius: 22px;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(255,255,255,.10);
-  overflow: hidden;
-}
-
-/* si tu gardes <a> qui wrap tout */
-.aboutReview__link,
-.aboutRatingCard > a {
-  display: block;
-  padding: 16px;
-  color: inherit;
-  text-decoration: none;
-  height: 100%;
-}
-
-/* hover subtil */
-.aboutReview__link:hover,
-.aboutRatingCard > a:hover {
-  background: rgba(255,255,255,.03);
-  border-radius: 22px;
-}
-
-/* head */
-.aboutReview__head,
-.aboutRatingCard > a > .aboutRatingCard__stars {
-  /* (on ne se sert plus de l'ancien layout centré) */
-}
-
-.aboutReview__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-/* source */
-.aboutReview__source {
-  font-family: "Forum", serif;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  font-size: .95rem;
-  opacity: .92;
-}
-
-/* étoiles */
-.aboutReview__stars {
-  font-size: 12px;
-  letter-spacing: .22em;
-  opacity: .95;
-}
-
-/* texte avis : lisible + clamp */
-.aboutReview__text,
-.aboutRatingCard__sub {
-  margin: 0;
-  opacity: .82;
-  line-height: 1.55;
-  letter-spacing: .01em;
-  text-transform: none; /* ✅ stop uppercase */
-  text-align: left;     /* ✅ stop centré */
-
-  display: -webkit-box;
-  -webkit-line-clamp: 6;      /* ajuste (5/6/7) */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* CTA */
-.aboutReview__cta {
-  display: inline-flex;
-  margin-top: 12px;
-  font-size: .9rem;
-  opacity: .85;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-/* ---- compat si tu gardes tes anciennes classes dans le HTML ---- */
-.aboutRatingCard {
-  text-align: left; /* override de ton center */
-  padding: 0;       /* car padding géré par le lien */
-}
-
-.aboutRatingCard__title {
-  font-family: "Forum", serif;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  font-size: .95rem;
-  opacity: .92;
-  margin: 0 0 6px;
-}
-
-.aboutRatingCard__stars {
-  font-size: 12px;
-  letter-spacing: .22em;
-  opacity: .95;
-  margin: 0 0 12px;
-}
-
-/* =========================================================
-   Responsive avis
-========================================================= */
-@media (max-width: 980px) {
-  .aboutReviews,
+/* REVIEWS: tablette = 2 colonnes + 1 en dessous */
+@media (max-width: 1100px) {
   .aboutRatingsRow {
-    grid-template-columns: 1fr; /* 1 colonne */
-  }
-
-  .aboutReview__text,
-  .aboutRatingCard__sub {
-    -webkit-line-clamp: 7; /* un peu plus sur mobile */
-  }
-}
-
-
-/* =========================================================
-   ABOUT – AVIS (Qitchen polish)
-   -> colle ce bloc TOUT EN BAS pour override
-========================================================= */
-
-/* grille : 2 en haut + 1 en bas (centrée) sur desktop */
-.aboutRatingsRow {
-  grid-column: 1 / -1;
-  display: grid;
-  gap: 14px;
-
-  /* Qitchen : 2 colonnes */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: 1fr; /* ✅ mêmes hauteurs */
-  align-items: stretch;
-}
-
-/* si 3 cartes : la 3e passe en dessous et prend toute la largeur */
-.aboutRatingsRow > .aboutRatingCard:nth-child(3) {
-  grid-column: 1 / -1;
-}
-
-/* card */
-.aboutRatingCard {
-  border-radius: 18px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.10);
-  overflow: hidden;
-  min-width: 0;
-}
-
-/* lien full-card */
-.aboutRatingCard > a {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 14px 14px 12px;
-  text-decoration: none;
-  color: inherit;
-
-  /* ✅ Qitchen glow doux */
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.06), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.10), transparent);
-
-  transition: transform .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
-}
-
-.aboutRatingCard > a:hover {
-  transform: translateY(-1px);
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.085), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.14), transparent);
-}
-
-.aboutRatingCard > a:focus-visible {
-  outline: 2px solid rgba(255,255,255,.22);
-  outline-offset: 3px;
-  border-radius: 16px;
-}
-
-/* ---------- Header façon Qitchen (source + stars alignés) ---------- */
-.aboutRatingCard__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-}
-
-.aboutRatingCard__meta {
-  min-width: 0;
-}
-
-.aboutRatingCard__title {
-  font-family: "Forum", serif;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  font-size: .95rem;
-  line-height: 1.1;
-  opacity: .92;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.aboutRatingCard__sub {
-  margin-top: 4px;
-  font-size: .78rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  opacity: .65;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* étoiles / icône press */
-.aboutRatingCard__stars {
-  flex: 0 0 auto;
-  font-size: 12px;
-  letter-spacing: .22em;
-  opacity: .92;
-  transform: translateY(-1px);
-}
-
-/* ---------- Excerpt propre (clamp) ---------- */
-.aboutRatingCard__excerpt {
-  margin: 0;
-  opacity: .82;
-  line-height: 1.55;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* ✅ Qitchen = court */
-  overflow: hidden;
-}
-
-/* CTA collé en bas */
-.aboutRatingCard__cta {
-  margin-top: auto;
-  padding-top: 6px;
-
-  font-size: .85rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  opacity: .78;
-}
-
-/* ---------- Variante Presse : micro-diff (badge) ---------- */
-.aboutRatingCard--press .aboutRatingCard__stars {
-  letter-spacing: 0;
-  font-size: 14px;
-}
-
-/* =========================================================
-   Responsive
-========================================================= */
-
-@media (max-width: 980px) {
-  .aboutRatingsRow {
-    grid-template-columns: 1fr; /* ✅ stack */
-  }
-
-  .aboutRatingsRow > .aboutRatingCard:nth-child(3) {
-    grid-column: auto;
-  }
-
-  .aboutRatingCard > a {
-    padding: 14px;
-  }
-
-  .aboutRatingCard__excerpt {
-    -webkit-line-clamp: 4;
-  }
-}
-/* =========================================================
-   ABOUT – AVIS (Qitchen row align)
-   -> 3 cartes alignées, mêmes tailles, même hauteur
-========================================================= */
-
-.aboutRatingsRow{
-  grid-column: 1 / -1;
-  display: grid;
-  gap: 14px;
-
-  /* ✅ 3 cartes parfaitement alignées */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
-}
-
-/* la card doit remplir la cellule */
-.aboutRatingCard{
-  min-width: 0;
-  border-radius: 18px;
-  overflow: hidden;
-
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-/* lien full-card = layout interne */
-.aboutRatingCard > a{
-  height: 100%;
-  min-height: 100%;
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 14px 14px 12px;
-  text-decoration: none;
-  color: inherit;
-
-  /* vibe Qitchen */
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.06), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.10), transparent);
-
-  transition: transform .18s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
-}
-
-.aboutRatingCard > a:hover{
-  transform: translateY(-1px);
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.085), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.14), transparent);
-}
-
-.aboutRatingCard > a:focus-visible{
-  outline: 2px solid rgba(255,255,255,.22);
-  outline-offset: 3px;
-  border-radius: 16px;
-}
-
-/* ---------- Header aligné (source + stars) ---------- */
-.aboutRatingCard__top{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-}
-
-.aboutRatingCard__title{
-  font-family: "Forum", serif;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  font-size: .95rem;
-  line-height: 1.1;
-  opacity: .92;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.aboutRatingCard__stars{
-  flex: 0 0 auto;
-  font-size: 12px;
-  letter-spacing: .22em;
-  opacity: .92;
-}
-
-/* ---------- Extrait clampé (sinon ça casse l’alignement) ---------- */
-.aboutRatingCard__sub{
-  margin-top: 6px;
-  opacity: .80;
-  line-height: 1.55;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4; /* ✅ même hauteur visuelle */
-  overflow: hidden;
-}
-
-/* CTA collé en bas, style Qitchen */
-.aboutRatingCard__cta{
-  margin-top: auto;
-  padding-top: 6px;
-
-  font-size: .85rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  opacity: .78;
-}
-
-/* =========================================================
-   Breakpoints
-========================================================= */
-
-/* tablette : 2 colonnes + 1 en dessous */
-@media (max-width: 1100px){
-  .aboutRatingsRow{
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .aboutRatingsRow > .aboutRatingCard:nth-child(3){
+  .aboutRatingsRow > :nth-child(3) {
     grid-column: 1 / -1;
   }
 }
 
-/* mobile : stack */
-@media (max-width: 700px){
-  .aboutRatingsRow{
+/* REVIEWS: mobile stack */
+@media (max-width: 700px) {
+  .aboutRatingsRow {
     grid-template-columns: 1fr;
   }
-  .aboutRatingsRow > .aboutRatingCard:nth-child(3){
+  .aboutRatingsRow > :nth-child(3) {
     grid-column: auto;
   }
-}/* =========================================================
-   ABOUT (Qitchen-like) – menuSplit + panel en cards
-   (version clean / sans doublons / prête pour le nouveau HTML)
-========================================================= */
-
-/* ---------- SPLIT ---------- */
-.menuSplit--about {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 18px;
-  align-items: stretch;
-  min-height: 100vh;
-}
-
-.menuSplit--about .menuSplit__left,
-.menuSplit--about .menuSplit__right {
-  min-height: 100vh;
-}
-@media (max-width: 1279px) {
-  .menuSplit--about .menuSplit__left {
-    position: relative;
-    height: 52vh; /* ou ce que tu veux */
+  .aboutReview__text {
+    -webkit-line-clamp: 5;
   }
 }
-/* ---------- LEFT HERO ---------- */
-.menuHero--about {
-  position: relative;
-  height: 100%;
-  border-radius: 26px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
 
-.menuHero--about .menuHero__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: saturate(0.92) contrast(1.02);
-  transform: scale(1.02);
-}
-
-/* overlay sombre subtil comme Qitchen */
-.menuHero--about::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(80% 70% at 20% 80%, rgba(0,0,0,.55), transparent 55%),
-    linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05));
-  pointer-events: none;
-}
-
-.menuHero--about .menuHero__title {
-  position: absolute;
-  left: 18px;
-  bottom: 14px;
-  margin: 0;
-  z-index: 2;
-
-  font-family: "Forum", serif;
-  font-size: clamp(52px, 5.2vw, 96px);
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.92);
-  text-shadow: 0 10px 40px rgba(0,0,0,.55);
-}
-
-/* ---------- RIGHT PANEL (container) ---------- */
-.menuPanel--about {
-  height: 100%;
-  border-radius: 26px;
-  padding: 16px;
-  overflow: visible;
-
-  background: rgba(10,10,10,.55);
-  border: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(12px);
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  align-content: start;
-}
-
-/* tabs + footer en pleine largeur dans la grille */
-.menuTabs--about { grid-column: 1 / -1; }
-.menuFooter      { grid-column: 1 / -1; }
-
-/* ---------- TABS ---------- */
-.menuTabs--about {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-
-  padding: 10px 0 14px;
-  background: linear-gradient(to bottom, rgba(10,10,10,.85), rgba(10,10,10,0));
-  backdrop-filter: blur(10px);
-}
-
-.menuTabs--about .menuTabs__tab {
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: .9rem;
-  opacity: .85;
-
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
-}
-
-.menuTabs--about .menuTabs__tab.is-active {
-  opacity: 1;
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.18);
-}
-
-/* =========================================================
-   CARDS (nouvelle base)
-   - si tu gardes menuSection: tu peux ajouter .aboutCard en plus
-========================================================= */
-
-/* card générique */
-.aboutCard,
-.menuSection--about {
-  border-radius: 22px;
-  padding: 16px;
-  margin: 0;
-
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-/* titre de card (remplace l'ancien header à lignes) */
-.aboutCard__title {
-  font-family: "Forum", serif;
-  letter-spacing: .10em;
-  text-transform: uppercase;
-  font-size: 1.05rem;
-  margin: 0 0 10px;
-  opacity: .95;
-}
-
-.aboutCard__text {
-  margin: 0 0 14px;
-  opacity: .82;
-  max-width: 70ch;
-}
-
-/* actions (intro/cta) */
-.aboutActions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* =========================================================
-   PLACEMENT GRID (calé Qitchen)
-   -> fonctionne avec le nouveau HTML (aboutCard--*)
-   -> si tu restes sur ids: garde aussi les règles #intro etc.
-========================================================= */
-
-/* Nouveau HTML recommandé */
-.aboutCard--intro   { grid-column: 1; grid-row: span 2; }
-.aboutCard--galerie { grid-column: 2; grid-row: span 3; }
-
-.aboutCard--engagements { grid-column: 1; }
-.aboutCard--histoire    { grid-column: 2; grid-row: span 2; }
-
-.aboutCard--contact { grid-column: 1; }
-
-/* Compat: si tu utilises encore tes <section id="..."> */
-#intro        { grid-column: 1; grid-row: span 2; }
-#galerie      { grid-column: 2; grid-row: span 3; }
-#engagements  { grid-column: 1; }
-#histoire     { grid-column: 2; grid-row: span 2; }
-#contact      { grid-column: 1; }
-
-/* =========================================================
-   RATING ROW (3 cards sœurs, pas une "section" qui contient)
-========================================================= */
-
-/* row (wrapper) */
-.aboutRatingsRow {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-/* card rating */
-.aboutRatingCard {
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(255,255,255,.10);
-  text-align: center;
-}
-
-.aboutRatingCard__stars {
-  font-size: 13px;
-  letter-spacing: .22em;
-  opacity: .95;
-  margin-bottom: 10px;
-}
-
-.aboutRatingCard__title {
-  font-family: "Forum", serif;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  font-size: 1rem;
-  opacity: .92;
-  line-height: 1.1;
-}
-
-.aboutRatingCard__sub {
-  margin-top: 6px;
-  font-size: .85rem;
-  opacity: .70;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-/* =========================================================
-   ENGAGEMENTS (pills)
-========================================================= */
-
-.aboutPills {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.aboutPills__pill {
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-.aboutPills__title {
-  font-family: "Forum", serif;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  display: block;
-}
-
-.aboutPills__sub {
-  display: block;
-  margin-top: 4px;
-  opacity: .75;
-  font-size: .9rem;
-}
-
-/* =========================================================
-   FACTS (histoire)
-========================================================= */
-
-.aboutFacts {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.aboutFacts__item {
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-.aboutFacts__k {
-  display: block;
-  opacity: .65;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  font-size: .8rem;
-}
-
-.aboutFacts__v {
-  display: block;
-  margin-top: 4px;
-}
-
-/* =========================================================
-   SLIDER (pleine largeur, dans une card)
-========================================================= */
-
-.aboutSlider {
-  position: relative;
-  border-radius: 18px;
-}
-
-.aboutSlider__viewport {
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 18px;
-  outline: none;
-}
-
-.aboutSlider__viewport::-webkit-scrollbar { height: 0; }
-
-.aboutSlider__track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  gap: 0;
-}
-
-.aboutSlider__slide {
-  scroll-snap-align: start;
-  border-radius: 18px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.03);
-  margin: 0;
-  min-height: 300px;
-}
-
-.aboutSlider__slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.aboutSlider__btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.35);
-  backdrop-filter: blur(10px);
-
-  display: grid;
-  place-items: center;
-
-  font-size: 22px;
-  line-height: 1;
-  color: white;
-  opacity: .85;
-}
-
-.aboutSlider__btn--prev { left: 10px; }
-.aboutSlider__btn--next { right: 10px; }
-.aboutSlider__btn:hover { opacity: 1; }
-
+/* slider hauteur */
 @media (max-width: 900px) {
-  .aboutSlider__slide { min-height: 220px; }
+  .aboutSlider__slide {
+    min-height: 220px;
+  }
 }
 
 /* =========================================================
-   FOOTER
-========================================================= */
-.menuFooter {
-  opacity: .65;
-  padding: 6px 2px 2px;
-}
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-@media (max-width: 980px) {
-  .menuSplit--about { grid-template-columns: 1fr; }
-
-  .menuPanel--about { grid-template-columns: 1fr; }
-
-  .aboutRatingsRow  { grid-template-columns: 1fr; }
-
-  .aboutFacts { grid-template-columns: 1fr; }
-
-  /* si tu utilises les ids */
-  #intro, #galerie, #engagements, #histoire, #contact { grid-column: 1; grid-row: auto; }
-
-  /* si tu utilises les modifiers */
-  .aboutCard--intro,
-  .aboutCard--galerie,
-  .aboutCard--engagements,
-  .aboutCard--histoire,
-  .aboutCard--contact { grid-column: 1; grid-row: auto; }
-}
-
-
-/* ===== TOP ROW: INTRO & GALERIE même hauteur (desktop) ===== */
-.aboutCard--intro,
-#intro {
-  grid-column: 1;
-  grid-row: span 2;
-}
-
-.aboutCard--galerie,
-#galerie {
-  grid-column: 2;
-  grid-row: span 2; /* ✅ pareil que intro */
-}
-
-/* option : garantir que la galerie "remplit" la carte */
-.aboutCard--galerie,
-#galerie {
-  display: flex;
-  flex-direction: column;
-}
-
-.aboutCard--galerie .aboutSlider,
-#galerie .aboutSlider {
-  flex: 1;
-  min-height: 320px; /* ajuste si besoin */
-}
-
-/* si tu veux que la slide suive la hauteur dispo */
-.aboutCard--galerie .aboutSlider__slide,
-#galerie .aboutSlider__slide {
-  height: 100%;
-  min-height: 0;
-}
-
-
-/* =========================================================
-   RESPONSIVE – ABOUT
-   Objectif : hero compact + panel lisible + tabs scroll
+   ABOUT – ANTI OVERLAP (force grid flow)
+   -> COLLE TOUT EN BAS
 ========================================================= */
 
-/* ---------- TABLET (<= 1100px) : split 1 colonne, mais conserve vibe ---------- */
-@media (max-width: 1279px) {
-  .menuSplit--about {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    min-height: auto;
+.menuPanel--about {
+  position: relative;
+  isolation: isolate; /* évite les z-index chelous d’ailleurs */
+}
+
+/* si un style global a mis du absolute/inset, on neutralise */
+.menuPanel--about > * {
+  position: relative !important;  /* IMPORTANT: remet dans le flow */
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  transform: none !important;     /* au cas où un translate traîne */
+  margin: 0;                      /* évite marges négatives */
+  min-width: 0;
+}
+/* =========================
+   ABOUT — scroll only right
+   (desktop)
+========================= */
+
+/* Empêche le scroll global (uniquement sur desktop) */
+@media (min-width: 1280px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
   }
 
+  /* ton main doit prendre le viewport */
+  .siteMain {
+    height: 100vh;
+    overflow: hidden;
+    scroll-snap-type: none; /* si snapY te gêne sur cette page */
+  }
+
+  .menuSplit--about {
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden; /* important */
+  }
+
+  /* gauche fixe */
+  .menuSplit--about .menuSplit__left {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* conteneur droite */
+  .menuSplit--about .menuSplit__right {
+    height: 100vh;
+    overflow: hidden; /* le scroll doit être sur .menuPanel */
+  }
+
+  /* ✅ le scroll est ici */
+  .menuPanel--about {
+    height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* (option) scrollbar plus clean */
+  .menuPanel--about::-webkit-scrollbar { width: 10px; }
+}
+@media (max-width: 1279px) {
+  /* IMPORTANT : annule les min-height 100vh définis plus haut */
+  .menuSplit--about,
   .menuSplit--about .menuSplit__left,
   .menuSplit--about .menuSplit__right {
-    min-height: auto;
-  }
-
-  /* Hero devient une "banner card" */
-  .menuHero--about {
-    height: clamp(260px, 42vw, 420px);
-    border-radius: 22px;
-  }
-
-  .menuHero--about .menuHero__title {
-    left: 14px;
-    bottom: 12px;
-    font-size: clamp(40px, 7vw, 72px);
-  }
-
-  /* Panel : on garde la grille, mais plus aérée */
-  .menuPanel--about {
-    border-radius: 22px;
-    padding: 14px;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    min-height: 0;
+    height: auto;
     overflow: visible;
   }
 
-  /* intro + galerie : même taille mais en 2 colonnes encore */
-  .aboutCard--intro,
-  #intro { grid-column: 1; }
-
-  .aboutCard--galerie,
-  #galerie { grid-column: 2; }
-
-  .aboutRatingsRow {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  /* facts : passe en 2 colonnes */
-  .aboutFacts { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* ---------- MOBILE (<= 980px) : 1 colonne dans le panel ---------- */
-@media (max-width: 980px) {
-  .menuSplit--about {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .menuHero--about {
-    height: clamp(220px, 48vw, 340px);
-    border-radius: 20px;
-  }
-
+  /* le panel ne doit pas être un scroll container en mobile */
   .menuPanel--about {
-    grid-template-columns: 1fr;
-    padding: 12px;
-    gap: 12px;
-  }
-
-  /* toutes les cards en full width */
-  .aboutCard--intro,
-  .aboutCard--galerie,
-  .aboutCard--engagements,
-  .aboutCard--histoire,
-  .aboutCard--contact,
-  #intro, #galerie, #engagements, #histoire, #contact {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  /* tabs : en scroll horizontal façon Framer/Qitchen */
-  .menuTabs--about {
-    position: sticky;
-    top: 0;
-    padding: 10px 0 12px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 8px;
-    scrollbar-width: none;
-  }
-
-  .menuTabs--about::-webkit-scrollbar { height: 0; }
-
-  .menuTabs--about .menuTabs__tab {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding: 8px 12px;
-    font-size: .88rem;
-  }
-
-  /* ratings : en colonne */
-  .aboutRatingsRow { grid-template-columns: 1fr; }
-
-  /* facts : 1 colonne */
-  .aboutFacts { grid-template-columns: 1fr; }
-
-  /* slider : moins haut + flèches un poil plus petites */
-  .aboutSlider__slide { min-height: 220px; }
-
-  .aboutSlider__btn {
-    width: 34px;
-    height: 34px;
-    font-size: 20px;
-  }
-
-  .aboutSlider__btn--prev { left: 8px; }
-  .aboutSlider__btn--next { right: 8px; }
-
-  /* typographie */
-  .aboutCard__title {
-    font-size: 1rem;
-    letter-spacing: .08em;
-  }
-
-  .aboutCard__text {
-    max-width: none;
-  }
-}
-
-/* ---------- SMALL MOBILE (<= 480px) : micro-ajustements ---------- */
-@media (max-width: 480px) {
-  .menuHero--about .menuHero__title {
-    left: 12px;
-    bottom: 10px;
-    letter-spacing: .04em;
-  }
-
-  .aboutCard,
-  .menuSection--about {
-    padding: 14px;
-    border-radius: 18px;
-  }
-
-  .aboutRatingCard { padding: 12px; }
-}
-
-/* =========================================================
-   DESKTOP – lock : Intro & Galerie même largeur
-   (à mettre TOUT EN BAS pour override les anciens spans)
-========================================================= */
-@media (min-width: 981px) {
-  .menuPanel--about {
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* ✅ colonnes parfaitement égales */
-  }
-
-  /* top row : intro + galerie 50/50 */
-  .aboutCard--intro,
-  #intro {
-    grid-column: 1;
-    grid-row: span 2;
-  }
-
-  .aboutCard--galerie,
-  #galerie {
-    grid-column: 2;
-    grid-row: span 2; /* ✅ même hauteur que intro */
-    display: flex;
-    flex-direction: column;
-    min-width: 0; /* ✅ évite les débordements qui “poussent” la colonne */
-  }
-
-  /* IMPORTANT : retire toute contrainte de largeur qui fausse la perception */
-  .aboutCard__text {
-    max-width: none; /* ✅ sinon intro paraît plus étroite visuellement */
-  }
-
-  /* La galerie remplit bien sa card */
-  .aboutCard--galerie .aboutSlider,
-  #galerie .aboutSlider {
-    flex: 1;
-    min-height: 320px;
-    min-width: 0;
-  }
-
-  .aboutCard--galerie .aboutSlider__viewport,
-  #galerie .aboutSlider__viewport {
-    height: 100%;
-  }
-
-  .aboutCard--galerie .aboutSlider__slide,
-  #galerie .aboutSlider__slide {
-    height: 100%;
-    min-height: 0;
-  }
-}
-/* =========================================================
-   ABOUT – AVIS (Qitchen cards)
-========================================================= */
-
-.aboutRatingsRow{
-  grid-column: 1 / -1;
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
-}
-
-/* base card */
-.aboutReview{
-  min-width: 0;
-  border-radius: 18px;
-  overflow: hidden;
-
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-/* full card link */
-.aboutReview__link{
-  height: 100%;
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 14px 14px 12px;
-  color: inherit;
-  text-decoration: none;
-
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.06), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.10), transparent);
-
-  transition: transform .18s ease, background .18s ease, opacity .18s ease;
-}
-
-.aboutReview__link:hover{
-  transform: translateY(-1px);
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.085), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.14), transparent);
-}
-
-.aboutReview__link:focus-visible{
-  outline: 2px solid rgba(255,255,255,.22);
-  outline-offset: 3px;
-  border-radius: 16px;
-}
-
-/* header row */
-.aboutReview__head{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-}
-
-/* source */
-.aboutReview__source{
-  font-family: "Forum", serif;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  font-size: .95rem;
-  line-height: 1.1;
-  opacity: .92;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* stars / icon */
-.aboutReview__stars{
-  flex: 0 0 auto;
-  font-size: 1.8rem;
-  letter-spacing: .22em;
-  opacity: .92;
-  transform: translateY(-1px);
-}
-
-/* text */
-.aboutReview__text{
-  margin: 0;
-  opacity: .82;
-  line-height: 1.55;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4; /* ✅ garde des hauteurs proches */
-  overflow: hidden;
-}
-
-/* CTA pinned bottom */
-.aboutReview__cta{
-  margin-top: auto;
-  padding-top: 6px;
-
-  font-size: .85rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  opacity: .78;
-}
-
-/* petite variante presse */
-.aboutReview--press {
-  letter-spacing: 0;
-  font-size: 14px;
-}
-
-/* =========================================================
-   Responsive
-========================================================= */
-
-/* tablette : 2 colonnes + 1 en dessous */
-@media (max-width: 1100px){
-  //.aboutRatingsRow{
-   // grid-template-columns: repeat(2, minmax(0, 1fr));
-  //}
-  //.aboutRatingsRow > :nth-child(3){
-   // grid-column: 1 / -1;
- // }
-}
-
-/* mobile : stack */
-@media (max-width: 700px){
-  .aboutRatingsRow{
-    grid-template-columns: 1fr;
-  }
-  .aboutRatingsRow > :nth-child(3){
-    grid-column: auto;
-  }
-  .aboutReview__text{
-    -webkit-line-clamp: 5;
+    height: auto;
+    overflow: visible;
   }
 }

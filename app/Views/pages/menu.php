@@ -1,5 +1,5 @@
 <main class="siteMain siteContainer snapY">
-    <section class="menuSplit">
+    <section class="menuSplit" data-wheel-redirect data-wheel-target=".menuPanel--menu">
         <!-- LEFT : visuel -->
         <div class="menuSplit__left" aria-label="Visuel de la carte">
             <div class="menuHero">
@@ -10,7 +10,7 @@
 
         <!-- RIGHT : panel carte -->
         <div class="menuSplit__right">
-            <div class="menuPanel">
+            <div class="menuPanel menuPanel--menu">
                 <!-- tabs -->
                 <nav class="menuTabs" aria-label="Catégories">
                     <a href="#paniers" class="menuTabs__tab is-active">Paniers</a>
@@ -558,11 +558,12 @@
                             </div>
                         </article>
                     </div>
+                    <footer class="menuFooter">
+                        <p>© <?php echo date('Y') ?> Traiteur Passion
+                        </p>
+                    </footer>
             </div>
-            <footer class="menuFooter">
-                <p>© <?php echo date('Y') ?> Traiteur Passion
-                </p>
-            </footer>
+
         </div>
 
     </section>
