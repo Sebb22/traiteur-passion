@@ -1,0 +1,360 @@
+/* =========================================================
+   CONTACT — Qitchen-like split + form card (clean SCSS)
+   Objectif :
+   - rail central (H2 + form + infos alignés)
+   - form “reservation-like”
+   - scroll uniquement à droite en desktop
+   - responsive propre
+========================================================= */
+
+/* =========================================================
+   SPLIT LAYOUT
+========================================================= */
+.menuSplit--contact {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 18px;
+  min-height: 100vh;
+}
+
+/* =========================================================
+   LEFT HERO
+========================================================= */
+.menuHero--contact {
+  position: relative;
+  height: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .menuHero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.02);
+    filter: saturate(0.92) contrast(1.02);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        80% 70% at 20% 80%,
+        rgba(0, 0, 0, 0.55),
+        transparent 55%
+      ),
+      linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.05));
+    pointer-events: none;
+  }
+
+  .menuHero__title {
+    position: absolute;
+    left: 18px;
+    bottom: 14px;
+    margin: 0;
+    z-index: 2;
+
+    font-family: "Forum", serif;
+    font-size: clamp(52px, 5.2vw, 96px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* =========================================================
+   RIGHT PANEL (rail centré)
+========================================================= */
+.menuPanel--contact {
+  border-radius: 26px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(
+      900px 600px at 50% 10%,
+      rgba(255, 255, 255, 0.06),
+      rgba(0, 0, 0, 0)
+    ),
+    rgba(10, 10, 10, 0.55);
+  backdrop-filter: blur(12px);
+
+ 
+  gap: 18px;
+
+  /* ✅ rail central : tous les blocs (H2 / card / infos / footer) alignés */
+  justify-items: center;
+
+  > * {
+    width: min(640px, 100%);
+  }
+}
+
+/* =========================================================
+   HEADER (H2 + sous-titre)
+========================================================= */
+.contactHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
+  gap: 18px;
+
+  padding: 18px 8px 10px;
+  text-align: center;
+
+  &__title {
+    margin: 0;
+    font-family: "Forum", serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: clamp(22px, 2vw, 30px);
+  }
+
+  &__sub {
+    grid-column: 1 / -1;
+    margin: 8px 0 0;
+    opacity: 0.72;
+    max-width: 60ch;
+    justify-self: center;
+  }
+}
+
+/* =========================================================
+   FORM CARD (Qitchen-like)
+========================================================= */
+.contactCard {
+  border-radius: 22px;
+  padding: 26px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(
+      900px 520px at 50% 0%,
+      rgba(255, 255, 255, 0.05),
+      rgba(0, 0, 0, 0)
+    ),
+    rgba(0, 0, 0, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* grille “reservation-like” */
+.contactGrid--reservation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* champs */
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+
+  &__label {
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.6);
+  }
+
+  &__input {
+    width: 100%;
+    height: 44px;
+
+    border-radius: 12px;
+    padding: 0 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: none;
+
+    color: rgba(239, 231, 210, 0.88);
+
+    transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+
+    &::placeholder {
+      color: rgba(239, 231, 210, 0.35);
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      border-color: rgba(239, 231, 210, 0.22);
+      box-shadow: 0 0 0 3px rgba(239, 231, 210, 0.1);
+    }
+  }
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+
+  &__textarea {
+    height: auto;
+    min-height: 170px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    resize: vertical;
+  }
+}
+
+/* select arrow */
+select.field__input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+  cursor: pointer;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(239, 231, 210, 0.55) 50%),
+    linear-gradient(135deg, rgba(239, 231, 210, 0.55) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 52%,
+    calc(100% - 14px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* CTA “bar” */
+.contactCta {
+  width: 100%;
+  margin-top: 18px;
+  height: 44px;
+  border-radius: 12px;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  /* si ton .btn--primary force un style trop différent,
+     tu peux décommenter pour “neutraliser” façon Qitchen */
+  
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  color: rgba(239,231,210,.78);
+  &:hover{
+    background: rgba(255,255,255,.05);
+    border-color: rgba(239,231,210,.18);
+    color: rgba(239,231,210,.92);
+  }
+  
+}
+
+/* =========================================================
+   INFOS
+========================================================= */
+.contactInfos {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.contactInfo {
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
+
+  &__k {
+    display: block;
+    opacity: 0.65;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+
+  &__v {
+    display: block;
+    margin-top: 6px;
+    color: rgba(239, 231, 210, 0.9);
+    text-decoration: none;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+/* TABLET / <=1279 : split en 1 colonne */
+@media (max-width: 1279px) {
+  .menuSplit--contact {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .menuSplit--contact .menuSplit__left {
+    height: 52vh;
+    position: relative;
+  }
+}
+
+/* MOBILE / <=980 */
+@media (max-width: 980px) {
+  .menuPanel--contact {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .contactCard {
+    padding: 18px 16px;
+  }
+
+  .contactGrid--reservation {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .contactInfos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   DESKTOP : scroll only right (>=1280)
+========================================================= */
+@media (min-width: 1280px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .siteMain {
+    height: 100vh;
+    overflow: hidden;
+    scroll-snap-type: none;
+  }
+
+  .menuSplit--contact {
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .menuSplit--contact .menuSplit__left {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .menuSplit--contact .menuSplit__right {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .menuPanel--contact {
+    height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}

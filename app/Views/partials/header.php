@@ -39,11 +39,6 @@
                     <span class="menu__desc">Menus de saison, pièces cocktail, buffets</span>
                 </a>
 
-                <a class="menu__link" href="/prestations">
-                    <span class="menu__label">Prestations</span>
-                    <span class="menu__desc">Mariages, entreprises, réceptions privées</span>
-                </a>
-
                 <a class="menu__link" href="/a-propos">
                     <span class="menu__label">Nous découvrir</span>
                     <span class="menu__desc">L’équipe, la méthode, nos engagements</span>

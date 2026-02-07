@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace App\Controllers;
 
@@ -26,4 +26,5 @@ final class HomeController
     {
         View::render('pages/about', ['title' => 'Traiteur Passion — À propos']);
     }
+
 }
