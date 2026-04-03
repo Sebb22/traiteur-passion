@@ -1,13 +1,15 @@
 {
-  "name": "traiteur-passion",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build"
-  },
-  "devDependencies": {
-    "vite": "^5.4.0",
-    "sass": "^1.77.0"
-  }
+    "name": "traiteur-passion",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "fix:optional-chaining": "node scripts/fix-optional-chaining.mjs",
+        "check:optional-chaining": "node scripts/check-optional-chaining.mjs",
+        "dev": "npm run fix:optional-chaining && npm run check:optional-chaining && vite",
+        "build": "npm run fix:optional-chaining && npm run check:optional-chaining && vite build"
+    },
+    "devDependencies": {
+        "vite": "^5.4.0",
+        "sass": "^1.77.0"
+    }
 }

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare (strict_types = 1);
 
 /**
  * Bootstrap application
@@ -8,13 +8,36 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use App\Core\App;
-use App\Core\Router;
 use App\Core\Config;
+use App\Core\Router;
+use App\Core\Navigation;
 
 /**
  * Load env
  */
 Config::load(dirname(__DIR__) . '/.env');
+
+/**
+ * Secure session
+ */
+$isHttps = (
+    (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['SERVER_PORT'] ?? null) === '443')
+);
+
+session_name('TPSESSID');
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path'     => '/',
+    'domain'   => '',
+    'secure'   => $isHttps,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 /**
  * App config

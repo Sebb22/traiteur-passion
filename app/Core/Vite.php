@@ -48,7 +48,7 @@ final class Vite
 
     private static function manifest(): array
     {
-        $path = dirname(__DIR__, 2) . '/public/build/manifest.json';
+        $path = dirname(__DIR__, 2) . '/public/build/.vite/manifest.json';
 
         if (!file_exists($path)) {
             throw new \RuntimeException("Vite manifest introuvable: $path");

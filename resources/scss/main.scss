@@ -6,11 +6,13 @@
 
 @use "components/header";
 @use "components/footer";
-@use 'components/motions';
+@use "components/motions";
 @use "components/buttons";
-
 
 @use "pages/home/home";
 @use "pages/menu/menu";
 @use "pages/about/about";
-@use 'pages/contact/contact';
+@use "pages/contact/contact";
+@use "pages/admin/admin";
+@use "pages/admin/login";
+@use "pages/blog";

@@ -8,16 +8,16 @@
 ========================================================= */
 
 .menuSplit--about {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 18px;
-  align-items: stretch;
-  min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+    min-height: 100vh;
 }
 
 .menuSplit--about .menuSplit__left,
 .menuSplit--about .menuSplit__right {
-  min-height: 100vh;
+    min-height: 100vh;
 }
 
 /* =========================================================
@@ -25,47 +25,45 @@
 ========================================================= */
 
 .menuHero--about {
-  position: relative;
-  height: 100%;
-  border-radius: 26px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-       
+    position: relative;
+    height: 100%;
+    border-radius: 26px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .menuHero--about .menuHero__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: saturate(0.92) contrast(1.02);
-  transform: scale(1.02);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: saturate(0.92) contrast(1.02);
+    transform: scale(1.02);
 }
 
 .menuHero--about::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(80% 70% at 20% 80%, rgba(0, 0, 0, 0.55), transparent 55%),
-    linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.05));
-  pointer-events: none;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(80% 70% at 20% 80%, rgba(0, 0, 0, 0.55), transparent 55%),
+        linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.05));
+    pointer-events: none;
 }
 
 .menuHero--about .menuHero__title {
-  position: absolute;
-  left: 18px;
-  bottom: 14px;
-  margin: 0;
-  z-index: 2;
-
-  font-family: "Forum", serif;
-  font-size: clamp(52px, 5.2vw, 96px);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+    position: absolute;
+    left: 18px;
+    bottom: 14px;
+    margin: 0;
+    z-index: 2;
+    font-family: "Forum", serif;
+    font-size: clamp(52px, 5.2vw, 96px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
 }
 
 /* =========================================================
@@ -73,55 +71,60 @@
 ========================================================= */
 
 .menuPanel--about {
-  height: 100%;
-  border-radius: 26px;
-  padding: 16px;
-  overflow: visible;
-  background: rgba(10, 10, 10, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-
-  display: grid;
-  gap: 14px;
-  align-content: start;
-
-  /* ✅ SINGLE SOURCE OF TRUTH */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-areas:
-    "tabs     tabs"
-    "intro    galerie"
-    "intro    galerie"
-    "reviews  reviews"
-    "stats    stats"      /* ✅ FULL WIDTH */
-    "histoire histoire"   /* ✅ (option) full width aussi, plus clean */
-    "contact  contact"
-    "footer   footer";
+    height: 100%;
+    border-radius: 26px;
+    padding: 16px;
+    overflow: visible;
+    background: rgba(10, 10, 10, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    /* ✅ SINGLE SOURCE OF TRUTH */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+        "tabs     tabs" "intro    galerie" "intro    galerie" "reviews  reviews" "stats    stats" /* ✅ FULL WIDTH */
+        "histoire histoire" /* ✅ (option) full width aussi, plus clean */
+        "team     team" "contact  contact" "footer   footer";
 }
 
 /* zones */
+
 .menuTabs--about {
-  grid-area: tabs;
+    grid-area: tabs;
 }
+
 .aboutCard--intro {
-  grid-area: intro;
+    grid-area: intro;
 }
+
 .aboutCard--galerie {
-  grid-area: galerie;
+    grid-area: galerie;
 }
+
 .aboutRatingsRow {
-  grid-area: reviews;
+    grid-area: reviews;
 }
+
 .aboutCard--stats {
-  grid-area: stats;
+    grid-area: stats;
 }
+
 .aboutCard--histoire {
-  grid-area: histoire;
+    grid-area: histoire;
 }
+
+.aboutCard--team {
+    grid-area: team;
+}
+
 .aboutCard--contact {
-  grid-area: contact;
+    grid-area: contact;
 }
+
 .menuFooter {
-  grid-area: footer;
+    grid-area: footer;
 }
 
 /* =========================================================
@@ -129,37 +132,30 @@
 ========================================================= */
 
 .menuTabs--about {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-
-  padding: 10px 0 14px;
-  background: linear-gradient(
-    to bottom,
-    rgba(10, 10, 10, 0.85),
-    rgba(10, 10, 10, 0)
-  );
-  backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 0 14px;
+    background: linear-gradient(to bottom, rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0));
+    backdrop-filter: blur(10px);
 }
 
 .menuTabs--about .menuTabs__tab {
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  opacity: 0.85;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    opacity: 0.85;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .menuTabs--about .menuTabs__tab.is-active {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* =========================================================
@@ -168,34 +164,37 @@
 
 .aboutCard,
 .menuSection--about {
-  border-radius: 22px;
-  padding: 16px;
-  margin: 0;
-
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-width: 0; /* ✅ évite les débordements en grid */
+    border-radius: 22px;
+    padding: 16px;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0;
+    /* ✅ évite les débordements en grid */
 }
 
 .aboutCard__title {
-  font-family: "Forum", serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-size: 1.05rem;
-  margin: 0 0 10px;
-  opacity: 0.95;
+    font-family: "Forum", serif;
+    letter-spacing: 0.02em;
+    font-family: "Forum", serif;
+    font-size: clamp(2.6rem, 4vw, 4.2rem);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin: 0 0 10px;
+    opacity: 0.95;
 }
 
 .aboutCard__text {
-  margin: 0 0 14px;
-  opacity: 0.82;
-  max-width: 70ch;
+    margin: 0 0 14px;
+    opacity: 0.82;
+    max-width: 70ch;
 }
 
 .aboutActions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 /* =========================================================
@@ -203,18 +202,18 @@
 ========================================================= */
 
 .aboutCard--galerie {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .aboutCard--galerie .aboutSlider {
-  flex: 1;
-  min-height: 320px;
-  min-width: 0;
+    flex: 1;
+    min-height: 320px;
+    min-width: 0;
 }
 
 .aboutCard--galerie .aboutSlider__viewport {
-  height: 100%;
+    height: 100%;
 }
 
 /* =========================================================
@@ -222,110 +221,97 @@
 ========================================================= */
 
 .aboutRatingsRow {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  align-items: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    align-items: stretch;
 }
 
 .aboutReview {
-  border-radius: 18px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-width: 0;
-  
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0;
 }
 
 .aboutReview__link {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 14px 14px 12px;
-  color: inherit;
-  text-decoration: none;
-
-  background:
-    radial-gradient(
-      120% 120% at 20% 0%,
-      rgba(255, 255, 255, 0.06),
-      transparent 55%
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
-
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    opacity 0.18s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 14px 12px;
+    color: inherit;
+    text-decoration: none;
+    background:
+        radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        opacity 0.18s ease;
 }
 
 .aboutReview__link:hover {
-  transform: translateY(-1px);
-  background:
-    radial-gradient(
-      120% 120% at 20% 0%,
-      rgba(255, 255, 255, 0.085),
-      transparent 55%
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.14), transparent);
+    transform: translateY(-1px);
+    background:
+        radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.085), transparent 55%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.14), transparent);
 }
 
 .aboutReview__link:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.22);
-  outline-offset: 3px;
-  border-radius: 16px;
+    outline: 2px solid rgba(255, 255, 255, 0.22);
+    outline-offset: 3px;
+    border-radius: 16px;
 }
 
 /* header en ligne (pas centré en colonne) */
+
 .aboutReview__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-  flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    flex-direction: column;
 }
 
 .aboutReview__source {
-  font-family: "Forum", serif;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.95rem;
-  opacity: 0.92;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    font-family: "Forum", serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.95rem;
+    opacity: 0.92;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .aboutReview__stars {
-  letter-spacing: 0.22em;
-  font-size: 12px;
-  opacity: 0.9;
-  flex: 0 0 auto;
+    letter-spacing: 0.22em;
+    font-size: 12px;
+    opacity: 0.9;
+    flex: 0 0 auto;
 }
 
 .aboutReview__text {
-  margin: 0;
-  opacity: 0.82;
-  line-height: 1.55;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4; /* ✅ stable heights */
-  overflow: hidden;
+    margin: 0;
+    opacity: 0.82;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    /* ✅ stable heights */
+    overflow: hidden;
 }
 
 .aboutReview__cta {
-  margin-top: auto;
-  padding-top: 6px;
-
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.78;
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.78;
 }
 
 /* =========================================================
@@ -333,49 +319,45 @@
 ========================================================= */
 
 .aboutStats {
-  margin-top: 12px;
-
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
 }
 
 .aboutStat {
-  border-radius: 16px;
-  padding: 14px 12px;
-
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  display: grid;
-  gap: 10px;
-  align-content: start;
-
-  min-width: 0;
+    border-radius: 16px;
+    padding: 14px 12px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-width: 0;
 }
 
 .aboutStat__num {
-  font-size: clamp(28px, 3vw, 44px);
-  line-height: 1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: rgba(239, 231, 210, 0.95);
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: rgba(239, 231, 210, 0.95);
 }
 
 .aboutStat__label {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(239, 231, 210, 0.78);
-  line-height: 1.25;
-
-  overflow-wrap: anywhere; /* ✅ sécurité anti casse weird */
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.78);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    /* ✅ sécurité anti casse weird */
 }
 
 .aboutCard__text--muted {
-  margin-top: 12px;
-  color: rgba(239, 231, 210, 0.65);
-  font-size: 13px;
+    margin-top: 12px;
+    color: rgba(239, 231, 210, 0.65);
+    font-size: 13px;
 }
 
 /* =========================================================
@@ -383,34 +365,89 @@
 ========================================================= */
 
 .aboutFacts {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
 }
 
 .aboutFacts__item {
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-width: 0;
+    border-radius: 18px;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0;
 }
 
 .aboutFacts__k {
-  display: block;
-  opacity: 0.65;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.8rem;
+    display: block;
+    opacity: 0.65;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
 }
 
 .aboutFacts__v {
-  display: block;
-  margin-top: 4px;
+    display: block;
+    margin-top: 4px;
+}
+
+/* =========================================================
+   TEAM
+========================================================= */
+
+.aboutTeam {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.aboutTeamMember {
+    border-radius: 18px;
+    padding: 16px;
+    min-width: 0;
+    background:
+        radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 52%),
+        rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.aboutTeamMember__role {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.68);
+}
+
+.aboutTeamMember__name {
+    margin: 0;
+    font-family: "Forum", serif;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.94);
+}
+
+.aboutTeamMember__text {
+    margin: 0;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.aboutTeamMember__signature {
+    margin: auto 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: rgba(239, 231, 210, 0.78);
 }
 
 /* =========================================================
@@ -418,86 +455,83 @@
 ========================================================= */
 
 .aboutSlider {
-  position: relative;
-  border-radius: 18px;
+    position: relative;
+    border-radius: 18px;
 }
 
 .aboutSlider__viewport {
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 18px;
-  outline: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 18px;
+    outline: none;
 }
 
 .aboutSlider__viewport::-webkit-scrollbar {
-  height: 0;
+    height: 0;
 }
 
 .aboutSlider__track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  gap: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    gap: 0;
 }
 
 .aboutSlider__slide {
-  scroll-snap-align: start;
-  border-radius: 18px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
-  margin: 0;
-  min-height: 300px;
+    scroll-snap-align: start;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    margin: 0;
+    min-height: 300px;
 }
 
 .aboutSlider__slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .aboutSlider__btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(10px);
-
-  display: grid;
-  place-items: center;
-
-  font-size: 22px;
-  line-height: 1;
-  color: white;
-  opacity: 0.85;
-
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    line-height: 1;
+    color: white;
+    opacity: 0.85;
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
 }
 
 .aboutSlider__btn.is-hidden {
-  opacity: 0;
-  pointer-events: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .aboutSlider__btn--prev {
-  left: 10px;
+    left: 10px;
 }
+
 .aboutSlider__btn--next {
-  right: 10px;
+    right: 10px;
 }
+
 .aboutSlider__btn:hover {
-  opacity: 1;
+    opacity: 1;
 }
 
 /* =========================================================
@@ -505,8 +539,8 @@
 ========================================================= */
 
 .menuFooter {
-  opacity: 0.65;
-  padding: 6px 2px 2px;
+    opacity: 0.65;
+    padding: 6px 2px 2px;
 }
 
 /* =========================================================
@@ -514,154 +548,143 @@
 ========================================================= */
 
 /* TABLET / <=1279 : split en 1 colonne */
+
 @media (max-width: 1279px) {
-  .menuSplit--about {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    min-height: auto;
-    
-  }
-
-  .menuSplit--about .menuSplit__left,
-  .menuSplit--about .menuSplit__right {
-    min-height: auto;
-  }
-
-  .menuSplit--about .menuSplit__left {
-    position: relative;
-    height: 52vh;
-  }
-
-  .menuHero--about {
-    height: clamp(260px, 42vw, 420px);
-    border-radius: 22px;
-  }
-
-  .menuHero--about .menuHero__title {
-    left: 14px;
-    bottom: 12px;
-    font-size: clamp(40px, 7vw, 72px);
-  }
+    .menuSplit--about {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        min-height: auto;
+    }
+    .menuSplit--about .menuSplit__left,
+    .menuSplit--about .menuSplit__right {
+        min-height: auto;
+    }
+    .menuSplit--about .menuSplit__left {
+        position: relative;
+        height: 52vh;
+    }
+    .menuHero--about {
+        height: clamp(260px, 42vw, 420px);
+        border-radius: 22px;
+    }
+    .menuHero--about .menuHero__title {
+        left: 14px;
+        bottom: 12px;
+        font-size: clamp(40px, 7vw, 72px);
+    }
 }
 
 /* MOBILE / <=980 : panel 1 colonne + tabs scroll */
+
 @media (max-width: 980px) {
-  .menuPanel--about {
-    border-radius: 22px;
-    padding: 12px;
-
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "tabs"
-      "intro"
-      "galerie"
-      "reviews"
-      "stats"
-      "histoire"
-      "contact"
-      "footer";
-  }
-
-  .menuTabs--about {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 8px;
-    scrollbar-width: none;
-  }
-
-  .menuTabs--about::-webkit-scrollbar {
-    height: 0;
-  }
-
-  .menuTabs--about .menuTabs__tab {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    font-size: 0.88rem;
-  }
-
-  .aboutRatingsRow {
-    grid-template-columns: 1fr;
-  }
-
-  .aboutFacts {
-    grid-template-columns: 1fr;
-  }
-
-  .aboutStats {
-    grid-template-columns: 1fr;
-  }
-
-  .aboutSlider__slide {
-    min-height: 220px;
-  }
-
-  .aboutSlider__btn {
-    width: 34px;
-    height: 34px;
-    font-size: 20px;
-  }
-
-  .aboutSlider__btn--prev {
-    left: 8px;
-  }
-  .aboutSlider__btn--next {
-    right: 8px;
-  }
-
-  .aboutCard__title {
-    font-size: 1rem;
-    letter-spacing: 0.08em;
-  }
-
-  .aboutCard__text {
-    max-width: none;
-  }
+    .menuPanel--about {
+        border-radius: 22px;
+        padding: 12px;
+        grid-template-columns: 1fr;
+        grid-template-areas: "tabs" "intro" "galerie" "reviews" "stats" "histoire" "team" "contact" "footer";
+    }
+    .menuTabs--about {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        scrollbar-width: none;
+    }
+    .menuTabs--about::-webkit-scrollbar {
+        height: 0;
+    }
+    .menuTabs--about .menuTabs__tab {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-size: 0.88rem;
+    }
+    .aboutRatingsRow {
+        grid-template-columns: 1fr;
+    }
+    .aboutFacts {
+        grid-template-columns: 1fr;
+    }
+    .aboutStats {
+        grid-template-columns: 1fr;
+    }
+    .aboutTeam {
+        grid-template-columns: 1fr;
+    }
+    .aboutSlider__slide {
+        min-height: 220px;
+    }
+    .aboutSlider__btn {
+        width: 34px;
+        height: 34px;
+        font-size: 20px;
+    }
+    .aboutSlider__btn--prev {
+        left: 8px;
+    }
+    .aboutSlider__btn--next {
+        right: 8px;
+    }
+    .aboutCard__title {
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+    }
+    .aboutCard__text {
+        max-width: none;
+    }
 }
 
 /* SMALL MOBILE / <=480 */
-@media (max-width: 480px) {
-  .menuHero--about .menuHero__title {
-    left: 12px;
-    bottom: 10px;
-    letter-spacing: 0.04em;
-  }
 
-  .aboutCard,
-  .menuSection--about {
-    padding: 14px;
-    border-radius: 18px;
-  }
+@media (max-width: 480px) {
+    .menuHero--about .menuHero__title {
+        left: 12px;
+        bottom: 10px;
+        letter-spacing: 0.04em;
+    }
+    .aboutCard,
+    .menuSection--about {
+        padding: 14px;
+        border-radius: 18px;
+    }
 }
 
 /* REVIEWS: tablette = 2 colonnes + 1 en dessous */
+
 @media (max-width: 1100px) {
-  .aboutRatingsRow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .aboutRatingsRow > :nth-child(3) {
-    grid-column: 1 / -1;
-  }
+    .aboutRatingsRow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .aboutRatingsRow > :nth-child(3) {
+        grid-column: 1 / -1;
+    }
+    .aboutTeam {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .aboutTeam > :last-child {
+        grid-column: 1 / -1;
+    }
 }
 
 /* REVIEWS: mobile stack */
+
 @media (max-width: 700px) {
-  .aboutRatingsRow {
-    grid-template-columns: 1fr;
-  }
-  .aboutRatingsRow > :nth-child(3) {
-    grid-column: auto;
-  }
-  .aboutReview__text {
-    -webkit-line-clamp: 5;
-  }
+    .aboutRatingsRow {
+        grid-template-columns: 1fr;
+    }
+    .aboutRatingsRow > :nth-child(3) {
+        grid-column: auto;
+    }
+    .aboutReview__text {
+        -webkit-line-clamp: 5;
+    }
 }
 
 /* slider hauteur */
+
 @media (max-width: 900px) {
-  .aboutSlider__slide {
-    min-height: 220px;
-  }
+    .aboutSlider__slide {
+        min-height: 220px;
+    }
 }
 
 /* =========================================================
@@ -670,84 +693,90 @@
 ========================================================= */
 
 .menuPanel--about {
-  position: relative;
-  isolation: isolate; /* évite les z-index chelous d’ailleurs */
+    position: relative;
+    isolation: isolate;
+    /* évite les z-index chelous d’ailleurs */
 }
 
 /* si un style global a mis du absolute/inset, on neutralise */
-.menuPanel--about > * {
-  position: relative !important;  /* IMPORTANT: remet dans le flow */
-  inset: auto !important;
-  top: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: auto !important;
 
-  transform: none !important;     /* au cas où un translate traîne */
-  margin: 0;                      /* évite marges négatives */
-  min-width: 0;
+.menuPanel--about > * {
+    position: relative !important;
+    /* IMPORTANT: remet dans le flow */
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    /* au cas où un translate traîne */
+    margin: 0;
+    /* évite marges négatives */
+    min-width: 0;
 }
+
 /* =========================
    ABOUT — scroll only right
    (desktop)
 ========================= */
 
 /* Empêche le scroll global (uniquement sur desktop) */
+
 @media (min-width: 1280px) {
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  /* ton main doit prendre le viewport */
-  .siteMain {
-    height: 100vh;
-    overflow: hidden;
-    scroll-snap-type: none; /* si snapY te gêne sur cette page */
-  }
-
-  .menuSplit--about {
-    height: 100vh;
-    min-height: 100vh;
-    overflow: hidden; /* important */
-  }
-
-  /* gauche fixe */
-  .menuSplit--about .menuSplit__left {
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  /* conteneur droite */
-  .menuSplit--about .menuSplit__right {
-    height: 100vh;
-    overflow: hidden; /* le scroll doit être sur .menuPanel */
-  }
-
-  /* ✅ le scroll est ici */
-  .menuPanel--about {
-    height: 100vh;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* (option) scrollbar plus clean */
-  .menuPanel--about::-webkit-scrollbar { width: 10px; }
+    html,
+    body {
+        height: 100%;
+        overflow: hidden;
+    }
+    /* ton main doit prendre le viewport */
+    .siteMain {
+        height: 100vh;
+        overflow: hidden;
+        scroll-snap-type: none;
+        /* si snapY te gêne sur cette page */
+    }
+    .menuSplit--about {
+        height: 100vh;
+        min-height: 100vh;
+        overflow: hidden;
+        /* important */
+    }
+    /* gauche fixe */
+    .menuSplit--about .menuSplit__left {
+        height: 100vh;
+        overflow: hidden;
+    }
+    /* conteneur droite */
+    .menuSplit--about .menuSplit__right {
+        height: 100vh;
+        overflow: hidden;
+        /* le scroll doit être sur .menuPanel */
+    }
+    /* ✅ le scroll est ici */
+    .menuPanel--about {
+        height: 100vh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+    /* (option) scrollbar plus clean */
+    .menuPanel--about::-webkit-scrollbar {
+        width: 10px;
+    }
 }
-@media (max-width: 1279px) {
-  /* IMPORTANT : annule les min-height 100vh définis plus haut */
-  .menuSplit--about,
-  .menuSplit--about .menuSplit__left,
-  .menuSplit--about .menuSplit__right {
-    min-height: 0;
-    height: auto;
-    overflow: visible;
-  }
 
-  /* le panel ne doit pas être un scroll container en mobile */
-  .menuPanel--about {
-    height: auto;
-    overflow: visible;
-  }
+@media (max-width: 1279px) {
+    /* IMPORTANT : annule les min-height 100vh définis plus haut */
+    .menuSplit--about,
+    .menuSplit--about .menuSplit__left,
+    .menuSplit--about .menuSplit__right {
+        min-height: 0;
+        height: auto;
+        overflow: visible;
+    }
+    /* le panel ne doit pas être un scroll container en mobile */
+    .menuPanel--about {
+        height: auto;
+        overflow: visible;
+    }
 }

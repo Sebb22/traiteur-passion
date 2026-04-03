@@ -1,0 +1,493 @@
+/* ========================================
+   BLOG STYLES
+   ======================================== */
+
+/* Colors & Palette */
+$orange: #ff6b35;
+$dark-bg: rgba(22, 22, 22, 0.78);
+$darker-bg: rgba(14, 14, 14, 0.7);
+$border-light: rgba(255, 255, 255, 0.08);
+$text-light: rgba(255, 255, 255, 0.94);
+$text-muted: rgba(255, 255, 255, 0.65);
+
+/* ========================================
+   BLOG SPLIT (LISTING PAGE)
+   ======================================== */
+
+.blogSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin: 0;
+  max-width: none;
+  margin: 18px;
+  border-radius: 22px;
+
+  /* padding-right: 60px; */
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    padding-right: 0;
+    gap: 0;
+  }
+}
+
+.blogSplit__media {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 100vh;
+  margin: 18px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #0b0b0b;
+  border: 1px solid $border-light;
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  @media (max-width: 1024px) {
+    position: relative;
+    top: auto;
+    height: 360px;
+    min-height: 360px;
+    border-radius: 34px;
+    padding-right: 0;
+  }
+}
+
+.blogSplit__mediaImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.03);
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.blogSplit__mediaOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.55) 62%,
+      rgba(0, 0, 0, 0.78) 100%
+    ),
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(255, 107, 53, 0.18),
+      transparent 52%
+    );
+}
+
+.blogSplit__titles {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  bottom: 26px;
+  z-index: 2;
+  max-width: 560px;
+}
+
+.blogSplit__title {
+  font-family: "Forum", serif;
+  font-size: clamp(2.6rem, 4vw, 4.2rem);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.96);
+  margin: 0 0 0.35rem 0;
+  line-height: 1.02;
+}
+
+.blogSplit__subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+/* ========================================
+   BLOG RIGHT PANEL (CONTENT)
+   ======================================== */
+
+.blogSplit__panel {
+  background: transparent;
+  padding: 40px 0 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 780px;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1.25rem 2rem;
+    max-width: none;
+  }
+}
+
+.blogPanelHead {
+  border-radius: 26px;
+  padding: 22px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  background: linear-gradient(180deg, $dark-bg, $darker-bg);
+  border: 1px solid $border-light;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.blogPanelHead__title {
+  font-family: "Forum", serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  margin: 0 0 0.4rem 0;
+  color: $text-light;
+  letter-spacing: 0.02em;
+}
+
+.blogPanelHead__hint {
+  margin: 0;
+  color: $text-muted;
+  line-height: 1.5;
+  max-width: 56ch;
+  font-size: 0.95rem;
+}
+
+.blogPanelHead__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ========================================
+   BLOG GRID & CARDS
+   ======================================== */
+
+.blogGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 3rem;
+  padding: 4rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    gap: 2rem;
+    padding: 2rem 1rem;
+  }
+}
+
+.blogGrid--panel {
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.blogCard {
+  background: linear-gradient(180deg, $dark-bg, $darker-bg);
+  border-radius: 26px;
+  border: 1px solid $border-light;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  transform: translateY(0);
+  transition: all 0.25s ease;
+  animation: slideUp 0.6s ease-out both;
+
+  &:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 22px 56px rgba(0, 0, 0, 0.62),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+}
+
+.blogCard--row {
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blogCard__media {
+  position: relative;
+  background: #050505;
+  padding-bottom: 0;
+  min-height: 210px;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding-bottom: 56.25%;
+    min-height: 0;
+  }
+}
+
+.blogCard__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.blogCard__badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba($orange, 0.95);
+  color: #111;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+}
+
+.blogCard__content {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blogCard__title {
+  font-family: "Forum", serif;
+  font-size: 1.55rem;
+  font-weight: 400;
+  color: $text-light;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.blogCard__date {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+}
+
+.blogCard__excerpt {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.blogCard__meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.blogCard__category {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid $border-light;
+  color: rgba(255, 255, 255, 0.68);
+  padding: 0.35rem 0.65rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.blogCard a.btn:focus-visible {
+  outline: 3px solid rgba($orange, 0.45);
+  outline-offset: 3px;
+}
+
+/* ========================================
+   BLOG ARTICLE (DETAIL PAGE)
+   ======================================== */
+
+.blogArticle {
+  padding: 4rem 2rem;
+  background: transparent;
+  border-top: 1px solid $border-light;
+}
+
+.blogArticle__container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.blogArticleContent {
+  background: linear-gradient(180deg, $dark-bg, $darker-bg);
+  border: 1px solid $border-light;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  padding: 3rem;
+  border-radius: 26px;
+
+  @media (max-width: 768px) {
+    padding: 2rem;
+  }
+}
+
+.blogArticleContent__header {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.blogArticleContent__breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.8rem 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.92rem;
+
+  a {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $orange;
+    }
+  }
+}
+
+.blogArticleContent__title {
+  font-family: "Forum", serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: $text-light;
+  margin: 0 0 1rem 0;
+  line-height: 1.1;
+
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
+}
+
+.blogArticleContent__meta {
+  color: $text-muted;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.blogArticleContent__video {
+  margin: 2rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+  video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.blogArticleContent__body {
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
+  font-size: 1rem;
+  margin: 2rem 0 0 0;
+
+  h2,
+  h3 {
+    font-family: "Forum", serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: $text-light;
+    margin: 2rem 0 1rem 0;
+    line-height: 1.2;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+  }
+
+  a {
+    color: $orange;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #e55a1f;
+      text-decoration: underline;
+    }
+  }
+}
+
+.blogArticleContent__footer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  justify-content: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+/* ========================================
+   UTILITIES & ANIMATIONS
+   ======================================== */
+
+.btn--small {
+  padding: 0.6rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
