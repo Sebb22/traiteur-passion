@@ -1,4 +1,6 @@
 export function initAdminCatalog() {
+    initCatalogWorkspaceTools();
+
     const sectionList = document.querySelector("[data-section-sortable]");
     const sectionOrderInput = document.getElementById("catalogSectionOrderInput");
     const sectionOrderForm = document.getElementById("catalogSectionOrderForm");
@@ -121,6 +123,92 @@ export function initAdminCatalog() {
     initCatalogImageUploadUX();
 }
 
+function initCatalogWorkspaceTools() {
+    const searchInput = document.querySelector("[data-catalog-search]");
+    const jumpSelect = document.querySelector("[data-catalog-jump]");
+    const expandAllButton = document.querySelector("[data-catalog-expand-all]");
+    const collapseAllButton = document.querySelector("[data-catalog-collapse-all]");
+    const sections = Array.from(document.querySelectorAll("[data-catalog-section]"));
+
+    if (sections.length === 0) {
+        return;
+    }
+
+    const filterCatalog = () => {
+        const query = String(searchInput ? searchInput.value : "")
+            .trim()
+            .toLowerCase();
+
+        sections.forEach((section) => {
+            const sectionText = String(section.getAttribute("data-catalog-search-text") || "");
+            const items = Array.from(section.querySelectorAll("[data-catalog-item]"));
+
+            let sectionMatches = query === "" || sectionText.includes(query);
+            let visibleItemsCount = 0;
+
+            items.forEach((item) => {
+                const itemText = String(item.getAttribute("data-catalog-search-text") || "");
+                const itemMatches = query === "" || sectionMatches || itemText.includes(query);
+
+                item.classList.toggle("is-filtered-out", !itemMatches);
+                if (itemMatches) {
+                    visibleItemsCount += 1;
+                }
+            });
+
+            if (!sectionMatches && visibleItemsCount > 0) {
+                sectionMatches = true;
+            }
+
+            section.classList.toggle("is-filtered-out", !sectionMatches);
+
+            if (query !== "" && sectionMatches) {
+                section.setAttribute("open", "open");
+            }
+        });
+    };
+
+    if (searchInput) {
+        searchInput.addEventListener("input", filterCatalog);
+    }
+
+    if (jumpSelect) {
+        jumpSelect.addEventListener("change", () => {
+            const targetId = String(jumpSelect.value || "").trim();
+            if (targetId === "") {
+                return;
+            }
+
+            const target = document.getElementById(targetId);
+            if (!target) {
+                return;
+            }
+
+            if (target instanceof HTMLDetailsElement) {
+                target.setAttribute("open", "open");
+            }
+
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    }
+
+    if (expandAllButton) {
+        expandAllButton.addEventListener("click", () => {
+            sections.forEach((section) => {
+                section.setAttribute("open", "open");
+            });
+        });
+    }
+
+    if (collapseAllButton) {
+        collapseAllButton.addEventListener("click", () => {
+            sections.forEach((section) => {
+                section.removeAttribute("open");
+            });
+        });
+    }
+}
+
 function initCatalogImageUploadUX() {
     const uploadForms = Array.from(document.querySelectorAll('form')).filter((form) =>
         form.querySelector('input[name="image_file"]'),
@@ -130,6 +218,7 @@ function initCatalogImageUploadUX() {
         const fileInput = form.querySelector('input[name="image_file"]');
         const removeBgInput = form.querySelector('input[name="remove_bg"]');
         const fuzzInput = form.querySelector('input[name="background_fuzz"]');
+        const imageSaveButtons = Array.from(form.querySelectorAll('[data-image-save-button]'));
 
         if (!fileInput) {
             return;
@@ -149,14 +238,27 @@ function initCatalogImageUploadUX() {
         let previewAbortController = null;
         let previewRequestToken = 0;
 
+        preview.triggerButton.disabled = true;
+
+        const syncImageSaveButtons = () => {
+            const hasFile = Boolean(fileInput.files && fileInput.files.length > 0);
+            imageSaveButtons.forEach((button) => {
+                button.disabled = !hasFile;
+            });
+        };
+
         const renderPreview = () => {
             if (!sourceImage) {
                 preview.container.hidden = true;
                 preview.status.textContent = "";
+                preview.triggerButton.disabled = true;
+                syncImageSaveButtons();
                 return;
             }
 
             preview.container.hidden = false;
+            preview.triggerButton.disabled = false;
+            syncImageSaveButtons();
 
             const rawContext = preview.rawCanvas.getContext("2d");
             const cutoutContext = preview.cutoutCanvas.getContext("2d");
@@ -245,14 +347,29 @@ function initCatalogImageUploadUX() {
                         "X-Requested-With": "XMLHttpRequest",
                     },
                 })
-                .then((response) => response.json())
+                .then(async(response) => {
+                    const payload = await response.json().catch(() => null);
+
+                    if (!response.ok) {
+                        const message = payload && typeof payload.error === "string" ?
+                            payload.error :
+                            "Impossible de générer l'aperçu.";
+                        throw new Error(message);
+                    }
+
+                    return payload;
+                })
                 .then((payload) => {
                     if (currentToken !== previewRequestToken) {
                         return;
                     }
 
                     if (!payload || payload.ok !== true || typeof payload.preview_data_uri !== "string") {
-                        throw new Error("Réponse d'aperçu invalide");
+                        throw new Error(
+                            payload && typeof payload.error === "string" ?
+                            payload.error :
+                            "Réponse d'aperçu invalide",
+                        );
                     }
 
                     renderCutoutFromDataUri(payload.preview_data_uri);
@@ -267,7 +384,9 @@ function initCatalogImageUploadUX() {
                         return;
                     }
 
-                    preview.status.textContent = "Impossible de générer l'aperçu serveur.";
+                    preview.status.textContent = error instanceof Error && error.message ?
+                        error.message :
+                        "Impossible de générer l'aperçu serveur.";
                 })
                 .finally(() => {
                     if (currentToken !== previewRequestToken) {
@@ -293,6 +412,7 @@ function initCatalogImageUploadUX() {
                 }
 
                 renderPreview();
+                syncImageSaveButtons();
                 return;
             }
 
@@ -308,7 +428,10 @@ function initCatalogImageUploadUX() {
                 previewImage.src = String(fileReader.result || "");
             });
             fileReader.readAsDataURL(file);
+            syncImageSaveButtons();
         });
+
+        syncImageSaveButtons();
 
         if (removeBgInput) {
             removeBgInput.addEventListener("change", () => {

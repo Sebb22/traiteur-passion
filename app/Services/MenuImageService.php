@@ -33,6 +33,25 @@ final class MenuImageService
     }
 
     /**
+     * @return array{imagemagick: bool, rembg: bool, preview_ready: bool, final_ready: bool, preview_model: string, final_model: string, rembg_binary_path: string}
+     */
+    public function getRuntimeStatus(): array
+    {
+        $hasImageMagick = $this->canUseImageMagickCli();
+        $hasRembg       = $this->canUseRembg();
+
+        return [
+            'imagemagick'       => $hasImageMagick,
+            'rembg'             => $hasRembg,
+            'preview_ready'     => $hasImageMagick && $hasRembg,
+            'final_ready'       => $hasImageMagick,
+            'preview_model'     => $this->rembgPreviewModel,
+            'final_model'       => $this->rembgFinalModel,
+            'rembg_binary_path' => $this->rembgBinaryPath,
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $file
      * @param array{remove_background?: bool, background_fuzz?: int, preview_width?: int, preview_model?: string} $options
      */
@@ -335,9 +354,9 @@ final class MenuImageService
     {
         $this->runCommand([
             $this->rembgBinaryPath,
+            'i',
             '-m',
             $model,
-            'i',
             $inputPath,
             $outputPath,
         ]);

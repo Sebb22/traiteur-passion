@@ -6,6 +6,7 @@ $defaultTitle = 'Traiteur Passion – Traiteur événementiel à Compiègne';
 $pageTitle = isset($title) && is_string($title) && $title !== '' ? $title : $defaultTitle;
 
 $currentPath = Navigation::getCurrentPath();
+$bodyClass = Navigation::getBodyClass($currentPath);
 $metaDescription = Navigation::getMetaDescription($currentPath);
 $canonicalUrl = Navigation::getCanonicalUrl($currentPath);
 $breadcrumbs = Navigation::getBreadcrumbs($currentPath, $pageTitle);
@@ -60,7 +61,7 @@ $breadcrumbs = Navigation::getBreadcrumbs($currentPath, $pageTitle);
     <?php echo Vite::styles() ?>
 </head>
 
-<body>
+<body class="<?php echo htmlspecialchars($bodyClass, ENT_QUOTES, 'UTF-8'); ?>">
     <?php require dirname(__DIR__) . '/partials/header.php'; ?>
 
 

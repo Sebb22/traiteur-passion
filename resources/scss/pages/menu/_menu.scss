@@ -529,10 +529,18 @@
             display: block;
         }
         &--sand {
-            background: linear-gradient(135deg, rgba(181, 155, 104, 0.24), rgba(239, 231, 210, 0.06));
+            background: linear-gradient(
+                135deg,
+                rgba(181, 155, 104, 0.24),
+                rgba(239, 231, 210, 0.06)
+            );
         }
         &--amber {
-            background: linear-gradient(135deg, rgba(196, 126, 54, 0.24), rgba(239, 231, 210, 0.06));
+            background: linear-gradient(
+                135deg,
+                rgba(196, 126, 54, 0.24),
+                rgba(239, 231, 210, 0.06)
+            );
         }
     }
     &__intro {
@@ -596,10 +604,18 @@
             filter: saturate(0.86) contrast(1.02);
         }
         &--sand {
-            background: linear-gradient(135deg, rgba(181, 155, 104, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient(
+                135deg,
+                rgba(181, 155, 104, 0.24),
+                rgba(239, 231, 210, 0.08)
+            );
         }
         &--amber {
-            background: linear-gradient(135deg, rgba(196, 126, 54, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient(
+                135deg,
+                rgba(196, 126, 54, 0.24),
+                rgba(239, 231, 210, 0.08)
+            );
         }
         &--iconOnly {
             background: rgba(239, 231, 210, 0.06);

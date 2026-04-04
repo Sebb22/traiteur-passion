@@ -46,14 +46,15 @@ final class AdminController
         }
 
         View::render('admin/catalog', [
-            'title'    => 'Administration — Catalogue menu',
-            'sections' => $sections,
-            'stats'    => [
+            'title'        => 'Administration — Editer la carte',
+            'sections'     => $sections,
+            'stats'        => [
                 'sections' => count($sections),
                 'items'    => $itemsCount,
                 'options'  => $optionsCount,
             ],
-            'flash'    => $this->pullFlash(),
+            'imageRuntime' => (new MenuImageService())->getRuntimeStatus(),
+            'flash'        => $this->pullFlash(),
         ]);
     }
 
@@ -175,7 +176,7 @@ final class AdminController
             ]);
         } catch (\Throwable $e) {
             error_log('Catalog image preview error: ' . $e->getMessage());
-            $this->jsonResponse(['ok' => false, 'error' => 'Impossible de générer l’aperçu.'], 422);
+            $this->jsonResponse(['ok' => false, 'error' => $e->getMessage()], 422);
         }
     }
 
@@ -307,7 +308,7 @@ final class AdminController
         $filteredCount = $contactModel->countFiltered($filters);
 
         View::render('admin/contacts', [
-            'title'         => 'Administration — Demandes de contact',
+            'title'         => 'Administration — Demandes et devis',
             'contacts'      => $contacts,
             'stats'         => $stats,
             'filteredCount' => $filteredCount,
@@ -360,7 +361,7 @@ final class AdminController
         }
 
         View::render('admin/contact-detail', [
-            'title'         => 'Détail de la demande',
+            'title'         => 'Administration — Détail demande / devis',
             'contact'       => $contact,
             'statusOptions' => Contact::STATUS_LABELS,
             'flash'         => $this->pullFlash(),

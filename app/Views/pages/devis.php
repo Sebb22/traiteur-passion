@@ -16,7 +16,7 @@
 
     $formId                 = 'quoteForm';
     $formAction             = '/devis';
-	$formSubmitLabel        = 'Envoyer ma demande';
+    $formSubmitLabel        = 'Envoyer ma demande';
     $selectedSectionSlug    = $selectedCategory;
     $limitToSelectedSection = false;
     $accordionTitle         = $selectedCategoryName !== ''

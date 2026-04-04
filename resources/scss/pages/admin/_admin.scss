@@ -6,6 +6,7 @@
     min-height: 100vh;
     display: grid;
     grid-template-columns: 1.05fr 1fr;
+    align-items: start;
     gap: 18px;
     padding: 18px;
     background: #0b0b0c;
@@ -14,13 +15,19 @@
     }
 }
 
+.adminSplit--catalog {
+    grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
+}
+
 /* LEFT */
 
 .adminSplit__media {
-    position: relative;
+    position: sticky;
+    top: 18px;
     border-radius: 26px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    height: calc(100vh - 36px);
     min-height: calc(100vh - 36px);
 }
 
@@ -80,13 +87,15 @@
 
 .adminSplit__panel {
     border-radius: 26px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background:
         radial-gradient(80% 60% at 60% 0%, rgba(255, 255, 255, 0.06), transparent 60%),
         linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
     backdrop-filter: blur(10px);
     min-height: calc(100vh - 36px);
+    min-width: 0;
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -187,7 +196,7 @@
     margin: 0;
     padding: 0 12px;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
 }
 
@@ -237,6 +246,16 @@
     overflow: hidden;
 }
 
+.adminCard--collapsible {
+    summary {
+        list-style: none;
+        cursor: pointer;
+        &::-webkit-details-marker {
+            display: none;
+        }
+    }
+}
+
 .adminCard--table {
     flex: 1;
     display: flex;
@@ -256,6 +275,10 @@
     justify-content: space-between;
     gap: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminCard__head--summary {
+    cursor: pointer;
 }
 
 .adminCard__title {
@@ -346,6 +369,13 @@
     text-overflow: ellipsis;
 }
 
+.adminTable--contacts td,
+.adminTable--contacts .adminLink,
+.adminTable--contacts .adminInlineForm,
+.adminTable--contacts .adminInlineForm > * {
+    min-width: 0;
+}
+
 /* Links */
 
 .adminLink {
@@ -424,6 +454,9 @@
         grid-template-columns: 1fr;
     }
     .adminSplit__media {
+        position: relative;
+        top: auto;
+        height: auto;
         min-height: 320px;
     }
     .adminPanelHead {
@@ -437,6 +470,84 @@
     }
     .adminTextTruncate {
         max-width: 220px;
+    }
+}
+
+@media (max-width: 1500px) {
+    .adminTableWrap--contacts {
+        overflow: visible;
+    }
+    .adminTable--contacts {
+        display: block;
+        width: 100%;
+        thead {
+            display: none;
+        }
+        tbody {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+        }
+        tr {
+            display: grid;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        td {
+            display: grid;
+            grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+            gap: 12px;
+            padding: 0;
+            border: 0;
+            align-items: start;
+        }
+        td::before {
+            content: attr(data-label);
+            font-family:
+                "Inter",
+                system-ui,
+                -apple-system,
+                sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(239, 231, 210, 0.7);
+        }
+        td.adminEmptyState {
+            display: block;
+            padding: 42px 18px;
+        }
+        td.adminEmptyState::before {
+            content: none;
+        }
+    }
+    .adminTable--contacts .adminTextTruncate {
+        max-width: none;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: initial;
+        line-height: 1.6;
+    }
+    .adminTable--contacts .adminInlineForm {
+        align-items: stretch;
+    }
+    .adminTable--contacts .adminInlineForm:not(.adminInlineForm--stack) {
+        flex-direction: column;
+    }
+    .adminTable--contacts .adminSelect--compact,
+    .adminTable--contacts .adminBtn--sm {
+        width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .adminTable--contacts td {
+        grid-template-columns: 1fr;
+        gap: 6px;
     }
 }
 
@@ -525,13 +636,18 @@
 .adminCatalogList {
     display: flex;
     flex-direction: column;
+    flex: 1;
     gap: 16px;
+    min-height: 0;
     padding: 0 12px 12px;
-    overflow: auto;
+    overflow: visible;
 }
 
 .adminCatalogSection {
     overflow: visible;
+    &.is-filtered-out {
+        display: none;
+    }
     summary {
         list-style: none;
         &::-webkit-details-marker {
@@ -576,6 +692,60 @@
     margin: 0 12px;
 }
 
+.adminCatalogUtilityGrid {
+    padding: 0 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.adminCatalogUtilityCard,
+.adminCatalogGuideCard {
+    margin: 0 12px;
+}
+
+.adminCatalogToolbar {
+    padding: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(240px, 1fr);
+    gap: 12px;
+    align-items: end;
+}
+
+.adminCatalogToolbar .adminInlineActions--filters {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+}
+
+.adminDashboardStatus--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adminCatalogGuideGrid {
+    padding: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.adminCatalogSubsection {
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.64);
+}
+
+.adminCatalogSubsection--full {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+}
+
 .adminReorderForm {
     display: none;
 }
@@ -583,8 +753,116 @@
 .adminCatalogBody {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
     padding: 16px;
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015), transparent 220px),
+        rgba(0, 0, 0, 0.08);
+}
+
+.adminCatalogSectionGrid,
+.adminCatalogEditorGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.adminEditorBlock {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background:
+        linear-gradient(to bottom right, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.adminEditorBlock--collapsible {
+    summary {
+        list-style: none;
+        &::-webkit-details-marker {
+            display: none;
+        }
+    }
+}
+
+.adminEditorBlock--nested {
+    padding: 14px;
+    border-color: rgba(239, 231, 210, 0.08);
+    background:
+        linear-gradient(to bottom, rgba(239, 231, 210, 0.03), transparent 120px),
+        rgba(0, 0, 0, 0.12);
+}
+
+.adminEditorBlock--full {
+    grid-column: 1 / -1;
+}
+
+.adminEditorBlock__head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminEditorBlock__head--summary {
+    flex: 1;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.adminEditorBlock__summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.adminEditorBlock--collapsible > .adminForm {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminEditorBlock__chevron,
+.adminCard__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-left: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(239, 231, 210, 0.16);
+    color: rgba(239, 231, 210, 0.82);
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.adminEditorBlock--collapsible[open] .adminEditorBlock__chevron,
+.adminCard--collapsible[open] .adminCard__chevron {
+    transform: rotate(180deg);
+}
+
+.adminEditorBlock__title {
+    font-family: "Forum", serif;
+    font-size: 24px;
+    color: rgba(239, 231, 210, 0.95);
+}
+
+.adminEditorBlock__text {
+    margin: 0;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(229, 229, 229, 0.76);
 }
 
 .adminCatalogMeta {
@@ -599,6 +877,22 @@
         sans-serif;
     font-size: 12px;
     color: rgba(229, 229, 229, 0.7);
+}
+
+.adminCatalogMeta--inline {
+    margin-top: 6px;
+}
+
+.adminCatalogItemsHead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .adminDragHandle {
@@ -634,6 +928,17 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.adminEditorBlock {
+    min-width: 0;
+}
+
+.adminField,
+.adminInput,
+.adminTextarea,
+.adminSelect {
+    min-width: 0;
+}
+
 .adminField {
     grid-column: span 4;
     display: flex;
@@ -664,6 +969,19 @@
     color: rgba(239, 231, 210, 0.76);
 }
 
+.adminCatalogSubsection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.adminCatalogSubsection::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(239, 231, 210, 0.18), transparent);
+}
+
 .adminInput,
 .adminTextarea,
 .adminSelect {
@@ -689,6 +1007,15 @@
 
 .adminSelect {
     appearance: none;
+    color-scheme: dark;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
+        rgba(15, 15, 18, 0.96);
+    option,
+    optgroup {
+        background: #101013;
+        color: rgba(239, 231, 210, 0.95);
+    }
 }
 
 .adminSelect--compact {
@@ -711,10 +1038,20 @@
     justify-content: flex-end;
     gap: 10px;
     flex-wrap: wrap;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .adminInlineActions--filters {
     align-items: flex-end;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.adminInlineActions--image {
+    justify-content: flex-start;
+    padding-top: 4px;
+    border-top: 0;
 }
 
 .adminFilterBar {
@@ -755,17 +1092,32 @@
 .adminCatalogItems {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .adminCatalogItem {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.07);
-    background: rgba(255, 255, 255, 0.03);
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
+        rgba(255, 255, 255, 0.03);
     overflow: hidden;
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease;
+    &.is-filtered-out {
+        display: none;
+    }
     &.is-dragging {
         opacity: 0.58;
         transform: scale(0.995);
+    }
+    &[open] {
+        border-color: rgba(239, 231, 210, 0.16);
+        background:
+            linear-gradient(to bottom, rgba(239, 231, 210, 0.04), rgba(255, 255, 255, 0.015)),
+            rgba(255, 255, 255, 0.03);
     }
 }
 
@@ -773,7 +1125,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    align-items: center;
+    align-items: flex-start;
     padding: 14px 16px;
     cursor: pointer;
     font-family:
@@ -782,13 +1134,40 @@
         -apple-system,
         sans-serif;
     color: rgba(239, 231, 210, 0.92);
+    background: rgba(255, 255, 255, 0.018);
+    transition: background 0.2s ease;
     strong {
-        font-size: 14px;
+        font-size: 16px;
+        line-height: 1.3;
     }
     span {
         font-size: 12px;
         opacity: 0.72;
     }
+}
+
+.adminCatalogItem:hover .adminCatalogItem__summary {
+    background: rgba(255, 255, 255, 0.032);
+}
+
+.adminCatalogItem__summaryMain {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.adminCatalogItem__summaryText {
+    margin: 0;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(229, 229, 229, 0.76);
 }
 
 .adminCatalogItem__drag {
@@ -799,16 +1178,18 @@
 }
 
 .adminCatalogItem__body {
-    padding: 0 16px 16px;
+    padding: 14px 16px 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .adminCatalogOptions {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding-top: 2px;
 }
 
 .adminImagePreview {
@@ -993,12 +1374,31 @@
 
 .adminForm--option {
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(0, 0, 0, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.14)),
+        rgba(0, 0, 0, 0.16);
     padding: 14px;
 }
 
 @media (max-width: 1100px) {
+    .adminSplit--catalog {
+        grid-template-columns: 1fr;
+    }
+    .adminCatalogUtilityGrid,
+    .adminCatalogGuideGrid {
+        grid-template-columns: 1fr;
+    }
+    .adminCatalogSectionGrid,
+    .adminCatalogEditorGrid {
+        grid-template-columns: 1fr;
+    }
+    .adminStats--panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .adminCatalogToolbar {
+        grid-template-columns: 1fr;
+    }
     .adminField,
     .adminField--sm,
     .adminField--checkbox,
@@ -1021,6 +1421,12 @@
         }
     }
     .adminFilterBar {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .adminStats--panel {
         grid-template-columns: 1fr;
     }
 }
@@ -1049,6 +1455,11 @@
     align-items: center;
     justify-content: center;
     white-space: nowrap;
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
 }
 
 @media (max-width: 1100px) {
@@ -1072,9 +1483,12 @@
 .adminDashboardGrid {
     padding: 0 12px 12px;
     display: grid;
+    flex: 1;
     grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
     gap: 16px;
     align-items: start;
+    min-height: 0;
+    overflow: visible;
 }
 
 .adminDashboardStack {
@@ -1255,9 +1669,12 @@
 .adminDetailGrid {
     padding: 0 12px 12px;
     display: grid;
+    flex: 1;
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.85fr);
     gap: 16px;
     align-items: start;
+    min-height: 0;
+    overflow: visible;
 }
 
 .adminInfoGrid {
@@ -1376,6 +1793,87 @@
     gap: 10px;
 }
 
+.adminRequestList {
+    padding: 14px;
+    display: grid;
+    gap: 14px;
+}
+
+.adminRequestCard {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.adminRequestCard__head,
+.adminRequestCard__actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.adminRequestCard__titleWrap {
+    display: grid;
+    gap: 6px;
+}
+
+.adminRequestCard__eyebrow {
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.66);
+}
+
+.adminRequestCard__title {
+    font-family: "Forum", serif;
+    font-size: 30px;
+    line-height: 1;
+    color: rgba(239, 231, 210, 0.96);
+    width: fit-content;
+}
+
+.adminRequestCard__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.adminRequestCard__message {
+    display: grid;
+    gap: 8px;
+}
+
+.adminRequestCard__messageText {
+    margin: 0;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(239, 231, 210, 0.9);
+}
+
+.adminInlineForm--requestStatus {
+    align-items: stretch;
+}
+
 @media (max-width: 1380px) {
     .adminStats--dashboard {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1400,5 +1898,19 @@
     }
     .adminMiniList__aside {
         text-align: left;
+    }
+    .adminRequestCard__grid {
+        grid-template-columns: 1fr;
+    }
+    .adminRequestCard__title {
+        font-size: 24px;
+    }
+    .adminInlineForm--requestStatus {
+        flex-direction: column;
+        width: 100%;
+    }
+    .adminInlineForm--requestStatus .adminSelect--compact,
+    .adminInlineForm--requestStatus .adminBtn--sm {
+        width: 100%;
     }
 }

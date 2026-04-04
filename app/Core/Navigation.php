@@ -66,6 +66,24 @@ final class Navigation
         return $scheme . '://' . $host . $currentPath;
     }
 
+    public static function getBodyClass(string $currentPath): string
+    {
+        if (strpos($currentPath, '/admin') === 0) {
+            return 'page--admin';
+        }
+
+        $bodyClasses = [
+            '/'         => 'page--home',
+            '/menu'     => 'page--menu',
+            '/blog'     => 'page--blog',
+            '/a-propos' => 'page--about',
+            '/contact'  => 'page--contact',
+            '/devis'    => 'page--devis',
+        ];
+
+        return $bodyClasses[$currentPath] ?? 'page--generic';
+    }
+
     public static function getBreadcrumbs(string $currentPath, string $pageTitle): array
     {
         $isHttps = ! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';

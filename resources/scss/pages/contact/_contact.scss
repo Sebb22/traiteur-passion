@@ -1064,8 +1064,8 @@ select.field__input {
 ========================================================= */
 
 @media (min-width: 1280px) {
-    html,
-    body {
+    body.page--contact,
+    body.page--devis {
         height: 100%;
         overflow: hidden;
     }

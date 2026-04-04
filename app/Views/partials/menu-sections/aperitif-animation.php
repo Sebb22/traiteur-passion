@@ -77,7 +77,7 @@
                 }
             ?>
             <?php
-                $item = $itemsBySlug[$itemSlug];
+                $item          = $itemsBySlug[$itemSlug];
                 $itemImagePath = trim((string) ($item['image_path'] ?? ''));
                 $itemThumbPath = $itemImagePath !== '' ? str_replace('-1200.webp', '-600.webp', $itemImagePath) : '';
                 // Index des options de cet item par option_key pour accès O(1)
