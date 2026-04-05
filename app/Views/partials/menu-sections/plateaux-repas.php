@@ -15,6 +15,13 @@
     return $iconMap[$iconKey] ?? '';
     };
 
+    $buildPrefillParam = static function (string $itemSlug, string $optionKey = '__item__'): string {
+    $suffix = $optionKey === '__item__' ? 'item' : $optionKey;
+    $value  = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $itemSlug . '-' . $suffix));
+
+    return 'menu_' . trim($value, '-');
+    };
+
     // ── Config du widget de commande plateaux ──────────────────────────────────
 
     // Mappe chaque slug d'item à son label de ligne et ses option_key → data-param JS
@@ -79,6 +86,7 @@
                 foreach ($item['options'] as $option) {
                     $optionsByKey[$option['option_key']] = $option;
                 }
+                $renderedOptionKeys = [];
             ?>
             <div class="plateauOrder__row" data-plateau-row="<?php echo $e($itemSlug); ?>">
                 <div class="plateauOrder__rowHead">
@@ -104,7 +112,10 @@
                                 continue;
                             }
                         ?>
-                        <?php $option = $optionsByKey[$optionKey]; ?>
+                        <?php
+                            $option = $optionsByKey[$optionKey];
+                            $renderedOptionKeys[] = $optionKey;
+                        ?>
 
                         <div class="plateauOrder__optQty" data-variant="<?php echo $e($optionKey); ?>" data-param="<?php echo $e($param); ?>">
                             <span class="plateauOrder__optLabel">
@@ -114,6 +125,83 @@
                                 <?php endif; ?>
                             </span>
                             <div class="plateauOrder__qtyWrap" aria-label="Quantité <?php echo $e($rowConfig['row_name'] . ' ' . $option['label']); ?>">
+                                <button type="button" class="plateauOrder__qtyBtn" data-qty-action="minus" disabled aria-label="Diminuer">−</button>
+                                <output class="plateauOrder__qtyVal" aria-live="polite">0</output>
+                                <button type="button" class="plateauOrder__qtyBtn" data-qty-action="plus" aria-label="Augmenter">+</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <?php foreach ($item['options'] as $option): ?>
+                        <?php
+                            $optionKey = (string) ($option['option_key'] ?? '');
+                            if ($optionKey === '' || in_array($optionKey, $renderedOptionKeys, true)) {
+                                continue;
+                            }
+                            $fallbackParam = $buildPrefillParam($itemSlug, $optionKey);
+                        ?>
+                        <div class="plateauOrder__optQty" data-variant="<?php echo $e($optionKey); ?>" data-param="<?php echo $e($fallbackParam); ?>">
+                            <span class="plateauOrder__optLabel">
+                                <?php echo $e((string) ($option['label'] ?? '')); ?>
+                                <?php if (trim((string) ($option['price_label'] ?? '')) !== ''): ?>
+                                    <em><?php echo $e((string) $option['price_label']); ?></em>
+                                <?php endif; ?>
+                            </span>
+                            <div class="plateauOrder__qtyWrap" aria-label="Quantité <?php echo $e($rowConfig['row_name'] . ' ' . ((string) ($option['label'] ?? 'Option'))); ?>">
+                                <button type="button" class="plateauOrder__qtyBtn" data-qty-action="minus" disabled aria-label="Diminuer">−</button>
+                                <output class="plateauOrder__qtyVal" aria-live="polite">0</output>
+                                <button type="button" class="plateauOrder__qtyBtn" data-qty-action="plus" aria-label="Augmenter">+</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+
+        <?php foreach ($section['items'] as $item): ?>
+            <?php
+                $itemSlug = (string) ($item['slug'] ?? '');
+                if ($itemSlug === '' || isset($plateauxOrderMap[$itemSlug])) {
+                    continue;
+                }
+                $itemImagePath = trim((string) ($item['image_path'] ?? ''));
+                $itemThumbPath = $itemImagePath !== '' ? str_replace('-1200.webp', '-600.webp', $itemImagePath) : '';
+            ?>
+            <div class="plateauOrder__row" data-plateau-row="<?php echo $e($itemSlug); ?>">
+                <div class="plateauOrder__rowHead">
+                    <span class="plateauOrder__rowIdentity">
+                        <span class="plateauOrder__thumb plateauOrder__thumb--sand">
+                            <?php if ($itemThumbPath !== ''): ?>
+                            <img src="<?php echo $e($itemThumbPath); ?>" alt="" loading="lazy" decoding="async">
+                            <?php endif; ?>
+                            <span class="plateauOrder__thumbBadge"><?php echo $renderCategoryIcon('tray'); ?></span>
+                        </span>
+                        <span class="plateauOrder__nameBlock">
+                            <span class="plateauOrder__name"><?php echo $e((string) ($item['name'] ?? 'Plateau')); ?></span>
+                            <?php if (trim((string) ($item['price_from_label'] ?? '')) !== ''): ?>
+                            <span class="plateauOrder__meta"><?php echo $e((string) $item['price_from_label']); ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </span>
+                </div>
+
+                <div class="plateauOrder__opts plateauOrder__opts--stack">
+                    <?php foreach (($item['options'] ?? []) as $option): ?>
+                        <?php
+                            $optionKey = (string) ($option['option_key'] ?? '');
+                            if ($optionKey === '') {
+                                continue;
+                            }
+                            $fallbackParam = $buildPrefillParam($itemSlug, $optionKey);
+                        ?>
+                        <div class="plateauOrder__optQty" data-variant="<?php echo $e($optionKey); ?>" data-param="<?php echo $e($fallbackParam); ?>">
+                            <span class="plateauOrder__optLabel">
+                                <?php echo $e((string) ($option['label'] ?? '')); ?>
+                                <?php if (trim((string) ($option['price_label'] ?? '')) !== ''): ?>
+                                    <em><?php echo $e((string) $option['price_label']); ?></em>
+                                <?php endif; ?>
+                            </span>
+                            <div class="plateauOrder__qtyWrap" aria-label="Quantité <?php echo $e((string) ($item['name'] ?? 'Plateau') . ' ' . ((string) ($option['label'] ?? 'Option'))); ?>">
                                 <button type="button" class="plateauOrder__qtyBtn" data-qty-action="minus" disabled aria-label="Diminuer">−</button>
                                 <output class="plateauOrder__qtyVal" aria-live="polite">0</output>
                                 <button type="button" class="plateauOrder__qtyBtn" data-qty-action="plus" aria-label="Augmenter">+</button>

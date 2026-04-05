@@ -114,7 +114,8 @@
 
                     <?php if (! empty($section['items'])): ?>
                     <div class="menuSection__ctaRow">
-                        <a class="menuSection__cta" href="/devis?category=<?php echo $e($section['slug']); ?>#quoteForm">
+                        <a class="menuSection__cta"
+                            href="/devis?category=<?php echo $e($section['slug']); ?>#quoteForm">
                             <?php echo $e($editorial['cta'] ?? ('Composer ma commande de ' . $section['name'])); ?>
                         </a>
                     </div>

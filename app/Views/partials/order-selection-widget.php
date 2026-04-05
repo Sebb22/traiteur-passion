@@ -8,6 +8,13 @@
 
     $e = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 
+    $buildPrefillParam = static function (string $itemSlug, string $optionKey = '__item__'): string {
+    $suffix = $optionKey === '__item__' ? 'item' : $optionKey;
+    $value  = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $itemSlug . '-' . $suffix));
+
+    return 'menu_' . trim($value, '-');
+    };
+
     $selectedSectionSlug    = isset($selectedSectionSlug) ? trim((string) $selectedSectionSlug) : '';
     $limitToSelectedSection = (bool) ($limitToSelectedSection ?? false);
     $accordionTitle         = trim((string) ($accordionTitle ?? 'Sélectionner des items du menu (optionnel)'));
@@ -149,7 +156,7 @@
                     $itemPrefillMap      = $prefillParamMap[$itemSlug] ?? [];
                     $hasOptionQuantities = $itemOptions !== [];
                     $requiresLeadTime    = $sectionSlug === 'plateaux-repas';
-                    $prefillParam        = (string) ($itemPrefillMap['__item__'] ?? '');
+                    $prefillParam        = (string) ($itemPrefillMap['__item__'] ?? $buildPrefillParam($itemSlug, '__item__'));
                 ?>
 
                 <div class="menuCheckboxQty">
@@ -194,7 +201,7 @@
                             $optionKey          = (string) ($option['option_key'] ?? '');
                             $optionLabel        = trim((string) ($option['label'] ?? ''));
                             $optionPrice        = trim((string) ($option['price_label'] ?? ''));
-                            $optionPrefillParam = (string) ($itemPrefillMap[$optionKey] ?? '');
+                            $optionPrefillParam = (string) ($itemPrefillMap[$optionKey] ?? $buildPrefillParam($itemSlug, $optionKey));
                         ?>
                         <div class="menuVariantQty" data-option-key="<?php echo $e($optionKey); ?>"
                             data-option-label="<?php echo $e($optionLabel); ?>"
