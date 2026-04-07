@@ -217,6 +217,13 @@
     line-height: 1;
 }
 
+.corner-slot__btn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+    fill: currentColor;
+}
+
 /* Texte + plus (tiles) */
 
 .corner-slot__label {
