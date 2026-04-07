@@ -160,10 +160,14 @@ final class AdminController
             $removeBackground = isset($_POST['remove_bg']) && (string) $_POST['remove_bg'] === '1';
             $backgroundFuzz   = (int) ($_POST['background_fuzz'] ?? 12);
             $previewWidth     = (int) ($_POST['preview_width'] ?? 320);
-            $previewModel     = (string) ($_POST['preview_model'] ?? 'u2netp');
+            $imageService     = new MenuImageService();
+            $previewModel     = trim((string) ($_POST['preview_model'] ?? ''));
+            if ($previewModel === '') {
+                $runtimeStatus = $imageService->getRuntimeStatus();
+                $previewModel  = (string) ($runtimeStatus['preview_model'] ?? 'u2netp');
+            }
 
-            $imageService   = new MenuImageService();
-            $previewDataUri = $imageService->generatePreviewDataUri($file, [
+            $previewResult = $imageService->generatePreviewResult($file, [
                 'remove_background' => $removeBackground,
                 'background_fuzz'   => $backgroundFuzz,
                 'preview_width'     => $previewWidth,
@@ -172,7 +176,8 @@ final class AdminController
 
             $this->jsonResponse([
                 'ok'               => true,
-                'preview_data_uri' => $previewDataUri,
+                'preview_data_uri' => (string) ($previewResult['data_uri'] ?? ''),
+                'preview_token'    => (string) ($previewResult['preview_token'] ?? ''),
             ]);
         } catch (\Throwable $e) {
             error_log('Catalog image preview error: ' . $e->getMessage());
@@ -483,6 +488,7 @@ final class AdminController
         $result = $imageService->processItemImage($file, $baseName, [
             'remove_background' => $removeBackground,
             'background_fuzz'   => $backgroundFuzz,
+            'preview_token'     => (string) ($_POST['preview_token'] ?? ''),
         ]);
         $desktopPath = (string) ($result['desktop_path'] ?? '');
         if ($desktopPath === '') {

@@ -210,6 +210,10 @@ function initCatalogWorkspaceTools() {
 }
 
 function initCatalogImageUploadUX() {
+    const catalogRoot = document.querySelector("[data-rembg-preview-model]");
+    const configuredPreviewModel = String(catalogRoot ? catalogRoot.getAttribute("data-rembg-preview-model") || "" : "")
+        .trim() || "u2netp";
+    const previewReusableOnSave = catalogRoot ? catalogRoot.getAttribute("data-rembg-preview-reusable") === "1" : false;
     const uploadForms = Array.from(document.querySelectorAll('form')).filter((form) =>
         form.querySelector('input[name="image_file"]'),
     );
@@ -237,6 +241,24 @@ function initCatalogImageUploadUX() {
         let sourceFile = null;
         let previewAbortController = null;
         let previewRequestToken = 0;
+        let previewReuseToken = "";
+
+        let previewTokenInput = form.querySelector('input[name="preview_token"]');
+        if (!previewTokenInput) {
+            previewTokenInput = document.createElement("input");
+            previewTokenInput.type = "hidden";
+            previewTokenInput.name = "preview_token";
+            form.appendChild(previewTokenInput);
+        }
+
+        const syncPreviewToken = () => {
+            previewTokenInput.value = previewReuseToken;
+        };
+
+        const clearPreviewToken = () => {
+            previewReuseToken = "";
+            syncPreviewToken();
+        };
 
         preview.triggerButton.disabled = true;
 
@@ -284,11 +306,18 @@ function initCatalogImageUploadUX() {
             cutoutContext.drawImage(sourceImage, 0, 0, width, height);
 
             if (!removeBgInput || !removeBgInput.checked) {
+                clearPreviewToken();
                 preview.status.textContent = "Le fichier sera enregistré sans détourage automatique.";
                 return;
             }
 
-            preview.status.textContent = "Aperçu non généré. Cliquez sur \"Générer l'aperçu\" (mode rapide u2netp).";
+            clearPreviewToken();
+            if (previewReusableOnSave) {
+                preview.status.textContent = `Aperçu non généré. Cliquez sur \"Générer l'aperçu\" (${configuredPreviewModel}) puis l'enregistrement réutilisera ce détourage.`;
+                return;
+            }
+
+            preview.status.textContent = `Aperçu non généré. Cliquez sur \"Générer l'aperçu\" (${configuredPreviewModel}). L'enregistrement reprendra exactement ce détourage.`;
         };
 
         const renderCutoutFromDataUri = (dataUri) => {
@@ -337,7 +366,7 @@ function initCatalogImageUploadUX() {
             formData.append("remove_bg", "1");
             formData.append("background_fuzz", fuzzInput ? String(fuzzInput.value || "6") : "6");
             formData.append("preview_width", "320");
-            formData.append("preview_model", "u2netp");
+            formData.append("preview_model", configuredPreviewModel);
 
             fetch("/admin/catalog/image-preview", {
                     method: "POST",
@@ -372,8 +401,15 @@ function initCatalogImageUploadUX() {
                         );
                     }
 
+                    previewReuseToken = typeof payload.preview_token === "string" ? payload.preview_token : "";
+                    syncPreviewToken();
                     renderCutoutFromDataUri(payload.preview_data_uri);
-                    preview.status.textContent = "Aperçu rapide prêt (u2netp basse résolution).";
+                    if (previewReuseToken) {
+                        preview.status.textContent = `Aperçu prêt (${configuredPreviewModel}). L'enregistrement réutilisera ce détourage sans relancer rembg.`;
+                        return;
+                    }
+
+                    preview.status.textContent = `Aperçu prêt (${configuredPreviewModel}). L'enregistrement reprendra exactement ce détourage.`;
                 })
                 .catch((error) => {
                     if (error && error.name === "AbortError") {
@@ -406,6 +442,7 @@ function initCatalogImageUploadUX() {
             if (!file) {
                 sourceImage = null;
                 sourceFile = null;
+                clearPreviewToken();
 
                 if (previewAbortController) {
                     previewAbortController.abort();
@@ -417,6 +454,7 @@ function initCatalogImageUploadUX() {
             }
 
             sourceFile = file;
+            clearPreviewToken();
 
             const fileReader = new FileReader();
             fileReader.addEventListener("load", () => {
@@ -432,15 +470,18 @@ function initCatalogImageUploadUX() {
         });
 
         syncImageSaveButtons();
+        syncPreviewToken();
 
         if (removeBgInput) {
             removeBgInput.addEventListener("change", () => {
+                clearPreviewToken();
                 renderPreview();
             });
         }
 
         if (fuzzInput) {
             fuzzInput.addEventListener("input", () => {
+                clearPreviewToken();
                 renderPreview();
             });
         }

@@ -1,7 +1,8 @@
 <?php
-    $sections = is_array($sections ?? null) ? $sections : [];
-    $stats    = is_array($stats ?? null) ? $stats : ['sections' => 0, 'items' => 0, 'options' => 0];
-    $flash    = is_array($flash ?? null) ? $flash : null;
+    $sections     = is_array($sections ?? null) ? $sections : [];
+    $stats        = is_array($stats ?? null) ? $stats : ['sections' => 0, 'items' => 0, 'options' => 0];
+    $flash        = is_array($flash ?? null) ? $flash : null;
+    $imageRuntime = is_array($imageRuntime ?? null) ? $imageRuntime : [];
 
     $activeSections   = 0;
     $inactiveSections = 0;
@@ -56,7 +57,10 @@
     ];
     };
 ?>
-<div class="adminSplit adminSplit--catalog">
+<div class="adminSplit adminSplit--catalog"
+    data-rembg-preview-model="<?php echo $e((string) ($imageRuntime['preview_model'] ?? 'u2netp')); ?>"
+    data-rembg-final-model="<?php echo $e((string) ($imageRuntime['final_model'] ?? 'u2net')); ?>"
+    data-rembg-preview-reusable="<?php echo ! empty($imageRuntime['preview_reusable']) ? '1' : '0'; ?>">
     <aside class="adminSplit__media" aria-hidden="true">
         <img class="adminSplit__mediaImg" src="/uploads/pages/admin/adminIllu.png" alt="" loading="lazy" />
         <div class="adminSplit__mediaOverlay"></div>

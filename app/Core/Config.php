@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace App\Core;
 
@@ -9,7 +9,7 @@ final class Config
 
     public static function load(string $path): void
     {
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             throw new \RuntimeException(".env introuvable");
         }
 
@@ -22,8 +22,11 @@ final class Config
 
             [$key, $value] = array_map('trim', explode('=', $line, 2));
 
-            $value = trim($value, "\"'");
+            $value            = trim($value, "\"'");
             self::$data[$key] = $value;
+            putenv($key . '=' . $value);
+            $_ENV[$key]    = $value;
+            $_SERVER[$key] = $value;
         }
     }
 
