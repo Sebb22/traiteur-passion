@@ -34,58 +34,64 @@
 ?>
 
 <main class="siteMain siteContainer snapY">
-	<section class="menuSplit menuSplit--contact menuSplit--quote" data-wheel-redirect data-wheel-target=".menuPanel--contact">
+    <section class="menuSplit menuSplit--contact menuSplit--quote" data-wheel-redirect
+        data-wheel-target=".menuPanel--contact">
 
-		<div class="menuSplit__left" aria-label="Visuel de la page Devis">
-			<div class="menuHero menuHero--contact menuHero--quote">
-				<img class="menuHero__img" src="/uploads/pages/contact/contactIllu.png" alt="" aria-hidden="true">
-				<h1 class="menuHero__title">Devis</h1>
-			</div>
-		</div>
+        <div class="menuSplit__left" aria-label="Visuel de la page Devis">
+            <div class="menuHero menuHero--contact menuHero--quote">
+                <img class="menuHero__img" src="/uploads/pages/contact/adminIllu.png" alt="" aria-hidden="true">
+                <h1 class="menuHero__title">Devis</h1>
+            </div>
+        </div>
 
-		<div class="menuSplit__right">
-			<div class="menuPanel menuPanel--contact">
+        <div class="menuSplit__right">
+            <div class="menuPanel menuPanel--contact">
 
-				<header class="contactHead">
-					<span class="menuSectionTitle__line" aria-hidden="true"></span>
-					<h2 class="contactHead__title">Composer votre demande</h2>
-					<span class="menuSectionTitle__line" aria-hidden="true"></span>
-					<p class="contactHead__sub">
-                        Composez une première intention de commande, puis nous vous aidons à la transformer en proposition précise, cohérente et réaliste.
-					</p>
-					<?php if ($selectedCategoryName !== ''): ?>
-					<p class="contactHead__meta">
-						Catégorie présélectionnée : <?php echo htmlspecialchars($selectedCategoryName, ENT_QUOTES, 'UTF-8'); ?>.
-						Vous pouvez partir de cette base, l’enrichir librement, puis nous laisser affiner le bon calibrage.
-					</p>
-					<?php else: ?>
-					<p class="contactHead__meta">Plateaux repas : prévoir un minimum de 72h avant l'événement ou la livraison. Intervention et livraison selon votre zone.</p>
-					<?php endif; ?>
-				</header>
+                <header class="contactHead">
+                    <span class="menuSectionTitle__line" aria-hidden="true"></span>
+                    <h2 class="contactHead__title">Composer votre demande</h2>
+                    <span class="menuSectionTitle__line" aria-hidden="true"></span>
+                    <p class="contactHead__sub">
+                        Composez une première intention de commande, puis nous vous aidons à la transformer en
+                        proposition précise, cohérente et réaliste.
+                    </p>
+                    <?php if ($selectedCategoryName !== ''): ?>
+                    <p class="contactHead__meta">
+                        Catégorie présélectionnée :
+                        <?php echo htmlspecialchars($selectedCategoryName, ENT_QUOTES, 'UTF-8'); ?>.
+                        Vous pouvez partir de cette base, l’enrichir librement, puis nous laisser affiner le bon
+                        calibrage.
+                    </p>
+                    <?php else: ?>
+                    <p class="contactHead__meta">Plateaux repas : prévoir un minimum de 72h avant l'événement ou la
+                        livraison. Intervention et livraison selon votre zone.</p>
+                    <?php endif; ?>
+                </header>
 
-				<?php require dirname(__DIR__) . '/partials/request-form.php'; ?>
+                <?php require dirname(__DIR__) . '/partials/request-form.php'; ?>
 
-				<section class="contactInfos" aria-label="Coordonnées">
-					<div class="contactInfo">
-						<span class="contactInfo__k">Téléphone</span>
-						<a class="contactInfo__v" href="tel:+33659215349">0659215349</a>
-						<a class="contactInfo__v" href="tel:+330761603538">0761603538</a>
-					</div>
-					<div class="contactInfo">
-						<span class="contactInfo__k">Email</span>
-						<a class="contactInfo__v" href="mailto:contact@traiteur-passion.fr">contact@traiteur-passion.fr</a>
-					</div>
-					<div class="contactInfo">
-						<span class="contactInfo__k">Zone</span>
-						<span class="contactInfo__v">Vignemont • Oise</span>
-					</div>
-				</section>
+                <section class="contactInfos" aria-label="Coordonnées">
+                    <div class="contactInfo">
+                        <span class="contactInfo__k">Téléphone</span>
+                        <a class="contactInfo__v" href="tel:+33659215349">0659215349</a>
+                        <a class="contactInfo__v" href="tel:+330761603538">0761603538</a>
+                    </div>
+                    <div class="contactInfo">
+                        <span class="contactInfo__k">Email</span>
+                        <a class="contactInfo__v"
+                            href="mailto:contact@traiteur-passion.fr">contact@traiteur-passion.fr</a>
+                    </div>
+                    <div class="contactInfo">
+                        <span class="contactInfo__k">Zone</span>
+                        <span class="contactInfo__v">Vignemont • Oise</span>
+                    </div>
+                </section>
 
-				<footer class="menuFooter">
-					<p>© <?php echo date('Y') ?> Traiteur Passion</p>
-				</footer>
+                <footer class="menuFooter">
+                    <p>© <?php echo date('Y') ?> Traiteur Passion</p>
+                </footer>
 
-			</div>
-		</div>
-	</section>
+            </div>
+        </div>
+    </section>
 </main>

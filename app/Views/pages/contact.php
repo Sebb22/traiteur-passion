@@ -17,7 +17,7 @@
         <!-- LEFT : visuel -->
         <div class="menuSplit__left" aria-label="Visuel de la page Contact">
             <div class="menuHero menuHero--contact">
-                <img class="menuHero__img" src="/uploads/pages/contact/contactIllu.png" alt="" aria-hidden="true">
+                <img class="menuHero__img" src="/uploads/pages/contact/adminIllu.png" alt="" aria-hidden="true">
                 <h1 class="menuHero__title">Contact</h1>
             </div>
         </div>
@@ -31,9 +31,11 @@
                     <h2 class="contactHead__title">Demander un devis</h2>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
                     <p class="contactHead__sub">
-                        Donnez-nous le cadre, l’envie et les contraintes de votre réception. Nous revenons vers vous avec une proposition structurée, lisible et directement exploitable.
+                        Donnez-nous le cadre, l’envie et les contraintes de votre réception. Nous revenons vers vous
+                        avec une proposition structurée, lisible et directement exploitable.
                     </p>
-                    <p class="contactHead__meta">Plateaux repas : prévoir un minimum de 72h avant l'événement ou la livraison. Intervention et livraison selon votre zone.</p>
+                    <p class="contactHead__meta">Plateaux repas : prévoir un minimum de 72h avant l'événement ou la
+                        livraison. Intervention et livraison selon votre zone.</p>
                 </header>
                 <?php require dirname(__DIR__) . '/partials/request-form.php'; ?>
                 <section class="contactInfos" aria-label="Coordonnées">

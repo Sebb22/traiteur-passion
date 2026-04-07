@@ -1,16 +1,16 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
+    publicDir: false,
     build: {
         manifest: true,
-        outDir: 'public/build',
-        emptyOutDir: false,
+        outDir: "public/build",
+        emptyOutDir: true,
         rollupOptions: {
-            input: 'resources/js/main.js',
+            input: "resources/js/main.js",
         },
     },
 });
-
 
 /*
 npm run dev
