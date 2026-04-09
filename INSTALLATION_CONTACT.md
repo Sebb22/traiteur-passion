@@ -90,6 +90,37 @@ npm run dev
 npm run build
 ```
 
+## 📬 Configurer l'envoi d'emails
+
+Le projet peut maintenant envoyer :
+
+- une notification à l'administrateur pour chaque demande de contact ou devis
+- un accusé de réception automatique au client
+
+Ajoutez et renseignez ces variables dans `.env` :
+
+```env
+MAIL_ENABLED=1
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_SMTP_AUTH=1
+MAIL_USERNAME=utilisateur-smtp
+MAIL_PASSWORD=mot-de-passe-smtp
+MAIL_ENCRYPTION=tls
+MAIL_TIMEOUT=15
+MAIL_FROM_ADDRESS=no-reply@traiteur-passion.fr
+MAIL_FROM_NAME="Traiteur Passion"
+MAIL_ADMIN_TO=contact@traiteur-passion.fr
+MAIL_NOTIFY_ADMIN=1
+MAIL_ACK_CLIENT=1
+```
+
+Notes :
+
+- `MAIL_ADMIN_TO` accepte plusieurs destinataires séparés par des virgules
+- laissez `MAIL_ENABLED=0` tant que le SMTP n'est pas prêt
+- si la base enregistre bien la demande mais que l'email échoue, l'erreur est journalisée côté PHP sans bloquer l'envoi du formulaire
+
 ## 🧪 Tester le formulaire
 
 1. Accédez à la page contact : `http://localhost/contact`
@@ -110,9 +141,12 @@ SELECT * FROM contact_menu_items;
 - `app/Core/Database.php` - Classe singleton pour la connexion PDO
 - `app/Models/Contact.php` - Modèle pour les opérations CRUD
 - `app/Controllers/ContactController.php` - Contrôleur pour gérer les soumissions
+- `app/Services/Mailer.php` - Service SMTP basé sur PHPMailer
+- `app/Services/ContactNotificationService.php` - Orchestration des notifications admin + client
 - `app/Controllers/AdminController.php` - Contrôleur pour l'interface d'administration
 - `app/Views/admin/contacts.php` - Liste des demandes de contact
 - `app/Views/admin/contact-detail.php` - Détail d'une demande avec items du menu
+- `config/mail.php` - Configuration centralisée des emails
 - `storage/database.sql` - Script de création des tables
 - `resources/js/contact/contactForm.js` - Gestion AJAX du formulaire
 
@@ -124,6 +158,8 @@ SELECT * FROM contact_menu_items;
 - `resources/js/main.js` - Import du module contactForm
 - `app/Routes/web.php` - Ajout des routes POST /contact et routes admin
 - `app/Controllers/HomeController.php` - Suppression de la méthode contact()
+- `.env.example` - Variables SMTP d'exemple
+- `composer.json` - Dépendance PHPMailer
 
 ## 🎯 Utilisation
 
@@ -178,11 +214,10 @@ print_r($request['menu_items']);
 
 ## 📧 Prochaines étapes suggérées
 
-1. **Notifications email** : Envoyer un email à l'administrateur lors d'une nouvelle demande
-2. **Interface admin** : Créer une page d'administration pour consulter/gérer les demandes
-3. **Export** : Permettre l'export des demandes en CSV/Excel
-4. **Réponse automatique** : Envoyer un email de confirmation au client
-5. **Système de statuts** : Permettre de marquer les demandes comme traitées
+1. **Protection anti-spam** : Ajouter un honeypot, une limitation de débit ou un captcha
+2. **Observabilité** : Centraliser les erreurs SMTP dans des logs exploitables ou un dashboard
+3. **Back-office** : Permettre la relance manuelle d'un accusé de réception depuis l'admin
+4. **Templates** : Personnaliser davantage les emails selon le type de demande
 
 ## ❓ Dépannage
 

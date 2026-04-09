@@ -1,14 +1,14 @@
 <?php
-$eyebrow = $eyebrow ?? 'Accès refusé';
-$headline = $headline ?? 'Cette porte reste fermée.';
-$message = $message ?? 'Vous avez bien trouvé la bonne zone, mais votre session ou vos droits actuels ne permettent pas d\'y entrer.';
-$primaryAction = $primaryAction ?? ['href' => '/admin/login', 'label' => 'Connexion admin'];
-$secondaryAction = $secondaryAction ?? ['href' => '/', 'label' => 'Retour à l\'accueil'];
-$hints = $hints ?? [
+    $eyebrow         = $eyebrow ?? 'Accès refusé';
+    $headline        = $headline ?? 'Cette porte reste fermée.';
+    $message         = $message ?? 'Vous avez bien trouvé la bonne zone, mais votre session ou vos droits actuels ne permettent pas d\'y entrer.';
+    $primaryAction   = $primaryAction ?? ['href' => '/admin/login', 'label' => 'Connexion admin'];
+    $secondaryAction = $secondaryAction ?? ['href' => '/', 'label' => 'Retour à l\'accueil'];
+    $hints           = $hints ?? [
     'Vérifiez que vous utilisez le bon compte administrateur.',
     'Reconnectez-vous si votre session a expiré.',
     'Revenez à l\'accueil si vous cherchiez une page publique.',
-];
+    ];
 ?>
 <main class="errorPage" aria-labelledby="error-page-title">
     <section class="errorHero errorHero--403">

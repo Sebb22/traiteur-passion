@@ -11,6 +11,8 @@ Ce système permet aux clients de :
 Côté administrateur :
 
 - ✅ Toutes les demandes sont enregistrées en base de données
+- ✅ Notification email automatique sur chaque nouvelle demande
+- ✅ Accusé de réception envoyé au client
 - ✅ Interface d'administration complète
 - ✅ Export CSV des demandes
 - ✅ Vue détaillée avec items de menu sélectionnés
@@ -21,6 +23,15 @@ Côté administrateur :
 # 1. Configurer la BDD
 cp .env.example .env
 nano .env  # Éditer les identifiants MySQL
+
+# 1bis. Configurer le SMTP pour les emails
+# MAIL_ENABLED=1
+# MAIL_HOST=...
+# MAIL_PORT=587
+# MAIL_USERNAME=...
+# MAIL_PASSWORD=...
+# MAIL_FROM_ADDRESS=...
+# MAIL_ADMIN_TO=contact@traiteur-passion.fr
 
 # 2. Créer les tables
 mysql -u root -p < storage/database.sql
@@ -68,7 +79,14 @@ app/
 ├── Controllers/
 │   ├── ContactController.php  # Gestion du formulaire
 │   └── AdminController.php    # Interface d'administration
+├── Services/
+│   ├── Mailer.php             # Envoi SMTP via PHPMailer
+│   └── ContactNotificationService.php # Orchestration des emails
 └── Views/
+    ├── emails/
+    │   ├── layout.php         # Layout commun des emails
+    │   ├── admin-notification.php
+    │   └── client-acknowledgement.php
     ├── pages/
     │   └── contact.php        # Formulaire avec sélection menu
     └── admin/
@@ -102,6 +120,30 @@ php -S localhost:8000 -t public
 # - Admin : http://localhost:8000/admin/contacts
 ```
 
+## 📬 Emails transactionnels
+
+Le système peut maintenant envoyer :
+
+- un email de notification à l'adresse définie dans `MAIL_ADMIN_TO`
+- un accusé de réception automatique au client
+
+Variables à renseigner dans `.env` :
+
+```env
+MAIL_ENABLED=1
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_SMTP_AUTH=1
+MAIL_USERNAME=utilisateur-smtp
+MAIL_PASSWORD=mot-de-passe-smtp
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=no-reply@traiteur-passion.fr
+MAIL_FROM_NAME="Traiteur Passion"
+MAIL_ADMIN_TO=contact@traiteur-passion.fr
+MAIL_NOTIFY_ADMIN=1
+MAIL_ACK_CLIENT=1
+```
+
 ## 🔐 Sécurité
 
 ⚠️ **Important** : L'interface admin n'est pas protégée par défaut.
@@ -118,10 +160,9 @@ Pour la production, ajoutez :
 Améliorations suggérées :
 
 1. 🔒 Ajouter une authentification admin
-2. 📧 Envoyer des emails de notification
-3. 📱 Rendre le formulaire mobile-friendly
-4. 🔔 Notifications en temps réel
-5. 📊 Dashboard avec graphiques
+2. 📱 Rendre le formulaire mobile-friendly
+3. 🔔 Notifications en temps réel
+4. 📊 Dashboard avec graphiques
 
 ## ❓ Support
 

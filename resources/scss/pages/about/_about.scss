@@ -3,7 +3,6 @@
    CLEAN VERSION (no duplicates / single source of truth)
 ========================================================= */
 
-
 /* =========================================================
    SPLIT LAYOUT
 ========================================================= */
@@ -20,7 +19,6 @@
 .menuSplit--about .menuSplit__right {
     min-height: 100vh;
 }
-
 
 /* =========================================================
    LEFT HERO
@@ -48,7 +46,9 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(80% 70% at 20% 80%, rgba(0, 0, 0, 0.55), transparent 55%), linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.05));
+    background:
+        radial-gradient(80% 70% at 20% 80%, rgba(0, 0, 0, 0.55), transparent 55%),
+        linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.05));
     pointer-events: none;
 }
 
@@ -65,7 +65,6 @@
     color: rgba(255, 255, 255, 0.92);
     text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
 }
-
 
 /* =========================================================
    RIGHT PANEL (container)
@@ -84,11 +83,11 @@
     align-content: start;
     /* ✅ SINGLE SOURCE OF TRUTH */
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas: "tabs     tabs" "intro    galerie" "intro    galerie" "reviews  reviews" "stats    stats"/* ✅ FULL WIDTH */
-    "histoire histoire"/* ✅ (option) full width aussi, plus clean */
-    "team     team" "contact  contact" "footer   footer";
+    grid-template-areas:
+        "tabs     tabs" "intro    galerie" "intro    galerie" "reviews  reviews" "stats    stats" /* ✅ FULL WIDTH */
+        "histoire histoire" /* ✅ (option) full width aussi, plus clean */
+        "team     team" "contact  contact" "footer   footer";
 }
-
 
 /* zones */
 
@@ -128,7 +127,6 @@
     grid-area: footer;
 }
 
-
 /* =========================================================
    TABS
 ========================================================= */
@@ -159,7 +157,6 @@
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.18);
 }
-
 
 /* =========================================================
    CARDS (base)
@@ -200,7 +197,6 @@
     flex-wrap: wrap;
 }
 
-
 /* =========================================================
    GALERIE CARD: fait remplir le slider
 ========================================================= */
@@ -220,14 +216,13 @@
     height: 100%;
 }
 
-
 /* =========================================================
    REVIEWS (Google/Facebook/Presse)
 ========================================================= */
 
 .aboutRatingsRow {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 14px;
     align-items: stretch;
 }
@@ -248,13 +243,20 @@
     padding: 14px 14px 12px;
     color: inherit;
     text-decoration: none;
-    background: radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%), linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
-    transition: transform 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+    background:
+        radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        opacity 0.18s ease;
 }
 
 .aboutReview__link:hover {
     transform: translateY(-1px);
-    background: radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.085), transparent 55%), linear-gradient(to bottom, rgba(0, 0, 0, 0.14), transparent);
+    background:
+        radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.085), transparent 55%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.14), transparent);
 }
 
 .aboutReview__link:focus-visible {
@@ -262,7 +264,6 @@
     outline-offset: 3px;
     border-radius: 16px;
 }
-
 
 /* header en ligne (pas centré en colonne) */
 
@@ -313,7 +314,6 @@
     opacity: 0.78;
 }
 
-
 /* =========================================================
    STATS (remplace engagements)
 ========================================================= */
@@ -360,7 +360,6 @@
     font-size: 13px;
 }
 
-
 /* =========================================================
    FACTS (histoire)
 ========================================================= */
@@ -395,7 +394,6 @@
     margin-top: 4px;
 }
 
-
 /* =========================================================
    TEAM
 ========================================================= */
@@ -411,7 +409,9 @@
     border-radius: 18px;
     padding: 16px;
     min-width: 0;
-    background: radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 52%), rgba(0, 0, 0, 0.2);
+    background:
+        radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 52%),
+        rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: grid;
     gap: 10px;
@@ -449,7 +449,6 @@
     line-height: 1.5;
     color: rgba(239, 231, 210, 0.78);
 }
-
 
 /* =========================================================
    SLIDER
@@ -513,7 +512,9 @@
     line-height: 1;
     color: white;
     opacity: 0.85;
-    transition: opacity 0.18s ease, transform 0.18s ease;
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
 }
 
 .aboutSlider__btn.is-hidden {
@@ -533,7 +534,6 @@
     opacity: 1;
 }
 
-
 /* =========================================================
    FOOTER
 ========================================================= */
@@ -543,11 +543,9 @@
     padding: 6px 2px 2px;
 }
 
-
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-
 
 /* TABLET / <=1279 : split en 1 colonne */
 
@@ -575,7 +573,6 @@
         font-size: clamp(40px, 7vw, 72px);
     }
 }
-
 
 /* MOBILE / <=980 : panel 1 colonne + tabs scroll */
 
@@ -636,7 +633,6 @@
     }
 }
 
-
 /* SMALL MOBILE / <=480 */
 
 @media (max-width: 480px) {
@@ -652,24 +648,19 @@
     }
 }
 
-
 /* REVIEWS: tablette = 2 colonnes + 1 en dessous */
 
 @media (max-width: 1100px) {
     .aboutRatingsRow {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .aboutRatingsRow> :nth-child(3) {
-        grid-column: 1 / -1;
-    }
     .aboutTeam {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .aboutTeam> :last-child {
+    .aboutTeam > :last-child {
         grid-column: 1 / -1;
     }
 }
-
 
 /* REVIEWS: mobile stack */
 
@@ -677,14 +668,10 @@
     .aboutRatingsRow {
         grid-template-columns: 1fr;
     }
-    .aboutRatingsRow> :nth-child(3) {
-        grid-column: auto;
-    }
     .aboutReview__text {
         -webkit-line-clamp: 5;
     }
 }
-
 
 /* slider hauteur */
 
@@ -693,7 +680,6 @@
         min-height: 220px;
     }
 }
-
 
 /* =========================================================
    ABOUT – ANTI OVERLAP (force grid flow)
@@ -706,10 +692,9 @@
     /* évite les z-index chelous d’ailleurs */
 }
 
-
 /* si un style global a mis du absolute/inset, on neutralise */
 
-.menuPanel--about>* {
+.menuPanel--about > * {
     position: relative !important;
     /* IMPORTANT: remet dans le flow */
     inset: auto !important;
@@ -724,12 +709,10 @@
     min-width: 0;
 }
 
-
 /* =========================
    ABOUT — scroll only right
    (desktop)
 ========================= */
-
 
 /* Empêche le scroll global (uniquement sur desktop) */
 

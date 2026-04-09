@@ -1,5 +1,5 @@
 <?php
-use App\Core\Navigation;
+    use App\Core\Navigation;
 ?>
 
 <header class="header">
@@ -47,6 +47,10 @@ use App\Core\Navigation;
 
             <div class="menu__links" aria-label="Accès">
                 <span class="menuDeco__line" aria-hidden="true"></span>
+                <a class="menu__link<?php echo Navigation::isActivePath('/') ? ' menu__link--active' : ''; ?>" href="/"
+                    <?php echo Navigation::isActivePath('/') ? ' aria-current="page"' : ''; ?>>
+                    <span class="menu__label">Accueil</span>
+                </a>
                 <a class="menu__link<?php echo Navigation::isActivePath('/menu') ? ' menu__link--active' : ''; ?>"
                     href="/menu" <?php echo Navigation::isActivePath('/menu') ? ' aria-current="page"' : ''; ?>>
                     <span class="menu__label">Carte</span>

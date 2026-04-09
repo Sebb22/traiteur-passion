@@ -1,14 +1,14 @@
 <?php
-$eyebrow = $eyebrow ?? 'Page introuvable';
-$headline = $headline ?? 'Cette page s\'est évaporée.';
-$message = $message ?? 'L\'adresse demandée n\'existe pas, plus, ou n\'est pas accessible depuis ce lien. On vous renvoie vers quelque chose d\'utile.';
-$primaryAction = $primaryAction ?? ['href' => '/', 'label' => 'Retour à l\'accueil'];
-$secondaryAction = $secondaryAction ?? ['href' => '/menu', 'label' => 'Voir le menu'];
-$hints = $hints ?? [
+    $eyebrow         = $eyebrow ?? 'Page introuvable';
+    $headline        = $headline ?? 'Cette page s\'est évaporée.';
+    $message         = $message ?? 'L\'adresse demandée n\'existe pas, plus, ou n\'est pas accessible depuis ce lien. On vous renvoie vers quelque chose d\'utile.';
+    $primaryAction   = $primaryAction ?? ['href' => '/', 'label' => 'Retour à l\'accueil'];
+    $secondaryAction = $secondaryAction ?? ['href' => '/menu', 'label' => 'Voir le menu'];
+    $hints           = $hints ?? [
     'Vérifiez l\'orthographe de l\'URL si vous l\'avez saisie à la main.',
     'Repartez du menu ou de l\'accueil pour retrouver la bonne page.',
     'Contactez-nous si vous cherchiez une prestation précise.',
-];
+    ];
 ?>
 <main class="errorPage" aria-labelledby="error-page-title">
     <section class="errorHero errorHero--404">

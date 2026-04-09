@@ -19,7 +19,7 @@
 
 <div class="contactCard">
     <div class="contactAlert contactAlert--success" data-form-success style="display: none;">
-        ✅ Votre demande a été envoyée avec succès ! Nous vous recontacterons rapidement.
+        ✅ <span data-form-success-text>Votre demande a été envoyée avec succès ! Nous vous recontacterons rapidement.</span>
     </div>
 
     <div class="contactAlert contactAlert--error" data-form-error style="display: none;">

@@ -1,3 +1,5 @@
+<?php $aboutReviews = isset($aboutReviews) && is_array($aboutReviews) ? $aboutReviews : []; ?>
+
 <main class="siteMain siteContainer">
     <section class="menuSplit menuSplit--about">
         <!-- LEFT : visuel -->
@@ -64,34 +66,20 @@
 
                 <!-- ROW “RATINGS” -->
                 <div class="aboutRatingsRow" id="recommandations" aria-label="Avis et distinctions">
-                    <!-- Google -->
-                    <article class="aboutReview" aria-label="Avis Google">
-                        <a class="aboutReview__link"
-                            href="https://www.google.com/search?sca_esv=95c4599e20cb2333&sxsrf=ANbL-n4UoR9hWZxE_DJOyM6c_ZDOCjkuoA:1769787102684&q=Traiteur+passion+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDa3MLS0tDAzNTcyNjU0NLM0Nd7AyPiKUTSkKDGzJLW0SKEgsbg4Mz9PwbEss3gRK3ZxAH98L6dLAAAA&rldimm=13781998657235116953&tbm=lcl&hl=fr-FR&sa=X&ved=2ahUKEwj4o9XcyrOSAxW1caQEHbmhH6QQ9fQKegQIUxAG&biw=1920&bih=941&dpr=1&aic=0#lkt=LocalPoiReviews"
-                            target="_blank" rel="noopener">
-                            <header class="aboutReview__head">
-                                <div class="aboutReview__stars" aria-hidden="true">★★★★★</div>
-                                <div class="aboutReview__source">Google</div>
-                            </header>
-                            <p class="aboutReview__text">Un repas pour 15 à la maison… Merci pour votre gentillesse et
-                                votre accueil.</p>
-                            <span class="aboutReview__cta">Lire l’avis →</span>
-                        </a>
-                    </article>
-
-                    <!-- Facebook -->
-                    <article class="aboutReview" aria-label="Avis Facebook">
-                        <a class="aboutReview__link" href="https://www.facebook.com/kevinbrien6/reviews" target="_blank"
-                            rel="noopener">
-                            <header class="aboutReview__head">
-                                <div class="aboutReview__stars" aria-hidden="true">★★★★★</div>
-                                <div class="aboutReview__source">Facebook</div>
-                            </header>
-                            <p class="aboutReview__text">Repas couscous pour l’anniversaire… je recommanderai pour
-                                d’autres occasions !</p>
-                            <span class="aboutReview__cta">Lire l’avis →</span>
-                        </a>
-                    </article>
+                    <?php foreach ($aboutReviews as $review): ?>
+                        <article class="aboutReview" aria-label="<?php echo htmlspecialchars((string) ($review['aria_label'] ?? 'Avis client'), ENT_QUOTES, 'UTF-8'); ?>">
+                            <a class="aboutReview__link"
+                                href="<?php echo htmlspecialchars((string) ($review['link'] ?? '#'), ENT_QUOTES, 'UTF-8'); ?>"
+                                target="_blank" rel="noopener">
+                                <header class="aboutReview__head">
+                                    <div class="aboutReview__stars" aria-hidden="true"><?php echo htmlspecialchars((string) ($review['badge'] ?? '★★★★★'), ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div class="aboutReview__source"><?php echo htmlspecialchars((string) ($review['source'] ?? 'Avis client'), ENT_QUOTES, 'UTF-8'); ?></div>
+                                </header>
+                                <p class="aboutReview__text"><?php echo htmlspecialchars((string) ($review['text'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>
+                                <span class="aboutReview__cta"><?php echo htmlspecialchars((string) ($review['cta'] ?? 'Lire plus →'), ENT_QUOTES, 'UTF-8'); ?></span>
+                            </a>
+                        </article>
+                    <?php endforeach; ?>
 
                     <!-- Presse -->
                     <article class="aboutReview aboutReview--press" aria-label="Article de presse">

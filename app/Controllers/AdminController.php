@@ -362,19 +362,19 @@ final class AdminController
 
         if (! $contact) {
             HttpError::notFound([
-                'title' => '404 — Demande introuvable',
-                'eyebrow' => 'Demande introuvable',
-                'headline' => 'Cette demande client est introuvable.',
-                'message' => 'L\'identifiant demandé ne correspond à aucune fiche disponible. Il est possible que la demande ait été supprimée ou que le lien soit incomplet.',
-                'primaryAction' => [
-                    'href' => '/admin/contacts',
+                'title'           => '404 — Demande introuvable',
+                'eyebrow'         => 'Demande introuvable',
+                'headline'        => 'Cette demande client est introuvable.',
+                'message'         => 'L\'identifiant demandé ne correspond à aucune fiche disponible. Il est possible que la demande ait été supprimée ou que le lien soit incomplet.',
+                'primaryAction'   => [
+                    'href'  => '/admin/contacts',
                     'label' => 'Retour aux demandes',
                 ],
                 'secondaryAction' => [
-                    'href' => '/admin/dashboard',
+                    'href'  => '/admin/dashboard',
                     'label' => 'Tableau de bord',
                 ],
-                'hints' => [
+                'hints'           => [
                     'Revenez à la liste des demandes pour relancer votre recherche.',
                     'Contrôlez l\'identifiant dans l\'URL si vous avez collé un lien.',
                     'Si la demande a été archivée ailleurs, exportez les contacts pour la retrouver.',

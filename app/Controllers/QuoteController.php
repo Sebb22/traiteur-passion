@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Models\Contact;
 use App\Models\Menu;
+use App\Services\ContactNotificationService;
 use App\Services\ContactSubmissionService;
 
 final class QuoteController
@@ -63,9 +64,20 @@ final class QuoteController
             return;
         }
 
+        $notificationResult = (new ContactNotificationService())->dispatch(
+            'quote',
+            (int) $contactId,
+            $result['contactData'] ?? [],
+            $result['menuItems'] ?? [],
+        );
+
+        if (($notificationResult['errors'] ?? []) !== []) {
+            error_log('Quote notification errors: ' . implode(' | ', $notificationResult['errors']));
+        }
+
         $this->json(200, [
             'success' => true,
-            'message' => 'Votre demande a été envoyée avec succès !',
+            'message' => 'Votre demande de devis a été envoyée avec succès !',
             'id'      => $contactId,
         ]);
     }

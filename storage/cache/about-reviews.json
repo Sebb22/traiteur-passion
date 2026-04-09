@@ -1,0 +1,23 @@
+{
+    "fetched_at": 1775762560,
+    "cards": [
+        {
+            "provider": "google",
+            "aria_label": "Avis Google",
+            "source": "Google",
+            "badge": "★★★★★",
+            "text": "Un repas pour 15 à la maison… Merci pour votre gentillesse et votre accueil.",
+            "link": "https://www.google.com/search?sca_esv=95c4599e20cb2333&sxsrf=ANbL-n4UoR9hWZxE_DJOyM6c_ZDOCjkuoA:1769787102684&q=Traiteur+passion+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDa3MLS0tDAzNTcyNjU0NLM0Nd7AyPiKUTSkKDGzJLW0SKEgsbg4Mz9PwbEss3gRK3ZxAH98L6dLAAAA&rldimm=13781998657235116953&tbm=lcl&hl=fr-FR&sa=X&ved=2ahUKEwj4o9XcyrOSAxW1caQEHbmhH6QQ9fQKegQIUxAG&biw=1920&bih=941&dpr=1&aic=0#lkt=LocalPoiReviews",
+            "cta": "Lire l’avis →"
+        },
+        {
+            "provider": "facebook",
+            "aria_label": "Avis Facebook",
+            "source": "Facebook",
+            "badge": "★★★★★",
+            "text": "Repas couscous pour l’anniversaire… je recommanderai pour d’autres occasions !",
+            "link": "https://www.facebook.com/kevinbrien6/reviews",
+            "cta": "Lire l’avis →"
+        }
+    ]
+}

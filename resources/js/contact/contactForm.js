@@ -25,9 +25,7 @@ function escapeKey(value) {
 }
 
 function findItemToggle(form, itemSlug) {
-    return form.querySelector(
-        `[data-order-item-toggle][data-item-slug="${escapeKey(itemSlug)}"]`,
-    );
+    return form.querySelector(`[data-order-item-toggle][data-item-slug="${escapeKey(itemSlug)}"]`);
 }
 
 function findItemGrid(form, itemSlug) {
@@ -103,12 +101,14 @@ function renderCategoryIcon(iconKey) {
     const iconMap = {
         spark: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 9.7 6.3 14.5 8l-4.8 1.7L8 14.5 6.3 9.7 1.5 8l4.8-1.7Z" fill="currentColor"/></svg>',
         tray: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4.5h12v7H2z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 2.8h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
-        sunrise: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 9a4 4 0 1 1 8 0" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 11.5h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 2.2v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+        sunrise:
+            '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 9a4 4 0 1 1 8 0" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 11.5h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 2.2v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
         leaf: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 2.6c-4.1.2-7 1.7-8.6 4.4-1.2 2-.9 4.3.8 6 .2.2.6.2.8 0l6.7-6.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.8 13.4c-1.3-.3-2.4-1-3.2-2.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
         basket: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6h10l-1 6.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 6 8 2.8 10.8 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         cuts: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.2a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4Zm0 4.2a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m4.4 5.6 8.1 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="m4.4 10.4 8.1-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
         flame: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8.2 2.2c.5 2-.7 2.8-.7 4.1 0 1 .7 1.7 1.7 1.7 1.1 0 1.9-.8 2-2 .9 1 1.4 2.2 1.4 3.5 0 2.3-1.8 4-4.4 4S3.8 11.8 3.8 9.5c0-2 1-3.7 2.8-5.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-        default: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="currentColor"/></svg>',
+        default:
+            '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="currentColor"/></svg>',
     };
 
     return iconMap[iconKey] || iconMap.default;
@@ -212,6 +212,7 @@ function buildSelectionEntries(form) {
 function initRequestForm(form) {
     const container = form.closest(".contactCard") || form.parentElement;
     const successMessage = container ? container.querySelector("[data-form-success]") : null;
+    const successText = container ? container.querySelector("[data-form-success-text]") : null;
     const errorMessage = container ? container.querySelector("[data-form-error]") : null;
     const errorText = container ? container.querySelector("[data-form-error-text]") : null;
     const submitButton = form.querySelector('button[type="submit"]');
@@ -247,7 +248,9 @@ function initRequestForm(form) {
             return;
         }
 
-        const hasLeadSelection = buildSelectionEntries(form).some((entry) => entry.requiresLeadTime);
+        const hasLeadSelection = buildSelectionEntries(form).some(
+            (entry) => entry.requiresLeadTime,
+        );
         if (!hasLeadSelection) {
             warning.style.display = "none";
             return;
@@ -273,7 +276,11 @@ function initRequestForm(form) {
             return;
         }
 
-        if (!allowAutoMessage && messageInput.value.trim() && messageInput.value !== lastAutoMessage) {
+        if (
+            !allowAutoMessage &&
+            messageInput.value.trim() &&
+            messageInput.value !== lastAutoMessage
+        ) {
             return;
         }
 
@@ -329,16 +336,16 @@ function initRequestForm(form) {
             .map(([category, categoryEntries]) => {
                 const items = categoryEntries
                     .map((entry) => {
-                        const imageMarkup = entry.itemImage ?
-                            `<span class="selectionSummary__thumb selectionSummary__thumb--${entry.categoryTone}"><img src="${entry.itemImage}" alt="" loading="lazy" decoding="async"><span class="selectionSummary__thumbBadge">${renderCategoryIcon(entry.categoryIcon)}</span></span>` :
-                            `<span class="selectionSummary__thumb selectionSummary__thumb--${entry.categoryTone} selectionSummary__thumb--fallback">${entry.itemVisual}<span class="selectionSummary__thumbBadge">${renderCategoryIcon(entry.categoryIcon)}</span></span>`;
-                        const controlsMarkup = entry.isAdjustable ?
-                            `<div class="selectionSummary__controls">
+                        const imageMarkup = entry.itemImage
+                            ? `<span class="selectionSummary__thumb selectionSummary__thumb--${entry.categoryTone}"><img src="${entry.itemImage}" alt="" loading="lazy" decoding="async"><span class="selectionSummary__thumbBadge">${renderCategoryIcon(entry.categoryIcon)}</span></span>`
+                            : `<span class="selectionSummary__thumb selectionSummary__thumb--${entry.categoryTone} selectionSummary__thumb--fallback">${entry.itemVisual}<span class="selectionSummary__thumbBadge">${renderCategoryIcon(entry.categoryIcon)}</span></span>`;
+                        const controlsMarkup = entry.isAdjustable
+                            ? `<div class="selectionSummary__controls">
                                     <button type="button" class="selectionSummary__controlBtn" data-summary-action="minus" data-item-slug="${entry.itemSlug}" data-option-key="${entry.optionKey}" aria-label="Diminuer ${entry.line}">−</button>
                                     <span class="selectionSummary__controlQty">${entry.quantity}</span>
                                     <button type="button" class="selectionSummary__controlBtn" data-summary-action="plus" data-item-slug="${entry.itemSlug}" data-option-key="${entry.optionKey}" aria-label="Augmenter ${entry.line}">+</button>
-                                </div>` :
-                            `<button type="button" class="selectionSummary__removeBtn" data-summary-action="remove" data-item-slug="${entry.itemSlug}" aria-label="Retirer ${entry.line}">Retirer</button>`;
+                                </div>`
+                            : `<button type="button" class="selectionSummary__removeBtn" data-summary-action="remove" data-item-slug="${entry.itemSlug}" aria-label="Retirer ${entry.line}">Retirer</button>`;
 
                         return `
                             <li class="selectionSummary__item">
@@ -555,7 +562,7 @@ function initRequestForm(form) {
 
     syncAutoMessage();
 
-    form.addEventListener("submit", async(event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         const entries = buildSelectionEntries(form);
@@ -595,6 +602,11 @@ function initRequestForm(form) {
             const data = await response.json();
             if (response.ok && data.success) {
                 if (successMessage) {
+                    if (successText) {
+                        successText.textContent =
+                            data.message ||
+                            "Votre demande a été envoyée avec succès ! Nous vous recontacterons rapidement.";
+                    }
                     successMessage.style.display = "block";
                     successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
                 }
@@ -608,7 +620,8 @@ function initRequestForm(form) {
                     }
                 }, 8000);
             } else if (errorMessage && errorText) {
-                errorText.textContent = data.error || "Une erreur est survenue. Veuillez réessayer.";
+                errorText.textContent =
+                    data.error || "Une erreur est survenue. Veuillez réessayer.";
                 errorMessage.style.display = "block";
                 errorMessage.scrollIntoView({ behavior: "smooth", block: "center" });
             }

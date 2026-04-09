@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace App\Core;
 
@@ -24,9 +24,9 @@ final class HttpError
         http_response_code($statusCode);
 
         View::render($view, array_merge([
-            'bodyClass' => 'page--error',
-            'metaDescription' => 'Page d\'erreur Traiteur Passion.',
-            'metaRobots' => 'noindex, nofollow',
+            'bodyClass'                    => 'page--error',
+            'metaDescription'              => 'Page d\'erreur Traiteur Passion.',
+            'metaRobots'                   => 'noindex, nofollow',
             'disableStructuredBreadcrumbs' => true,
         ], $data));
     }

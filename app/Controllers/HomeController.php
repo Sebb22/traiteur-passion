@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Core\HttpError;
 use App\Core\View;
+use App\Services\SocialReviewService;
 
 final class HomeController
 {
@@ -15,7 +16,12 @@ final class HomeController
 
     public function about(): void
     {
-        View::render('pages/about', ['title' => 'Traiteur Passion — À propos']);
+        $reviews = (new SocialReviewService())->getAboutReviews();
+
+        View::render('pages/about', [
+            'title'        => 'Traiteur Passion — À propos',
+            'aboutReviews' => $reviews,
+        ]);
     }
 
     public function blog(): void
@@ -32,19 +38,19 @@ final class HomeController
 
         if ($post === null) {
             HttpError::notFound([
-                'title' => '404 — Article introuvable',
-                'eyebrow' => 'Article introuvable',
-                'headline' => 'Cet article n\'est plus au menu.',
-                'message' => 'Le lien demandé ne correspond à aucun article publié. Vous pouvez revenir au blog ou découvrir nos inspirations culinaires ailleurs sur le site.',
-                'primaryAction' => [
-                    'href' => '/blog',
+                'title'           => '404 — Article introuvable',
+                'eyebrow'         => 'Article introuvable',
+                'headline'        => 'Cet article n\'est plus au menu.',
+                'message'         => 'Le lien demandé ne correspond à aucun article publié. Vous pouvez revenir au blog ou découvrir nos inspirations culinaires ailleurs sur le site.',
+                'primaryAction'   => [
+                    'href'  => '/blog',
                     'label' => 'Retour au blog',
                 ],
                 'secondaryAction' => [
-                    'href' => '/',
+                    'href'  => '/',
                     'label' => 'Accueil',
                 ],
-                'hints' => [
+                'hints'           => [
                     'Vérifiez l\'adresse saisie dans la barre du navigateur.',
                     'Consultez le blog pour retrouver les autres publications.',
                     'Revenez à l\'accueil si vous cherchiez une prestation plutôt qu\'un article.',

@@ -12,6 +12,18 @@ cp .env.example .env
 nano .env
 ```
 
+Ajoutez aussi la configuration SMTP si vous voulez activer les emails transactionnels :
+
+```env
+MAIL_ENABLED=1
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_USERNAME=utilisateur-smtp
+MAIL_PASSWORD=mot-de-passe-smtp
+MAIL_FROM_ADDRESS=no-reply@traiteur-passion.fr
+MAIL_ADMIN_TO=contact@traiteur-passion.fr
+```
+
 ### 2️⃣ Créer la base et les tables
 
 ```bash
@@ -66,6 +78,7 @@ Testez que tout fonctionne :
 3. ✅ Sélectionnez des items du menu (optionnel)
 4. ✅ Soumettez le formulaire
 5. ✅ Vérifiez l'enregistrement dans `/admin/contacts`
+6. ✅ Vérifiez la réception de l'email admin et de l'accusé de réception client
 
 ## 📊 Requêtes SQL utiles
 

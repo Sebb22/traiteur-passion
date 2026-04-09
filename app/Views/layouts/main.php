@@ -1,20 +1,20 @@
 <?php
-use App\Core\Vite;
-use App\Core\Navigation;
+    use App\Core\Navigation;
+    use App\Core\Vite;
 
-$defaultTitle = 'Traiteur Passion – Traiteur événementiel à Compiègne';
-$pageTitle = isset($title) && is_string($title) && $title !== '' ? $title : $defaultTitle;
+    $defaultTitle = 'Traiteur Passion – Traiteur événementiel à Compiègne';
+    $pageTitle    = isset($title) && is_string($title) && $title !== '' ? $title : $defaultTitle;
 
-$currentPath = Navigation::getCurrentPath();
-$resolvedBodyClass = isset($bodyClass) && is_string($bodyClass) && $bodyClass !== ''
+    $currentPath       = Navigation::getCurrentPath();
+    $resolvedBodyClass = isset($bodyClass) && is_string($bodyClass) && $bodyClass !== ''
     ? $bodyClass
     : Navigation::getBodyClass($currentPath);
-$resolvedMetaDescription = isset($metaDescription) && is_string($metaDescription) && $metaDescription !== ''
+    $resolvedMetaDescription = isset($metaDescription) && is_string($metaDescription) && $metaDescription !== ''
     ? $metaDescription
     : Navigation::getMetaDescription($currentPath);
-$canonicalUrl = Navigation::getCanonicalUrl($currentPath);
-$metaRobots = isset($metaRobots) && is_string($metaRobots) && $metaRobots !== '' ? $metaRobots : null;
-$breadcrumbs = ! empty($disableStructuredBreadcrumbs)
+    $canonicalUrl = Navigation::getCanonicalUrl($currentPath);
+    $metaRobots   = isset($metaRobots) && is_string($metaRobots) && $metaRobots !== '' ? $metaRobots : null;
+    $breadcrumbs  = ! empty($disableStructuredBreadcrumbs)
     ? []
     : Navigation::getBreadcrumbs($currentPath, $pageTitle);
 ?>
@@ -49,14 +49,14 @@ $breadcrumbs = ! empty($disableStructuredBreadcrumbs)
     <?php if (count($breadcrumbs) > 1): ?>
     <script type="application/ld+json">
     <?php
-    echo json_encode(
-        [
-            '@context' => 'https://schema.org',
-            '@type' => 'BreadcrumbList',
-            'itemListElement' => $breadcrumbs,
-        ],
-        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
-    );
+        echo json_encode(
+            [
+                '@context'        => 'https://schema.org',
+                '@type'           => 'BreadcrumbList',
+                'itemListElement' => $breadcrumbs,
+            ],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
+        );
     ?>
     </script>
     <?php endif; ?>
