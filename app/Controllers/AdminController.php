@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace App\Controllers;
 
 use App\Core\AdminAuth;
+use App\Core\HttpError;
 use App\Core\View;
 use App\Models\Contact;
 use App\Models\Menu;
@@ -360,8 +361,25 @@ final class AdminController
         $contact      = $contactModel->getById((int) $id);
 
         if (! $contact) {
-            http_response_code(404);
-            View::render('errors/404', ['title' => '404 — Demande introuvable']);
+            HttpError::notFound([
+                'title' => '404 — Demande introuvable',
+                'eyebrow' => 'Demande introuvable',
+                'headline' => 'Cette demande client est introuvable.',
+                'message' => 'L\'identifiant demandé ne correspond à aucune fiche disponible. Il est possible que la demande ait été supprimée ou que le lien soit incomplet.',
+                'primaryAction' => [
+                    'href' => '/admin/contacts',
+                    'label' => 'Retour aux demandes',
+                ],
+                'secondaryAction' => [
+                    'href' => '/admin/dashboard',
+                    'label' => 'Tableau de bord',
+                ],
+                'hints' => [
+                    'Revenez à la liste des demandes pour relancer votre recherche.',
+                    'Contrôlez l\'identifiant dans l\'URL si vous avez collé un lien.',
+                    'Si la demande a été archivée ailleurs, exportez les contacts pour la retrouver.',
+                ],
+            ]);
             return;
         }
 

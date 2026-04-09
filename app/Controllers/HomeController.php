@@ -3,6 +3,7 @@ declare (strict_types = 1);
 
 namespace App\Controllers;
 
+use App\Core\HttpError;
 use App\Core\View;
 
 final class HomeController
@@ -30,8 +31,25 @@ final class HomeController
         $post = $this->blogPosts()[$slug] ?? null;
 
         if ($post === null) {
-            http_response_code(404);
-            View::render('errors/404', ['title' => '404 — Article introuvable']);
+            HttpError::notFound([
+                'title' => '404 — Article introuvable',
+                'eyebrow' => 'Article introuvable',
+                'headline' => 'Cet article n\'est plus au menu.',
+                'message' => 'Le lien demandé ne correspond à aucun article publié. Vous pouvez revenir au blog ou découvrir nos inspirations culinaires ailleurs sur le site.',
+                'primaryAction' => [
+                    'href' => '/blog',
+                    'label' => 'Retour au blog',
+                ],
+                'secondaryAction' => [
+                    'href' => '/',
+                    'label' => 'Accueil',
+                ],
+                'hints' => [
+                    'Vérifiez l\'adresse saisie dans la barre du navigateur.',
+                    'Consultez le blog pour retrouver les autres publications.',
+                    'Revenez à l\'accueil si vous cherchiez une prestation plutôt qu\'un article.',
+                ],
+            ]);
             return;
         }
 

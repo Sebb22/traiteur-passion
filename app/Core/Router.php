@@ -45,8 +45,7 @@ final class Router
         }
 
         if (! $action) {
-            http_response_code(404);
-            View::render('errors/404', ['title' => '404 — Introuvable']);
+            HttpError::notFound();
             return;
         }
 

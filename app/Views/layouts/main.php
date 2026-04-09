@@ -6,10 +6,17 @@ $defaultTitle = 'Traiteur Passion – Traiteur événementiel à Compiègne';
 $pageTitle = isset($title) && is_string($title) && $title !== '' ? $title : $defaultTitle;
 
 $currentPath = Navigation::getCurrentPath();
-$bodyClass = Navigation::getBodyClass($currentPath);
-$metaDescription = Navigation::getMetaDescription($currentPath);
+$resolvedBodyClass = isset($bodyClass) && is_string($bodyClass) && $bodyClass !== ''
+    ? $bodyClass
+    : Navigation::getBodyClass($currentPath);
+$resolvedMetaDescription = isset($metaDescription) && is_string($metaDescription) && $metaDescription !== ''
+    ? $metaDescription
+    : Navigation::getMetaDescription($currentPath);
 $canonicalUrl = Navigation::getCanonicalUrl($currentPath);
-$breadcrumbs = Navigation::getBreadcrumbs($currentPath, $pageTitle);
+$metaRobots = isset($metaRobots) && is_string($metaRobots) && $metaRobots !== '' ? $metaRobots : null;
+$breadcrumbs = ! empty($disableStructuredBreadcrumbs)
+    ? []
+    : Navigation::getBreadcrumbs($currentPath, $pageTitle);
 ?>
 <!doctype html>
 <html lang="fr">
@@ -18,7 +25,10 @@ $breadcrumbs = Navigation::getBreadcrumbs($currentPath, $pageTitle);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
-    <meta name="description" content="<?php echo htmlspecialchars((string) $metaDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="description" content="<?php echo htmlspecialchars((string) $resolvedMetaDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php if ($metaRobots !== null): ?>
+    <meta name="robots" content="<?php echo htmlspecialchars($metaRobots, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php endif; ?>
     <link rel="canonical" href="<?php echo htmlspecialchars((string) $canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
 
     <script type="application/ld+json">
@@ -61,7 +71,7 @@ $breadcrumbs = Navigation::getBreadcrumbs($currentPath, $pageTitle);
     <?php echo Vite::styles() ?>
 </head>
 
-<body class="<?php echo htmlspecialchars($bodyClass, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="<?php echo htmlspecialchars($resolvedBodyClass, ENT_QUOTES, 'UTF-8'); ?>">
     <?php require dirname(__DIR__) . '/partials/header.php'; ?>
 
 
