@@ -24,6 +24,7 @@
 # =========================
 /storage/logs/*
 !/storage/logs/.gitkeep
+/storage/cache/about-reviews.json
 
 # =========================
 # OS / EDITORS

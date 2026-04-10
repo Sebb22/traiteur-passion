@@ -19,7 +19,7 @@
             <header class="blogPanelHead">
                 <div class="blogPanelHead__left">
                     <h2 class="blogPanelHead__title">Derniers articles</h2>
-                    <p class="blogPanelHead__hint">Une sélection d'idées gourmandes au style Qitchen.</p>
+                    <p class="blogPanelHead__hint">Recettes, inspirations et coulisses Traiteur Passion</p>
                 </div>
 
                 <div class="blogPanelHead__actions">
