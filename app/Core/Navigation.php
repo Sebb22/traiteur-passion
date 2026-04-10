@@ -72,6 +72,10 @@ final class Navigation
             return 'page--admin';
         }
 
+        if (strpos($currentPath, '/blog/') === 0) {
+            return 'page--blog-post';
+        }
+
         $bodyClasses = [
             '/'         => 'page--home',
             '/menu'     => 'page--menu',

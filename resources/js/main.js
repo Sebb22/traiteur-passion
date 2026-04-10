@@ -8,6 +8,7 @@ import { initContactForm } from "./contact/contactForm";
 import { initMenuTabs } from "./menu/menuTabs";
 import { initMenuOrder } from "./menu/menuOrder";
 import { initAdminCatalog } from "./admin/catalog";
+import { initAdminBlog } from "./admin/blog";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
 document.addEventListener("DOMContentLoaded", () => {
@@ -20,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenuTabs();
     initMenuOrder();
     initAdminCatalog();
+    initAdminBlog();
 
     enableWheelRedirect();
     console.log("Traiteur Passion ready 🔥");

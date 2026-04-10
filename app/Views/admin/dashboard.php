@@ -1,5 +1,6 @@
 <?php
     $contactStats   = is_array($contactStats ?? null) ? $contactStats : [];
+    $blogStats      = is_array($blogStats ?? null) ? $blogStats : [];
     $catalogStats   = is_array($catalogStats ?? null) ? $catalogStats : [];
     $recentContacts = is_array($recentContacts ?? null) ? $recentContacts : [];
     $typeBreakdown  = is_array($typeBreakdown ?? null) ? $typeBreakdown : [];
@@ -44,6 +45,7 @@
                 </div>
                 <div class="adminPanelHead__actions">
                     <a href="/admin/contacts" class="adminBtn adminBtn--primary">Voir les demandes</a>
+                    <a href="/admin/blog" class="adminBtn">Gerer le blog</a>
                     <a href="/admin/catalog" class="adminBtn">Editer la carte</a>
                     <a href="/menu" class="adminBtn">Voir le menu</a>
                     <a href="/" class="adminBtn">Retour au site</a>
@@ -70,6 +72,10 @@
             <div class="statCard">
                 <div class="statCard__label">Avec menu</div>
                 <div class="statCard__value"><?php echo (int) ($contactStats['with_menu_items'] ?? 0); ?></div>
+            </div>
+            <div class="statCard">
+                <div class="statCard__label">Articles blog</div>
+                <div class="statCard__value"><?php echo (int) ($blogStats['published'] ?? 0); ?></div>
             </div>
             <div class="statCard">
                 <div class="statCard__label">Sections menu</div>
@@ -172,6 +178,12 @@
                             <div class="adminQuickLinkCard__eyebrow">Carte</div>
                             <div class="adminQuickLinkCard__title">Editer la carte</div>
                             <div class="adminQuickLinkCard__meta">Sections, items, options et visuels depuis le back-office.</div>
+                        </a>
+
+                        <a href="/admin/blog" class="adminQuickLinkCard adminLink">
+                            <div class="adminQuickLinkCard__eyebrow">Contenu</div>
+                            <div class="adminQuickLinkCard__title">Gerer le blog</div>
+                            <div class="adminQuickLinkCard__meta">Publier des articles, les corriger ou les passer en brouillon.</div>
                         </a>
                     </div>
                 </section>

@@ -30,16 +30,24 @@
 
             <section class="blogGrid blogGrid--panel">
                 <?php foreach ($posts as $post): ?>
+                <?php $hasVideo = ! empty($post['video_url']); ?>
                 <article class="blogCard blogCard--row">
                     <div class="blogCard__media">
-                        <video class="blogCard__video" controls preload="metadata"
+                        <?php if ($hasVideo): ?>
+                        <video class="blogCard__visual" controls preload="metadata"
                             poster="<?php echo htmlspecialchars((string) $post['cover_image'], ENT_QUOTES, 'UTF-8'); ?>">
                             <source
                                 src="<?php echo htmlspecialchars((string) $post['video_url'], ENT_QUOTES, 'UTF-8'); ?>"
                                 type="video/mp4">
                             Votre navigateur ne supporte pas la lecture vidéo HTML5.
                         </video>
-                        <span class="blogCard__badge">Vidéo</span>
+                        <?php else: ?>
+                        <img class="blogCard__visual"
+                            src="<?php echo htmlspecialchars((string) $post['cover_image'], ENT_QUOTES, 'UTF-8'); ?>"
+                            alt="<?php echo htmlspecialchars((string) $post['title'], ENT_QUOTES, 'UTF-8'); ?>"
+                            loading="lazy">
+                        <?php endif; ?>
+                        <span class="blogCard__badge"><?php echo $hasVideo ? 'Vidéo' : 'Article'; ?></span>
                     </div>
 
                     <div class="blogCard__content">

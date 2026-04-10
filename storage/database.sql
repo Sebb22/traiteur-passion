@@ -117,6 +117,43 @@ CREATE TABLE IF NOT EXISTS menu_item_options (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ====================================================
+-- Tables: blog_*
+-- Mini CMS blog content managed from admin
+-- ====================================================
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    slug VARCHAR(160) NOT NULL UNIQUE,
+    title VARCHAR(255) NOT NULL,
+    date_iso DATE NOT NULL,
+    author VARCHAR(160) NOT NULL,
+    excerpt TEXT NULL,
+    categories_json TEXT NULL,
+    cover_image VARCHAR(255) NULL,
+    video_url VARCHAR(255) NULL,
+    intro TEXT NULL,
+    is_published TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_blog_posts_date (date_iso),
+    INDEX idx_blog_posts_published (is_published)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS blog_post_sections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    title VARCHAR(255) NULL,
+    body TEXT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (post_id) REFERENCES blog_posts(id) ON DELETE CASCADE,
+    INDEX idx_blog_post_sections_order (post_id, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ====================================================
 -- Sample data (optional - for testing)
 -- ====================================================
 -- INSERT INTO contact_requests (name, email, phone, people, date, location, type, message, status)

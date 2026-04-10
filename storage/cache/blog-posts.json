@@ -1,0 +1,145 @@
+{
+    "updated_at": "2026-04-09T12:00:00+00:00",
+    "posts": [
+        {
+            "slug": "buffet-entreprise-sur-mesure",
+            "title": "Buffet d’entreprise sur mesure : trouver le bon rythme",
+            "date_iso": "2026-04-07",
+            "author": "Traiteur Passion",
+            "excerpt": "Petit-déjeuner d’équipe, déjeuner client ou soirée réseau : un buffet réussi se pense comme un vrai parcours de dégustation.",
+            "categories": ["Entreprise", "Conseils", "Buffet"],
+            "cover_image": "/uploads/pages/blog/images/blogIllu.png",
+            "video_url": null,
+            "intro": "Un buffet professionnel ne se limite pas à aligner des plateaux. Il doit accompagner le timing de l’événement, faciliter les échanges et rester irréprochable jusqu’au dernier passage.",
+            "sections": [
+                {
+                    "title": "Penser le service avant la carte",
+                    "text": "Le format dépend du moment de la journée, du temps disponible et du niveau de convivialité recherché. Un accueil café n’appelle pas la même cadence qu’un cocktail de lancement ou qu’un déjeuner assis en version souple."
+                },
+                {
+                    "title": "Varier les formats pour garder de l’élan",
+                    "text": "Bouchées froides, pièces chaudes, pièces végétariennes, douceurs finales : l’alternance évite la monotonie et améliore la circulation autour du buffet. Les convives se servent plus facilement quand les propositions sont lisibles."
+                },
+                {
+                    "title": "Soigner l’image de marque",
+                    "text": "Sur un événement d’entreprise, la prestation culinaire reflète directement votre niveau d’exigence. Une présentation nette, une logistique fluide et des saveurs équilibrées participent autant à l’expérience que le contenu de la réunion."
+                }
+            ],
+            "is_published": true,
+            "created_at": "2026-04-09T12:00:00+00:00",
+            "updated_at": "2026-04-09T12:00:00+00:00"
+        },
+        {
+            "slug": "brunch-lendemain-mariage",
+            "title": "Le brunch du lendemain : prolonger le mariage sans retomber",
+            "date_iso": "2026-03-25",
+            "author": "Traiteur Passion",
+            "excerpt": "Le brunch permet de retrouver ses proches dans une ambiance plus détendue, avec une cuisine généreuse et facile à partager.",
+            "categories": ["Mariage", "Brunch", "Organisation"],
+            "cover_image": "/uploads/pages/blog/images/blogIllu.jpg",
+            "video_url": null,
+            "intro": "Après l’intensité d’un mariage, le brunch offre une respiration bienvenue. C’est souvent le moment préféré des familles et des amis proches, parce qu’il laisse plus de place à la discussion et aux souvenirs de la veille.",
+            "sections": [
+                {
+                    "title": "Une ambiance plus libre",
+                    "text": "On oublie le rythme du dîner et le protocole du jour J. Les invités arrivent progressivement, s’installent où ils veulent et profitent d’une formule plus décontractée qui reste néanmoins élégante."
+                },
+                {
+                    "title": "La bonne carte pour tous les profils",
+                    "text": "Viennoiseries, pièces salées, œufs, salades fraîches, fruits et boissons chaudes : le succès d’un brunch repose sur l’équilibre entre réconfort, fraîcheur et simplicité de service."
+                },
+                {
+                    "title": "Un format facile à intégrer",
+                    "text": "En intérieur, sous tente ou dans un jardin, le brunch s’adapte facilement au lieu et au nombre de convives. C’est aussi une excellente manière d’optimiser les restes du week-end lorsque cela a été anticipé avec le traiteur."
+                }
+            ],
+            "is_published": true,
+            "created_at": "2026-04-09T12:00:00+00:00",
+            "updated_at": "2026-04-09T12:00:00+00:00"
+        },
+        {
+            "slug": "paella-en-poelon",
+            "title": "La Paella en Poêlon",
+            "date_iso": "2026-03-02",
+            "author": "Traiteur Passion",
+            "excerpt": "Découvrez notre recette signature de paella en poêlon, préparée devant vos invités pour un moment convivial et spectaculaire.",
+            "categories": ["Recette", "Poêlon"],
+            "cover_image": "/uploads/pages/blog/images/blogIllu.jpg",
+            "video_url": "/uploads/pages/blog/videos/paella.mp4",
+            "intro": "La paella en poêlon fait partie de nos animations culinaires les plus demandées. Généreuse, parfumée et festive, elle transforme un repas en véritable expérience.",
+            "sections": [
+                {
+                    "title": "Une animation qui rassemble",
+                    "text": "Préparée en direct, la paella attire les regards et crée un vrai moment de partage. Les couleurs, les arômes et la cuisson au poêlon donnent immédiatement le ton de la réception."
+                },
+                {
+                    "title": "Des produits choisis avec soin",
+                    "text": "Nous sélectionnons des ingrédients frais, un riz adapté à la cuisson longue, des épices équilibrées et des garnitures généreuses pour garantir une paella savoureuse et régulière."
+                },
+                {
+                    "title": "Idéale pour vos événements",
+                    "text": "Mariages, anniversaires, événements d’entreprise ou réceptions privées : le format poêlon permet de servir un grand nombre de convives avec une présentation élégante et chaleureuse."
+                }
+            ],
+            "is_published": true,
+            "created_at": "2026-04-09T12:00:00+00:00",
+            "updated_at": "2026-04-09T12:00:00+00:00"
+        },
+        {
+            "slug": "cocktail-dinatoire-de-saison",
+            "title": "Cocktail dînatoire de saison : moins de pièces, plus d’impact",
+            "date_iso": "2026-02-18",
+            "author": "Traiteur Passion",
+            "excerpt": "Un cocktail marquant ne repose pas sur la quantité, mais sur un enchaînement juste, lisible et adapté à la saison.",
+            "categories": ["Cocktail", "Saisonnier", "Réception"],
+            "cover_image": "/uploads/pages/blog/images/blogIllu.png",
+            "video_url": null,
+            "intro": "Le cocktail dînatoire séduit parce qu’il permet un événement mobile, vivant et élégant. Pour qu’il fonctionne vraiment, chaque pièce doit avoir un rôle précis et s’inscrire dans une progression cohérente.",
+            "sections": [
+                {
+                    "title": "Commencer par des bouchées franches",
+                    "text": "Les premières pièces donnent le ton. Elles doivent être immédiates, nettes en bouche et faciles à saisir, sans sacrifier la finesse. C’est ce premier contact qui installe la confiance des invités."
+                },
+                {
+                    "title": "S’appuyer sur la saison",
+                    "text": "Produits printaniers, légumes d’été, notes plus réconfortantes en automne : la saison aide à construire un menu qui paraît évident, tout en améliorant la fraîcheur et la cohérence de l’ensemble."
+                },
+                {
+                    "title": "Prévoir une vraie conclusion",
+                    "text": "Un bon cocktail ne s’interrompt pas brutalement. Une pièce chaude plus généreuse, suivie d’une transition vers les desserts, permet de clore la réception avec une sensation de repas complet."
+                }
+            ],
+            "is_published": true,
+            "created_at": "2026-04-09T12:00:00+00:00",
+            "updated_at": "2026-04-09T12:00:00+00:00"
+        },
+        {
+            "slug": "animation-plancha-et-brasero",
+            "title": "Animation plancha et brasero : faire de la cuisson un spectacle",
+            "date_iso": "2026-01-30",
+            "author": "Traiteur Passion",
+            "excerpt": "Cuire devant les convives transforme le service en moment vivant, chaleureux et très mémorable.",
+            "categories": ["Animation culinaire", "Plancha", "Événement"],
+            "cover_image": "/uploads/pages/blog/images/blogIllu.jpg",
+            "video_url": null,
+            "intro": "Les animations culinaires créent immédiatement de la présence. Elles apportent du rythme à la réception, une odeur appétissante dans l’air et cette sensation que quelque chose se passe vraiment sous les yeux des invités.",
+            "sections": [
+                {
+                    "title": "Une cuisson qui attire naturellement",
+                    "text": "Le son, les flammes, les parfums et les gestes du chef créent un point de rassemblement spontané. La cuisine devient un élément central de la scénographie de l’événement."
+                },
+                {
+                    "title": "Des produits adaptés au direct",
+                    "text": "Certaines préparations se prêtent parfaitement à ce format : gambas, viandes marinées, légumes grillés, mini-brochettes ou garnitures minute. Le choix des pièces doit garantir une cuisson rapide et régulière."
+                },
+                {
+                    "title": "Un format idéal pour les réceptions conviviales",
+                    "text": "Garden party, mariage, anniversaire ou lancement de produit : la plancha et le brasero installent une atmosphère plus incarnée qu’un buffet statique, tout en conservant un haut niveau de service."
+                }
+            ],
+            "is_published": true,
+            "created_at": "2026-04-09T12:00:00+00:00",
+            "updated_at": "2026-04-09T12:00:00+00:00"
+        }
+    ]
+}
