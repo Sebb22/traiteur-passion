@@ -74,7 +74,7 @@ final class Mailer
             try {
                 $mail->addBCC($bccEmail);
             } catch (PHPMailerException $e) {
-                error_log(sprintf('MAIL_BCC_TO ignored (%s): %s', $bccEmail, $e->getMessage()));
+                error_log(sprintf('Invalid BCC address ignored (%s): %s', $bccEmail, $e->getMessage()));
             }
         }
 
