@@ -4,7 +4,6 @@ declare (strict_types = 1);
 namespace App\Services;
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 final class Mailer
 {
@@ -71,11 +70,12 @@ final class Mailer
                 continue;
             }
 
-            try {
-                $mail->addBCC($bccEmail);
-            } catch (PHPMailerException $e) {
+            if (! PHPMailer::validateAddress($bccEmail)) {
                 error_log(sprintf('Invalid BCC address at position %d in MAIL_BCC_TO ignored during mail send.', (int) $index + 1));
+                continue;
             }
+
+            $mail->addBCC($bccEmail);
         }
 
         if ($mail->getToAddresses() === []) {
