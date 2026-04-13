@@ -70,7 +70,11 @@ final class Mailer
                 continue;
             }
 
-            $mail->addBCC($bccEmail);
+            try {
+                $mail->addBCC($bccEmail);
+            } catch (\Throwable $e) {
+                continue;
+            }
         }
 
         if ($mail->getToAddresses() === []) {
