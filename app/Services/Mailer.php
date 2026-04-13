@@ -64,6 +64,15 @@ final class Mailer
             $mail->addAddress($email, trim((string) ($recipient['name'] ?? '')));
         }
 
+        foreach (($this->config['bcc_recipients'] ?? []) as $bccEmail) {
+            $bccEmail = trim((string) $bccEmail);
+            if (! filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+
+            $mail->addBCC($bccEmail);
+        }
+
         if ($mail->getToAddresses() === []) {
             throw new \RuntimeException('Aucun destinataire e-mail valide.');
         }

@@ -316,7 +316,7 @@ final class ContactNotificationService
 
     /**
      * @param array<string,mixed> $data
-     * @param array{title:string,preheader:string,eyebrow:string,accentColor:string,footerNote:string} $layout
+        * @param array{title:string,preheader:string,eyebrow:string,heroBadge:string,heroSummary:string,accentColor:string,pageBackground:string,panelBackground:string,footerBackground:string,borderColor:string,eyebrowColor:string,heroBackground:string,heroTextColor:string,heroAccent:string,badgeBackground:string,badgeColor:string,footerNote:string} $layout
      */
     private function renderEmailTemplate(string $template, array $data, array $layout): string
     {
@@ -331,14 +331,26 @@ final class ContactNotificationService
         require $bodyPath;
         $content = (string) ob_get_clean();
 
-        $layoutPath  = dirname(__DIR__) . '/Views/emails/layout.php';
-        $appName     = $this->appName();
-        $appUrl      = $this->appUrl();
-        $title       = $layout['title'];
-        $preheader   = $layout['preheader'];
-        $eyebrow     = $layout['eyebrow'];
-        $accentColor = $layout['accentColor'];
-        $footerNote  = $layout['footerNote'];
+        $layoutPath       = dirname(__DIR__) . '/Views/emails/layout.php';
+        $appName          = $this->appName();
+        $appUrl           = $this->appUrl();
+        $title            = $layout['title'];
+        $preheader        = $layout['preheader'];
+        $eyebrow          = $layout['eyebrow'];
+        $heroBadge        = $layout['heroBadge'];
+        $heroSummary      = $layout['heroSummary'];
+        $accentColor      = $layout['accentColor'];
+        $pageBackground   = $layout['pageBackground'];
+        $panelBackground  = $layout['panelBackground'];
+        $footerBackground = $layout['footerBackground'];
+        $borderColor      = $layout['borderColor'];
+        $eyebrowColor     = $layout['eyebrowColor'];
+        $heroBackground   = $layout['heroBackground'];
+        $heroTextColor    = $layout['heroTextColor'];
+        $heroAccent       = $layout['heroAccent'];
+        $badgeBackground  = $layout['badgeBackground'];
+        $badgeColor       = $layout['badgeColor'];
+        $footerNote       = $layout['footerNote'];
 
         ob_start();
         require $layoutPath;
