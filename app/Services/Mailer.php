@@ -65,7 +65,7 @@ final class Mailer
             $mail->addAddress($email, trim((string) ($recipient['name'] ?? '')));
         }
 
-        foreach (($this->config['bcc_recipients'] ?? []) as $bccEmail) {
+        foreach (($this->config['bcc_recipients'] ?? []) as $index => $bccEmail) {
             $bccEmail = trim((string) $bccEmail);
             if (! filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
                 continue;
@@ -74,7 +74,7 @@ final class Mailer
             try {
                 $mail->addBCC($bccEmail);
             } catch (PHPMailerException $e) {
-                error_log('Invalid BCC address from MAIL_BCC_TO ignored during mail send.');
+                error_log(sprintf('Invalid BCC address at position %d in MAIL_BCC_TO ignored during mail send.', (int) $index + 1));
             }
         }
 
