@@ -66,10 +66,6 @@ final class Mailer
 
         foreach (($this->config['bcc_recipients'] ?? []) as $index => $bccEmail) {
             $bccEmail = trim((string) $bccEmail);
-            if (! filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
-                continue;
-            }
-
             if (! PHPMailer::validateAddress($bccEmail)) {
                 error_log(sprintf('Invalid BCC address at position %d in MAIL_BCC_TO ignored during mail send.', (int) $index + 1));
                 continue;
