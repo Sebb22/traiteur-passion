@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace App\Services;
 
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 final class Mailer
 {
@@ -72,8 +73,8 @@ final class Mailer
 
             try {
                 $mail->addBCC($bccEmail);
-            } catch (\Throwable $e) {
-                continue;
+            } catch (PHPMailerException $e) {
+                error_log(sprintf('MAIL_BCC_TO ignored (%s): %s', $bccEmail, $e->getMessage()));
             }
         }
 
