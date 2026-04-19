@@ -9,6 +9,7 @@ import { initMenuTabs } from "./menu/menuTabs";
 import { initMenuOrder } from "./menu/menuOrder";
 import { initAdminCatalog } from "./admin/catalog";
 import { initAdminBlog } from "./admin/blog";
+import { initAdminLogin } from "./admin/login";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenuOrder();
     initAdminCatalog();
     initAdminBlog();
+    initAdminLogin();
 
     enableWheelRedirect();
     console.log("Traiteur Passion ready 🔥");
