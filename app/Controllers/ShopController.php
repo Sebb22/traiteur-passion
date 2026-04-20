@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Models\Shop;
 use App\Models\ShopOrder;
+use App\Services\ShopOrderNotificationService;
 use App\Services\ShopOrderSubmissionService;
 
 final class ShopController
@@ -55,6 +56,17 @@ final class ShopController
                 'stock'     => $this->safeStockSnapshot(),
             ]);
             return;
+        }
+
+        $orderId = (int) ($orderResult['order_id'] ?? 0);
+        if ($orderId > 0) {
+            $orderData = (new ShopOrder())->getByIdWithItems($orderId);
+            if (is_array($orderData)) {
+                $notificationResult = (new ShopOrderNotificationService())->dispatch($orderId, $orderData);
+                if (($notificationResult['errors'] ?? []) !== []) {
+                    error_log('Shop order notification error(s): ' . implode(' | ', $notificationResult['errors']));
+                }
+            }
         }
 
         $this->json(200, [

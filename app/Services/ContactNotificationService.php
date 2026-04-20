@@ -3,6 +3,8 @@ declare (strict_types = 1);
 
 namespace App\Services;
 
+use App\Core\Url;
+
 final class ContactNotificationService
 {
     private Mailer $mailer;
@@ -359,8 +361,7 @@ final class ContactNotificationService
 
     private function appUrl(): ?string
     {
-        $url = trim((string) ($this->appConfig['url'] ?? ''));
-        return $url === '' ? null : rtrim($url, '/');
+        return Url::resolveBaseUrl((string) ($this->appConfig['url'] ?? ''));
     }
 
     private function adminDetailUrl(int $contactId): ?string

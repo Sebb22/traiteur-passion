@@ -16,16 +16,16 @@
         <nav class="header__nav header__nav--desktop" aria-label="Navigation principale">
             <a href="/carte-évènementielle"
                 class="header__link<?php echo Navigation::isActivePath('/carte-évènementielle') ? ' header__link--active' : ''; ?>"
-                <?php echo Navigation::isActivePath('/carte-évènementielle') ? ' aria-current="page"' : ''; ?>>Carte évènementielle</a>
+                <?php echo Navigation::isActivePath('/carte-évènementielle') ? ' aria-current="page"' : ''; ?>><span class="header__linkLabel header__linkLabel--stack">Carte<br>évènementielle</span></a>
             <a href="/boutique-en-ligne"
                 class="header__link<?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' header__link--active' : ''; ?>"
-                <?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' aria-current="page"' : ''; ?>>Boutique en ligne</a>
+                <?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' aria-current="page"' : ''; ?>><span class="header__linkLabel header__linkLabel--stack">Boutique<br>en ligne</span></a>
             <a href="/blog"
                 class="header__link<?php echo Navigation::isActivePath('/blog') ? ' header__link--active' : ''; ?>"
-                <?php echo Navigation::isActivePath('/blog') ? ' aria-current="page"' : ''; ?>>Blog</a>
+                <?php echo Navigation::isActivePath('/blog') ? ' aria-current="page"' : ''; ?>><span class="header__linkLabel">Blog</span></a>
             <a href="/a-propos"
                 class="header__link<?php echo Navigation::isActivePath('/a-propos') ? ' header__link--active' : ''; ?>"
-                <?php echo Navigation::isActivePath('/a-propos') ? ' aria-current="page"' : ''; ?>>A propos</a>
+                <?php echo Navigation::isActivePath('/a-propos') ? ' aria-current="page"' : ''; ?>><span class="header__linkLabel">A propos</span></a>
 
         </nav>
         <a href="/contact"

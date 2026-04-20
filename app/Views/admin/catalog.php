@@ -81,7 +81,7 @@
                 <div class="adminPanelHead__actions">
                     <a href="/admin" class="adminBtn">Dashboard</a>
                     <a href="/carte-évènementielle" class="adminBtn adminBtn--primary">Voir la carte évènementielle</a>
-                    <a href="/admin/contacts" class="adminBtn">Demandes</a>
+                    <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
                     <form action="/admin/logout" method="post">
                         <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>
                     </form>

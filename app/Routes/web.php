@@ -55,6 +55,7 @@ $router->post('/admin/boutique/sections/{id}/items/reorder', 'AdminController@re
 $router->post('/admin/boutique/items/{id}', 'AdminController@updateShopItem');
 $router->post('/admin/boutique/image-preview', 'AdminController@previewShopImage');
 $router->post('/admin/boutique/items/{id}/delete', 'AdminController@deleteShopItem');
+$router->get('/admin/boutique/orders/{id}', 'AdminController@orderDetail');
 $router->post('/admin/boutique/orders/{id}/status', 'AdminController@updateShopOrderStatus');
 $router->get('/admin/contacts/export', 'AdminController@exportContacts');
 $router->get('/admin/contacts', 'AdminController@contacts');

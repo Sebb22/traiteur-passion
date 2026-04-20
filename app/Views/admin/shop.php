@@ -703,14 +703,22 @@
                             <?php foreach ($recentOrders as $order): ?>
                             <tr>
                                 <td>
-                                    <strong><?php echo $e($order['customer_name'] ?? ''); ?></strong><br>
+                                    <strong>
+                                        <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminLink">
+                                            #<?php echo (int) ($order['id'] ?? 0); ?> · <?php echo $e($order['customer_name'] ?? ''); ?>
+                                        </a>
+                                    </strong><br>
                                     <?php echo $e($order['customer_email'] ?? ''); ?><br>
                                     <span
                                         class="adminHint"><?php echo $e($formatDateTime($order['created_at'] ?? '')); ?></span>
                                 </td>
                                 <td>
+                                    <strong><?php echo $e(($order['fulfillment_method'] ?? 'pickup') === 'delivery' ? 'Livraison' : 'Retrait'); ?></strong><br>
                                     <?php echo $e($order['pickup_date'] ?? ''); ?><br>
                                     <span class="adminHint"><?php echo $e($order['pickup_slot'] ?? ''); ?></span>
+                                    <?php if (($order['fulfillment_method'] ?? 'pickup') === 'delivery'): ?><br>
+                                    <span class="adminHint"><?php echo $e(trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? '')))); ?></span>
+                                    <?php endif; ?>
                                 </td>
                                 <td><?php echo (int) ($order['item_count'] ?? 0); ?> article(s)</td>
                                 <td><?php echo $e($formatPrice($order['total_cents'] ?? 0)); ?></td>
@@ -728,6 +736,7 @@
                                         </select>
                                         <div class="adminInlineActions">
                                             <button type="submit" class="adminBtn">Enregistrer</button>
+                                            <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminBtn">Détail</a>
                                         </div>
                                     </form>
                                 </td>

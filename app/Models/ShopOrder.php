@@ -8,6 +8,8 @@ use PDO;
 
 final class ShopOrder
 {
+    private const DELIVERY_MINIMUM_CENTS = 1500;
+
     public const STATUS_LABELS = [
         'new'       => 'Nouvelle',
         'confirmed' => 'Confirmée',
@@ -17,6 +19,9 @@ final class ShopOrder
     ];
 
     private PDO $db;
+
+    /** @var list<string>|null */
+    private ?array $orderColumns = null;
 
     public function __construct()
     {
@@ -106,24 +111,48 @@ final class ShopOrder
                 ];
             }
 
-            $orderStmt = $this->db->prepare(
-                'INSERT INTO boutique_orders (
-                    customer_name, customer_email, customer_phone,
-                    pickup_date, pickup_slot, message, status, created_at
-                 ) VALUES (
-                    :customer_name, :customer_email, :customer_phone,
-                    :pickup_date, :pickup_slot, :message, :status, NOW()
-                 )',
-            );
-            $orderStmt->execute([
-                'customer_name'  => trim((string) ($customerData['name'] ?? '')),
-                'customer_email' => trim((string) ($customerData['email'] ?? '')),
-                'customer_phone' => $this->nullableTrim($customerData['phone'] ?? null),
-                'pickup_date'    => $this->nullableTrim($customerData['pickup_date'] ?? null),
-                'pickup_slot'    => $this->nullableTrim($customerData['pickup_slot'] ?? null),
-                'message'        => $this->nullableTrim($customerData['message'] ?? null),
-                'status'         => 'new',
-            ]);
+            $orderTotalCents = 0;
+            foreach ($requested as $itemId => $quantity) {
+                $item           = $itemsById[$itemId];
+                $unitPriceCents = max(0, (int) ($item['price_cents'] ?? 0));
+                $orderTotalCents += $unitPriceCents * $quantity;
+            }
+
+            $fulfillmentMethod = $this->normalizeFulfillmentMethod($customerData['fulfillment_method'] ?? null);
+            if ($fulfillmentMethod === 'delivery' && $orderTotalCents < self::DELIVERY_MINIMUM_CENTS) {
+                $this->db->rollBack();
+                return [
+                    'success' => false,
+                    'status'  => 400,
+                    'error'   => 'La livraison est proposée à partir de 15 € de commande.',
+                ];
+            }
+
+            $orderPayload = [
+                'customer_name'         => trim((string) ($customerData['name'] ?? '')),
+                'customer_email'        => trim((string) ($customerData['email'] ?? '')),
+                'customer_phone'        => $this->nullableTrim($customerData['phone'] ?? null),
+                'fulfillment_method'    => $fulfillmentMethod,
+                'pickup_date'           => $this->nullableTrim($customerData['pickup_date'] ?? null),
+                'pickup_slot'           => $this->nullableTrim($customerData['pickup_slot'] ?? null),
+                'delivery_address'      => $this->nullableTrim($customerData['delivery_address'] ?? null),
+                'delivery_postal_code'  => $this->nullableTrim($customerData['delivery_postal_code'] ?? null),
+                'delivery_city'         => $this->nullableTrim($customerData['delivery_city'] ?? null),
+                'message'               => $this->nullableTrim($customerData['message'] ?? null),
+                'status'                => 'new',
+            ];
+
+            $availableColumns = array_values(array_filter(
+                array_keys($orderPayload),
+                fn(string $column): bool => $this->hasOrderColumn($column),
+            ));
+
+            $orderStmt = $this->db->prepare(sprintf(
+                'INSERT INTO boutique_orders (%s) VALUES (%s)',
+                implode(', ', $availableColumns),
+                implode(', ', array_map(static fn(string $column): string => ':' . $column, $availableColumns)),
+            ));
+            $orderStmt->execute(array_intersect_key($orderPayload, array_flip($availableColumns)));
 
             $orderId = (int) $this->db->lastInsertId();
 
@@ -225,6 +254,37 @@ final class ShopOrder
         return $stmt->fetchAll();
     }
 
+    public function getByIdWithItems(int $orderId): ?array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT bo.*, COUNT(boi.id) AS line_count,
+                    COALESCE(SUM(boi.quantity), 0) AS item_count,
+                    COALESCE(SUM(boi.line_total_cents), 0) AS total_cents
+             FROM boutique_orders bo
+             LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
+             WHERE bo.id = :id
+             GROUP BY bo.id
+             LIMIT 1",
+        );
+        $stmt->execute(['id' => $orderId]);
+
+        $order = $stmt->fetch();
+        if (! is_array($order)) {
+            return null;
+        }
+
+        $itemsStmt = $this->db->prepare(
+            'SELECT *
+             FROM boutique_order_items
+             WHERE order_id = :order_id
+             ORDER BY id ASC',
+        );
+        $itemsStmt->execute(['order_id' => $orderId]);
+        $order['items'] = $itemsStmt->fetchAll();
+
+        return $order;
+    }
+
     public function updateStatus(int $orderId, string $status): bool
     {
         if (! isset(self::STATUS_LABELS[$status])) {
@@ -319,5 +379,35 @@ final class ShopOrder
     {
         $value = trim((string) ($value ?? ''));
         return $value === '' ? null : $value;
+    }
+
+    private function normalizeFulfillmentMethod($value): string
+    {
+        return trim((string) $value) === 'delivery' ? 'delivery' : 'pickup';
+    }
+
+    private function hasOrderColumn(string $column): bool
+    {
+        return in_array($column, $this->getOrderColumns(), true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getOrderColumns(): array
+    {
+        if ($this->orderColumns !== null) {
+            return $this->orderColumns;
+        }
+
+        $stmt = $this->db->query('SHOW COLUMNS FROM boutique_orders');
+        $rows = $stmt !== false ? $stmt->fetchAll() : [];
+
+        $this->orderColumns = array_values(array_filter(array_map(
+            static fn(array $row): string => (string) ($row['Field'] ?? ''),
+            is_array($rows) ? $rows : [],
+        )));
+
+        return $this->orderColumns;
     }
 }

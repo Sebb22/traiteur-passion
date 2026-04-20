@@ -41,10 +41,10 @@
             <div class="adminPanelHead__row">
                 <div>
                     <h2 class="adminTitle">Vue d'ensemble</h2>
-                    <p class="adminSubtitle">Synthese des demandes entrantes et de la carte pour prioriser l'exploitation.</p>
+                    <p class="adminSubtitle">Synthese des demandes entrantes, des commandes boutique et de la carte pour prioriser l'exploitation.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin/contacts" class="adminBtn adminBtn--primary">Voir les demandes</a>
+                    <a href="/admin/contacts" class="adminBtn adminBtn--primary">Voir demandes & commandes</a>
                     <a href="/admin/blog" class="adminBtn">Gerer le blog</a>
                     <a href="/admin/catalog" class="adminBtn">Editer la carte</a>
                     <a href="/admin/boutique" class="adminBtn">Gerer la boutique</a>

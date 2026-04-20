@@ -11,6 +11,7 @@
     /** @var array<int,array{label:string,value:string}> $summaryFields */
     /** @var array<int,array{category:string,name:string,price:string,quantity:string}> $menuItems */
     /** @var string|null $adminDetailUrl */
+    /** @var string|null $ctaLabel */
 
     $e = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 ?>
@@ -104,7 +105,7 @@
 <p style="margin:0 0 8px 0;">
     <a href="<?php echo $e($adminDetailUrl); ?>"
         style="display:inline-block;padding:13px 18px;border-radius:999px;background:<?php echo $e($ctaBackground); ?>;color:<?php echo $e($ctaTextColor); ?>;text-decoration:none;font-weight:700;font-size:14px;">
-        Ouvrir la demande dans l'admin
+        <?php echo $e($ctaLabel ?? "Ouvrir la demande dans l'admin"); ?>
     </a>
 </p>
 <?php endif; ?>

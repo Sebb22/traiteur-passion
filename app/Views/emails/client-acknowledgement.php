@@ -2,6 +2,7 @@
     /** @var string $requestLabel */
     /** @var string $clientName */
     /** @var int $contactId */
+    /** @var string|null $referenceLabel */
     /** @var string $introCopy */
     /** @var string $nextStepCopy */
     /** @var string $messageBlockTitle */
@@ -28,7 +29,7 @@
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px 0;background:#f8f2ea;border:1px solid #e6dccf;border-radius:18px;">
     <tr>
         <td style="padding:18px 20px;">
-            <p style="margin:0 0 4px 0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8b6f47;font-weight:700;">Référence de demande</p>
+            <p style="margin:0 0 4px 0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8b6f47;font-weight:700;"><?php echo $e($referenceLabel ?? 'Référence de demande'); ?></p>
             <p style="margin:0;font-size:26px;line-height:1.2;color:#231f20;font-weight:700;">#<?php echo $e($contactId); ?></p>
         </td>
     </tr>

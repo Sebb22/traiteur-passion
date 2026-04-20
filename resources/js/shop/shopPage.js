@@ -47,6 +47,8 @@ export function initShopPage() {
     const summaryTabCount = form.querySelector("[data-shop-summary-tab-count]");
     const summaryCountMobile = form.querySelector("[data-shop-summary-count-mobile]");
     const summaryTabTotal = form.querySelector("[data-shop-summary-tab-total]");
+    const summaryTabCta = form.querySelector(".shopSummaryTab__cta");
+    const summaryBoundsHost = form.closest(".shopPanel") || form.closest(".menuSplit__right");
     const summaryLines = form.querySelector("[data-shop-summary-lines]");
     const summaryTotal = form.querySelector("[data-shop-summary-total]");
     const feedback = form.querySelector("[data-shop-feedback]");
@@ -54,6 +56,9 @@ export function initShopPage() {
     const goCheckoutButton = form.querySelector("[data-shop-go-checkout]");
     const checkout = form.querySelector("[data-shop-checkout]");
     const checkoutAnchor = form.querySelector("#shop-checkout");
+    const fulfillmentInputs = Array.from(form.querySelectorAll("[data-shop-fulfillment]"));
+    const deliveryPanel = form.querySelector("[data-shop-delivery-panel]");
+    const deliveryFields = Array.from(form.querySelectorAll("[data-shop-delivery-field]"));
     const itemNodes = Array.from(form.querySelectorAll("[data-shop-item]"));
     const inputs = Array.from(form.querySelectorAll("[data-shop-qty]"));
     const addButtons = Array.from(form.querySelectorAll("[data-shop-add]"));
@@ -61,7 +66,9 @@ export function initShopPage() {
     const decreaseButtons = Array.from(form.querySelectorAll("[data-shop-decrease]"));
     const removeButtons = Array.from(form.querySelectorAll("[data-shop-remove]"));
     let isSummaryOpen = false;
+    let isSummaryPinned = false;
     let hideSummaryTimeout = null;
+    let summaryPromptTimeout = null;
     let summaryDragResetTimeout = null;
     let touchStartY = 0;
     let touchCurrentY = 0;
@@ -118,6 +125,10 @@ export function initShopPage() {
             summaryToggle.setAttribute("aria-expanded", String(open));
         }
 
+        if (summaryTabCta) {
+            summaryTabCta.textContent = open ? "Fermer le panier" : "Ouvrir le panier";
+        }
+
         if (summaryClose) {
             summaryClose.hidden = !open;
         }
@@ -141,21 +152,61 @@ export function initShopPage() {
     };
 
     const scheduleSummaryHide = () => {
+        if (!isDesktopToast() || isSummaryPinned) {
+            return;
+        }
+
         clearSummaryHideTimeout();
         hideSummaryTimeout = window.setTimeout(() => {
             setSummaryOpen(false);
-        }, 2200);
+        }, 1800);
+    };
+
+    const clearSummaryPromptTimeout = () => {
+        if (summaryPromptTimeout) {
+            window.clearTimeout(summaryPromptTimeout);
+            summaryPromptTimeout = null;
+        }
     };
 
     const revealSummaryToast = () => {
-        if (!summaryDock || !summary || summary.hidden) {
+        if (!summaryDock || !summaryToggle || summaryToggle.hidden) {
             return;
         }
 
         if (isDesktopToast()) {
+            isSummaryPinned = false;
             setSummaryOpen(true);
+            clearSummaryPromptTimeout();
+            if (summaryDock) {
+                summaryDock.classList.remove("is-prompt");
+            }
             scheduleSummaryHide();
+            return;
         }
+
+        summaryDock.classList.add("is-prompt");
+        clearSummaryPromptTimeout();
+        summaryPromptTimeout = window.setTimeout(() => {
+            summaryDock.classList.remove("is-prompt");
+            summaryPromptTimeout = null;
+        }, 1600);
+    };
+
+    const syncSummaryDockBounds = () => {
+        if (!summaryDock) {
+            return;
+        }
+
+        if (!isDesktopToast() || !(summaryBoundsHost instanceof HTMLElement)) {
+            summaryDock.style.removeProperty("left");
+            summaryDock.style.removeProperty("right");
+            return;
+        }
+
+        const bounds = summaryBoundsHost.getBoundingClientRect();
+        summaryDock.style.left = `${Math.max(12, Math.round(bounds.left))}px`;
+        summaryDock.style.right = `${Math.max(12, Math.round(window.innerWidth - bounds.right))}px`;
     };
 
     const items = new Map();
@@ -249,6 +300,25 @@ export function initShopPage() {
         feedback.className = `shopFeedback is-${type}`;
     };
 
+    const syncFulfillmentState = () => {
+        const wantsDelivery = fulfillmentInputs.some(
+            (input) => input instanceof HTMLInputElement && input.checked && input.value === "delivery",
+        );
+
+        if (deliveryPanel instanceof HTMLElement) {
+            deliveryPanel.hidden = !wantsDelivery;
+        }
+
+        deliveryFields.forEach((field) => {
+            if (!(field instanceof HTMLInputElement)) {
+                return;
+            }
+
+            field.disabled = !wantsDelivery;
+            field.required = wantsDelivery;
+        });
+    };
+
     const renderSummary = () => {
         let totalCount = 0;
         let totalCents = 0;
@@ -339,7 +409,8 @@ export function initShopPage() {
         }
 
         if (summaryDock) {
-            summaryDock.classList.toggle("is-available", totalCount > 0);
+            summaryDock.classList.add("is-available");
+            summaryDock.classList.toggle("is-empty", totalCount === 0);
         }
 
         if (summary) {
@@ -353,15 +424,16 @@ export function initShopPage() {
         }
 
         if (summaryToggle) {
-            summaryToggle.hidden = isDesktopToast() ? false : totalCount === 0;
-        }
-
-        if (!isDesktopToast() && totalCount > 0 && !isSummaryOpen) {
-            clearSummaryHideTimeout();
+            summaryToggle.hidden = false;
         }
 
         if (totalCount === 0) {
             clearSummaryHideTimeout();
+            clearSummaryPromptTimeout();
+            isSummaryPinned = false;
+            if (summaryDock) {
+                summaryDock.classList.remove("is-prompt");
+            }
             setSummaryOpen(false);
         }
 
@@ -466,6 +538,12 @@ export function initShopPage() {
         });
     });
 
+    fulfillmentInputs.forEach((input) => {
+        input.addEventListener("change", () => {
+            syncFulfillmentState();
+        });
+    });
+
     addButtons.forEach((button) => {
         button.addEventListener("click", () => {
             const item = items.get(Number.parseInt(button.getAttribute("data-item-id") || "0", 10));
@@ -521,18 +599,27 @@ export function initShopPage() {
                 return;
             }
 
-            const nextOpenState = !isSummaryOpen;
-            setSummaryOpen(nextOpenState);
-            if (isDesktopToast() && nextOpenState) {
-                scheduleSummaryHide();
-            } else {
+            if (isDesktopToast() && isSummaryOpen && !isSummaryPinned) {
+                isSummaryPinned = true;
                 clearSummaryHideTimeout();
+                setSummaryOpen(true);
+                return;
+            }
+
+            const nextOpenState = !isSummaryOpen;
+            isSummaryPinned = nextOpenState;
+            setSummaryOpen(nextOpenState);
+            clearSummaryHideTimeout();
+            clearSummaryPromptTimeout();
+            if (summaryDock) {
+                summaryDock.classList.remove("is-prompt");
             }
         });
     }
 
     if (summaryClose) {
         summaryClose.addEventListener("click", () => {
+            isSummaryPinned = false;
             setSummaryOpen(false);
             clearSummaryHideTimeout();
         });
@@ -540,9 +627,55 @@ export function initShopPage() {
 
     if (summaryOverlay) {
         summaryOverlay.addEventListener("click", () => {
+            isSummaryPinned = false;
             setSummaryOpen(false);
             clearSummaryHideTimeout();
         });
+    }
+
+    [summaryToggle, summary].forEach((node) => {
+        if (!node) {
+            return;
+        }
+
+        node.addEventListener("mouseenter", () => {
+            if (!isDesktopToast() || !isSummaryOpen) {
+                return;
+            }
+
+            clearSummaryHideTimeout();
+        });
+
+        node.addEventListener("mouseleave", () => {
+            if (!isDesktopToast() || !isSummaryOpen || isSummaryPinned) {
+                return;
+            }
+
+            scheduleSummaryHide();
+        });
+    });
+
+    if (summary) {
+        summary.addEventListener(
+            "wheel",
+            (event) => {
+                if (!isDesktopToast() || !isSummaryOpen) {
+                    return;
+                }
+
+                const nextScrollTop = summary.scrollTop + event.deltaY;
+                const maxScrollTop = Math.max(0, summary.scrollHeight - summary.clientHeight);
+
+                if (maxScrollTop <= 0) {
+                    event.preventDefault();
+                    return;
+                }
+
+                summary.scrollTop = Math.max(0, Math.min(maxScrollTop, nextScrollTop));
+                event.preventDefault();
+            },
+            { passive: false },
+        );
     }
 
     if (summaryHandle && summary) {
@@ -624,38 +757,19 @@ export function initShopPage() {
         );
     }
 
-    [summaryToggle, summary].forEach((node) => {
-        if (!node) {
-            return;
-        }
-
-        node.addEventListener("mouseenter", () => {
-            if (!isDesktopToast()) {
-                return;
-            }
-
-            if (summaryToggle && !summaryToggle.hidden) {
-                setSummaryOpen(true);
-            }
-            clearSummaryHideTimeout();
-        });
-
-        node.addEventListener("mouseleave", () => {
-            if (!isDesktopToast()) {
-                return;
-            }
-
-            if (summaryToggle && !summaryToggle.hidden) {
-                scheduleSummaryHide();
-            }
-        });
-    });
-
     desktopToastMedia.addEventListener("change", () => {
         clearSummaryHideTimeout();
+        clearSummaryPromptTimeout();
+        isSummaryPinned = false;
+        if (summaryDock) {
+            summaryDock.classList.remove("is-prompt");
+        }
         setSummaryOpen(false);
+        syncSummaryDockBounds();
         renderSummary();
     });
+
+    window.addEventListener("resize", syncSummaryDockBounds);
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -729,6 +843,8 @@ export function initShopPage() {
     });
 
     renderSummary();
+    syncFulfillmentState();
+    syncSummaryDockBounds();
     refreshStock({ silent: true });
     window.setInterval(() => refreshStock({ silent: true }), 15000);
 }

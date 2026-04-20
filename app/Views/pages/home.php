@@ -81,6 +81,16 @@
                 </div>
             </a>
 
+            <a class="home-tile motion-card" href="/boutique-en-ligne" data-reveal="up" data-stagger>
+                <div class="home-tile__media"
+                    style="--tile-bg:url('/uploads/pages/home/images/plateauxRepasIllu.jpg'); --tile-bg-position:center center; --tile-bg-size:cover; --tile-bg-size-hover:108%;">
+                    <span class="corner-slot corner-slot--tile" aria-hidden="true">
+                        <span class="corner-slot__label">Boutique en ligne</span>
+                        <span class="corner-slot__plus">+</span>
+                    </span>
+                </div>
+            </a>
+
             <a class="home-tile motion-card" href="/contact" data-reveal="up" data-stagger>
                 <div class="home-tile__media"
                     style="--tile-bg:url('/uploads/pages/home/images/contactIllu.png'); --tile-bg-size:auto 100%; --tile-bg-size-hover:auto 108%; --tile-bg-position:center center;">

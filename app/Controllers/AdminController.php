@@ -345,8 +345,9 @@ final class AdminController
     {
         AdminAuth::requireAuth();
 
-        $orderId = (int) $id;
-        $status  = trim((string) ($_POST['status'] ?? ''));
+        $orderId  = (int) $id;
+        $status   = trim((string) ($_POST['status'] ?? ''));
+        $redirect = $this->safeAdminRedirect((string) ($_POST['redirect'] ?? '/admin/boutique#orders'));
 
         if ((new ShopOrder())->updateStatus($orderId, $status)) {
             $this->pushFlash('success', 'Statut de commande boutique mis à jour.');
@@ -354,7 +355,46 @@ final class AdminController
             $this->pushFlash('error', 'Impossible de mettre à jour ce statut de commande boutique.');
         }
 
-        $this->redirectShop('#orders');
+        header('Location: ' . $redirect);
+        exit;
+    }
+
+    public function orderDetail(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        $orderModel = new ShopOrder();
+        $order      = $orderModel->getByIdWithItems((int) $id);
+
+        if (! is_array($order)) {
+            HttpError::notFound([
+                'title'           => '404 — Commande introuvable',
+                'eyebrow'         => 'Commande introuvable',
+                'headline'        => 'Cette commande boutique est introuvable.',
+                'message'         => 'La commande demandée n’existe pas ou n’est plus accessible depuis l’administration.',
+                'primaryAction'   => [
+                    'href'  => '/admin/boutique#orders',
+                    'label' => 'Retour aux commandes',
+                ],
+                'secondaryAction' => [
+                    'href'  => '/admin/contacts#orders',
+                    'label' => 'Voir les demandes',
+                ],
+                'hints'           => [
+                    'Vérifiez l’identifiant dans l’URL.',
+                    'Revenez à la liste des commandes boutique pour relancer la recherche.',
+                    'Si la commande a été supprimée ou annulée, son lien peut ne plus être valide.',
+                ],
+            ]);
+            return;
+        }
+
+        View::render('admin/order-detail', [
+            'title'         => 'Administration — Détail commande boutique',
+            'order'         => $order,
+            'statusOptions' => ShopOrder::STATUS_LABELS,
+            'flash'         => $this->pullFlash(),
+        ]);
     }
 
     public function updateCatalogSection(string $id): void
@@ -615,15 +655,38 @@ final class AdminController
         $contacts      = $contactModel->getFiltered($filters, 100);
         $stats         = $contactModel->getAdminSummary();
         $filteredCount = $contactModel->countFiltered($filters);
+        $orderStats    = [
+            'total'           => 0,
+            'new_count'       => 0,
+            'confirmed_count' => 0,
+            'preparing_count' => 0,
+            'completed_count' => 0,
+            'cancelled_count' => 0,
+        ];
+        $recentOrders   = [];
+        $orderLoadError = null;
+
+        try {
+            $orderModel   = new ShopOrder();
+            $orderStats   = $orderModel->getAdminSummary();
+            $recentOrders = $orderModel->getRecentOrders(12);
+        } catch (\Throwable $e) {
+            error_log('Admin contacts order load error: ' . $e->getMessage());
+            $orderLoadError = 'Les commandes boutique sont temporairement indisponibles sur cet écran.';
+        }
 
         View::render('admin/contacts', [
-            'title'         => 'Administration — Demandes et devis',
-            'contacts'      => $contacts,
-            'stats'         => $stats,
-            'filteredCount' => $filteredCount,
-            'filters'       => $filters,
-            'statusOptions' => Contact::STATUS_LABELS,
-            'flash'         => $this->pullFlash(),
+            'title'              => 'Administration — Demandes, devis et commandes',
+            'contacts'           => $contacts,
+            'stats'              => $stats,
+            'orderStats'         => $orderStats,
+            'recentOrders'       => $recentOrders,
+            'orderLoadError'     => $orderLoadError,
+            'filteredCount'      => $filteredCount,
+            'filters'            => $filters,
+            'statusOptions'      => Contact::STATUS_LABELS,
+            'orderStatusOptions' => ShopOrder::STATUS_LABELS,
+            'flash'              => $this->pullFlash(),
         ]);
     }
 

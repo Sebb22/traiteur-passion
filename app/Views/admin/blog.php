@@ -60,7 +60,7 @@
                 </div>
                 <div class="adminPanelHead__actions">
                     <a href="/admin" class="adminBtn">Dashboard</a>
-                    <a href="/admin/contacts" class="adminBtn">Demandes</a>
+                    <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
                     <a href="/admin/catalog" class="adminBtn">Carte</a>
                     <a href="/blog" class="adminBtn adminBtn--primary">Voir le blog</a>
                     <form action="/admin/logout" method="post">

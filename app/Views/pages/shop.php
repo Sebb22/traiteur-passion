@@ -25,10 +25,7 @@
             <div class="menuHero shopHero">
                 <img class="menuHero__img" src="/uploads/pages/menu/images/menu3Illu.webp" alt="" aria-hidden="true">
                 <div class="shopHero__content">
-                    <span class="shopHero__eyebrow">Boutique en ligne</span>
                     <h1 class="menuHero__title">Commande en ligne</h1>
-                    <p class="shopHero__lead">Créations du moment, quantités limitées et retrait organisé simplement.
-                        Les disponibilités se mettent à jour en direct.</p>
                 </div>
             </div>
         </div>
@@ -37,14 +34,32 @@
             <div class="menuPanel shopPanel">
                 <header class="shopIntro">
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
-                    <h2 class="shopIntro__title">Commander avec un stock réel</h2>
+                    <h2 class="shopIntro__title">Une carte renouvelée chaque semaine, produits frais et locaux</h2>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
-                    <p class="shopIntro__copy">Chaque quantité envoyée est vérifiée au moment de la commande pour
-                        garantir la fraîcheur et éviter toute survente.</p>
+                    <div class="shopIntro__body">
+                        <p class="shopIntro__copy">La carte boutique change chaque semaine pour suivre le rythme réel
+                            de production, garantir la fraîcheur et ne proposer que des créations prêtes à être
+                            retirées dans de bonnes conditions.</p>
+                        <p class="shopIntro__copy">Ici, pas de catalogue figé ni d’assemblage standardisé: uniquement
+                            du fait maison, produit en petites séries, avec une sélection volontairement courte pour
+                            préserver le goût, la régularité et la qualité d’exécution. Une livraison peut aussi être
+                            proposée ensuite par l’équipe dans un rayon de 20 km dès 15 € de commande.</p>
+                    </div>
+                    <div class="shopIntro__highlight">
+                        <strong class="shopIntro__highlightTitle">Carte courte, rotation hebdo, fait maison
+                            uniquement</strong>
+                        <p class="shopIntro__highlightCopy">Chaque quantité envoyée est revérifiée au moment de la
+                            commande pour éviter la survente et préserver la qualité des produits réellement
+                            disponibles,
+                            sans compromis sur la fraîcheur. Selon votre zone, nous pouvons aussi valider une livraison
+                            autour de Compiègne dans un rayon de 20 km dès 15 € de commande.</p>
+                    </div>
                     <div class="shopIntro__meta">
+                        <span class="shopPill">Renouvelée chaque semaine</span>
+                        <span class="shopPill">100% fait maison</span>
                         <span class="shopPill">Retrait sur créneau</span>
+                        <span class="shopPill">Livraison 20 km dès 15 €</span>
                         <span class="shopPill">Stock limité</span>
-                        <span class="shopPill">Validation immédiate</span>
                     </div>
                 </header>
 
@@ -69,6 +84,16 @@
                         <div class="shopSummaryDock" data-shop-summary-dock>
                             <button type="button" class="shopSummaryTab" data-shop-summary-toggle aria-expanded="false"
                                 aria-controls="shopSummaryPanel" hidden>
+                                <span class="shopSummaryTab__icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" focusable="false">
+                                        <path
+                                            d="M7 6.5h13l-1.4 6.73a2 2 0 0 1-1.96 1.6H10.1a2 2 0 0 1-1.95-1.56L6.2 4.5H3.5"
+                                            fill="none" stroke="currentColor" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.7" />
+                                        <circle cx="10.5" cy="18.5" r="1.35" fill="currentColor" />
+                                        <circle cx="17.25" cy="18.5" r="1.35" fill="currentColor" />
+                                    </svg>
+                                </span>
                                 <span class="shopSummaryTab__main">
                                     <span class="shopSummaryTab__label">Panier</span>
                                     <strong class="shopSummaryTab__count" data-shop-summary-tab-count>0</strong>
@@ -77,7 +102,7 @@
 
                                 <span class="shopSummaryTab__aside">
                                     <span class="shopSummaryTab__total" data-shop-summary-tab-total>0,00 €</span>
-                                    <span class="shopSummaryTab__cta">Voir le panier</span>
+                                    <span class="shopSummaryTab__cta">Ouvrir le panier</span>
                                 </span>
                             </button>
 
@@ -266,7 +291,10 @@
                                     <span class="shopCheckoutIntro__eyebrow">Après validation</span>
                                     <ul class="shopCheckoutIntro__list">
                                         <li>Le stock choisi est réservé à l’enregistrement.</li>
-                                        <li>Nous revenons vers vous pour confirmer le retrait.</li>
+                                        <li>Nous revenons vers vous pour confirmer le retrait ou proposer la livraison
+                                            si elle est possible.</li>
+                                        <li>La livraison peut être proposée dans un rayon de 20 km dès 15 € de commande.
+                                        </li>
                                         <li>Aucun paiement n’est demandé à cette étape.</li>
                                     </ul>
                                 </div>
@@ -297,21 +325,57 @@
 
                                 <div class="shopCheckoutPanel">
                                     <div class="shopCheckoutPanel__head">
-                                        <h4>Retrait souhaité</h4>
-                                        <p>Dites-nous quand vous souhaitez récupérer la commande.</p>
+                                        <h4>Retrait ou livraison</h4>
+                                        <p>Dites-nous quand vous souhaitez récupérer la commande. Si votre adresse le
+                                            permet, nous pouvons aussi vous proposer une livraison dans un rayon de 20
+                                            km dès 15 €.</p>
                                     </div>
 
                                     <div class="shopFieldGrid">
+                                        <div class="shopField shopField--full">
+                                            <span class="shopField__label">Mode souhaité</span>
+                                            <div class="shopFulfillmentChoices">
+                                                <label class="shopFulfillmentChoice">
+                                                    <input type="radio" name="fulfillment_method" value="pickup" data-shop-fulfillment checked>
+                                                    <span class="shopFulfillmentChoice__body">
+                                                        <strong>Retrait</strong>
+                                                        <small>Créneau confirmé avec vous</small>
+                                                    </span>
+                                                </label>
+                                                <label class="shopFulfillmentChoice">
+                                                    <input type="radio" name="fulfillment_method" value="delivery" data-shop-fulfillment>
+                                                    <span class="shopFulfillmentChoice__body">
+                                                        <strong>Livraison</strong>
+                                                        <small>Dans un rayon de 20 km dès 15 €</small>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
                                         <label class="shopField">
-                                            <span class="shopField__label">Date de retrait</span>
+                                            <span class="shopField__label">Date souhaitée</span>
                                             <input class="shopInput" type="date" name="pickup_date"
                                                 min="<?php echo $e($firstAvailable); ?>" required>
                                         </label>
                                         <label class="shopField">
-                                            <span class="shopField__label">Créneau de retrait</span>
+                                            <span class="shopField__label">Créneau souhaité</span>
                                             <input class="shopInput" type="text" name="pickup_slot"
                                                 placeholder="Ex: samedi 11h00 - 12h00">
                                         </label>
+                                        <div class="shopDeliveryFields shopFieldGrid shopField--full" data-shop-delivery-panel hidden>
+                                            <label class="shopField shopField--full">
+                                                <span class="shopField__label">Adresse de livraison</span>
+                                                <input class="shopInput" type="text" name="delivery_address" data-shop-delivery-field placeholder="Numéro, rue, complément d’adresse">
+                                            </label>
+                                            <label class="shopField">
+                                                <span class="shopField__label">Code postal</span>
+                                                <input class="shopInput" type="text" name="delivery_postal_code" data-shop-delivery-field inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="60200">
+                                            </label>
+                                            <label class="shopField">
+                                                <span class="shopField__label">Ville</span>
+                                                <input class="shopInput" type="text" name="delivery_city" data-shop-delivery-field placeholder="Compiègne">
+                                            </label>
+                                            <p class="shopDeliveryFields__note">La livraison reste validée par l’équipe selon l’adresse, la zone desservie et un minimum de 15 € de commande.</p>
+                                        </div>
                                         <label class="shopField shopField--full">
                                             <span class="shopField__label">Message</span>
                                             <textarea class="shopTextarea" name="message" rows="4"
