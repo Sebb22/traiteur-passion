@@ -263,6 +263,29 @@ final class Shop
         $stmt->execute(['id' => $id]);
     }
 
+    public function getItemById(int $id): ?array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM boutique_items WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+
+        $item = $stmt->fetch();
+        return is_array($item) ? $item : null;
+    }
+
+    public function updateItemImagePath(int $itemId, string $imagePath): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_items
+             SET image_path = :image_path
+             WHERE id = :id',
+        );
+
+        $stmt->execute([
+            'id'         => $itemId,
+            'image_path' => $this->nullableString($imagePath),
+        ]);
+    }
+
     public function reorderItems(int $sectionId, array $itemIds): void
     {
         $stmt = $this->db->prepare(

@@ -17,6 +17,7 @@ final class MenuImageService
     private string $projectRoot;
     private string $uploadDir;
     private string $sourceDir;
+    private string $publicUploadBasePath;
     private string $previewCacheDir;
     private string $timingLogPath;
     private string $rembgBinaryPath;
@@ -29,22 +30,25 @@ final class MenuImageService
     private int $finalInputMaxSize;
     private int $previewInputMaxSize;
 
-    public function __construct(?string $projectRoot = null)
+    public function __construct(?string $projectRoot = null, string $uploadNamespace = 'menu')
     {
-        $this->projectRoot         = $projectRoot ?? dirname(__DIR__, 2);
-        $this->uploadDir           = $this->projectRoot . '/public/uploads/pages/menu';
-        $this->sourceDir           = $this->uploadDir . '/sources';
-        $this->previewCacheDir     = $this->projectRoot . '/storage/rembg-preview-cache';
-        $this->timingLogPath       = $this->projectRoot . '/storage/logs/rembg-timing.log';
-        $this->rembgBinaryPath     = $this->projectRoot . '/.venv-rembg/bin/rembg';
-        $this->rembgModelsPath     = getenv('REMBG_MODELS_DIR') ?: $this->projectRoot . '/storage/rembg-models';
-        $this->rembgServerUrl      = rtrim(trim((string) (getenv('REMBG_SERVER_URL') ?: '')), '/');
-        $this->rembgPreviewModel   = getenv('REMBG_PREVIEW_MODEL') ?: 'u2netp';
-        $this->rembgFinalModel     = getenv('REMBG_FINAL_MODEL') ?: 'u2net';
-        $this->rembgDebugTiming    = in_array(strtolower((string) (getenv('REMBG_DEBUG_TIMING') ?: '0')), ['1', 'true', 'yes', 'on'], true);
-        $this->rembgServerTimeout  = max(5, (int) (getenv('REMBG_SERVER_TIMEOUT') ?: 120));
-        $this->finalInputMaxSize   = max(self::DESKTOP_WIDTH, (int) (getenv('REMBG_MAX_INPUT_SIZE') ?: self::DEFAULT_FINAL_INPUT_MAX_SIZE));
-        $this->previewInputMaxSize = max(self::PREVIEW_WIDTH, (int) (getenv('REMBG_PREVIEW_MAX_INPUT_SIZE') ?: self::PREVIEW_PROCESS_MAX_SIZE));
+        $normalizedNamespace        = trim($uploadNamespace, " \t\n\r\0\x0B/");
+        $normalizedNamespace        = $normalizedNamespace !== '' ? $normalizedNamespace : 'menu';
+        $this->projectRoot          = $projectRoot ?? dirname(__DIR__, 2);
+        $this->uploadDir            = $this->projectRoot . '/public/uploads/pages/' . $normalizedNamespace;
+        $this->sourceDir            = $this->uploadDir . '/sources';
+        $this->publicUploadBasePath = '/uploads/pages/' . $normalizedNamespace;
+        $this->previewCacheDir      = $this->projectRoot . '/storage/rembg-preview-cache';
+        $this->timingLogPath        = $this->projectRoot . '/storage/logs/rembg-timing.log';
+        $this->rembgBinaryPath      = $this->projectRoot . '/.venv-rembg/bin/rembg';
+        $this->rembgModelsPath      = getenv('REMBG_MODELS_DIR') ?: $this->projectRoot . '/storage/rembg-models';
+        $this->rembgServerUrl       = rtrim(trim((string) (getenv('REMBG_SERVER_URL') ?: '')), '/');
+        $this->rembgPreviewModel    = getenv('REMBG_PREVIEW_MODEL') ?: 'u2netp';
+        $this->rembgFinalModel      = getenv('REMBG_FINAL_MODEL') ?: 'u2net';
+        $this->rembgDebugTiming     = in_array(strtolower((string) (getenv('REMBG_DEBUG_TIMING') ?: '0')), ['1', 'true', 'yes', 'on'], true);
+        $this->rembgServerTimeout   = max(5, (int) (getenv('REMBG_SERVER_TIMEOUT') ?: 120));
+        $this->finalInputMaxSize    = max(self::DESKTOP_WIDTH, (int) (getenv('REMBG_MAX_INPUT_SIZE') ?: self::DEFAULT_FINAL_INPUT_MAX_SIZE));
+        $this->previewInputMaxSize  = max(self::PREVIEW_WIDTH, (int) (getenv('REMBG_PREVIEW_MAX_INPUT_SIZE') ?: self::PREVIEW_PROCESS_MAX_SIZE));
     }
 
     public function hasUploadedImage(array $file): bool
@@ -251,16 +255,16 @@ final class MenuImageService
         }
 
         return [
-            'desktop_path'    => '/uploads/pages/menu/' . basename($desktopWebpPath),
-            'mobile_path'     => '/uploads/pages/menu/' . basename($mobileWebpPath),
-            'source_png_path' => '/uploads/pages/menu/sources/' . basename($sourcePngPath),
+            'desktop_path'    => $this->publicUploadBasePath . '/' . basename($desktopWebpPath),
+            'mobile_path'     => $this->publicUploadBasePath . '/' . basename($mobileWebpPath),
+            'source_png_path' => $this->publicUploadBasePath . '/sources/' . basename($sourcePngPath),
         ];
     }
 
     public function cleanupFromDesktopPath(?string $desktopPath): void
     {
         $desktopPath = trim((string) ($desktopPath ?? ''));
-        if ($desktopPath === '' || strpos($desktopPath, '/uploads/pages/menu/') !== 0) {
+        if ($desktopPath === '' || strpos($desktopPath, $this->publicUploadBasePath . '/') !== 0) {
             return;
         }
 

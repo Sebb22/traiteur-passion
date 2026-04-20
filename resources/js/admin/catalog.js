@@ -214,6 +214,8 @@ function initCatalogImageUploadUX() {
     const configuredPreviewModel = String(catalogRoot ? catalogRoot.getAttribute("data-rembg-preview-model") || "" : "")
         .trim() || "u2netp";
     const previewReusableOnSave = catalogRoot ? catalogRoot.getAttribute("data-rembg-preview-reusable") === "1" : false;
+    const previewEndpoint = String(catalogRoot ? catalogRoot.getAttribute("data-image-preview-endpoint") || "" : "")
+        .trim() || "/admin/catalog/image-preview";
     const uploadForms = Array.from(document.querySelectorAll('form')).filter((form) =>
         form.querySelector('input[name="image_file"]'),
     );
@@ -368,7 +370,7 @@ function initCatalogImageUploadUX() {
             formData.append("preview_width", "320");
             formData.append("preview_model", configuredPreviewModel);
 
-            fetch("/admin/catalog/image-preview", {
+            fetch(previewEndpoint, {
                     method: "POST",
                     body: formData,
                     signal: previewAbortController.signal,
@@ -438,7 +440,7 @@ function initCatalogImageUploadUX() {
         });
 
         fileInput.addEventListener("change", () => {
-            const file = fileInput.files ?.[0];
+            const file = fileInput.files ? .[0];
             if (!file) {
                 sourceImage = null;
                 sourceFile = null;

@@ -53,6 +53,7 @@ $router->post('/admin/boutique/sections/{id}/delete', 'AdminController@deleteSho
 $router->post('/admin/boutique/sections/{id}/items/create', 'AdminController@createShopItem');
 $router->post('/admin/boutique/sections/{id}/items/reorder', 'AdminController@reorderShopItems');
 $router->post('/admin/boutique/items/{id}', 'AdminController@updateShopItem');
+$router->post('/admin/boutique/image-preview', 'AdminController@previewShopImage');
 $router->post('/admin/boutique/items/{id}/delete', 'AdminController@deleteShopItem');
 $router->post('/admin/boutique/orders/{id}/status', 'AdminController@updateShopOrderStatus');
 $router->get('/admin/contacts/export', 'AdminController@exportContacts');

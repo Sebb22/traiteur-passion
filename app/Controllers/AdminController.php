@@ -186,6 +186,7 @@ final class AdminController
             'recentOrders'  => $recentOrders,
             'lowStockItems' => $lowStockItems,
             'statusOptions' => ShopOrder::STATUS_LABELS,
+            'imageRuntime'  => (new MenuImageService(null, 'shop'))->getRuntimeStatus(),
             'flash'         => $this->pullFlash(),
             'loadError'     => $loadError,
         ]);
@@ -267,7 +268,9 @@ final class AdminController
 
         $sectionIdInt = (int) $sectionId;
         try {
-            $newId = (new Shop())->createItem($sectionIdInt, $_POST);
+            $shopModel = new Shop();
+            $newId     = $shopModel->createItem($sectionIdInt, $_POST);
+            $this->handleShopItemImageUpload($shopModel, $newId);
             $this->pushFlash('success', 'Produit boutique créé.');
             $this->redirectShop('#item-' . $newId);
         } catch (\Throwable $e) {
@@ -283,7 +286,9 @@ final class AdminController
 
         $itemId = (int) $id;
         try {
-            (new Shop())->updateItem($itemId, $_POST);
+            $shopModel = new Shop();
+            $shopModel->updateItem($itemId, $_POST);
+            $this->handleShopItemImageUpload($shopModel, $itemId);
             $this->pushFlash('success', 'Produit boutique mis à jour.');
         } catch (\Throwable $e) {
             error_log('Shop item update error: ' . $e->getMessage());
@@ -477,6 +482,11 @@ final class AdminController
             error_log('Catalog image preview error: ' . $e->getMessage());
             $this->jsonResponse(['ok' => false, 'error' => $e->getMessage()], 422);
         }
+    }
+
+    public function previewShopImage(): void
+    {
+        $this->previewCatalogImage();
     }
 
     public function createCatalogItem(string $sectionId): void
@@ -820,6 +830,43 @@ final class AdminController
 
         $previousImagePath = (string) ($item['image_path'] ?? '');
         $menuModel->updateItemImagePath($itemId, $desktopPath);
+        $imageService->cleanupFromDesktopPath($previousImagePath);
+    }
+
+    private function handleShopItemImageUpload(Shop $shopModel, int $itemId): void
+    {
+        $file = $_FILES['image_file'] ?? null;
+        if (! is_array($file)) {
+            return;
+        }
+
+        $imageService = new MenuImageService(null, 'shop');
+        if (! $imageService->hasUploadedImage($file)) {
+            return;
+        }
+
+        $item = $shopModel->getItemById($itemId);
+        if (! is_array($item)) {
+            throw new \RuntimeException('Produit boutique introuvable pour traitement d’image.');
+        }
+
+        $slug             = trim((string) ($item['slug'] ?? ''));
+        $baseName         = ($slug !== '' ? $slug : 'produit') . '-' . $itemId . '-' . date('YmdHis');
+        $removeBackground = isset($_POST['remove_bg']) && (string) $_POST['remove_bg'] === '1';
+        $backgroundFuzz   = (int) ($_POST['background_fuzz'] ?? 12);
+
+        $result = $imageService->processItemImage($file, $baseName, [
+            'remove_background' => $removeBackground,
+            'background_fuzz'   => $backgroundFuzz,
+            'preview_token'     => (string) ($_POST['preview_token'] ?? ''),
+        ]);
+        $desktopPath = (string) ($result['desktop_path'] ?? '');
+        if ($desktopPath === '') {
+            throw new \RuntimeException('Chemin image boutique générée introuvable.');
+        }
+
+        $previousImagePath = (string) ($item['image_path'] ?? '');
+        $shopModel->updateItemImagePath($itemId, $desktopPath);
         $imageService->cleanupFromDesktopPath($previousImagePath);
     }
 
