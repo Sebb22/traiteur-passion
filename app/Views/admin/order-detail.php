@@ -24,8 +24,8 @@
     $fulfillmentMethod = trim((string) ($order['fulfillment_method'] ?? 'pickup')) === 'delivery' ? 'delivery' : 'pickup';
     $orderItems        = is_array($order['items'] ?? null) ? $order['items'] : [];
     $deliveryAddress   = trim(implode(', ', array_filter([
-        trim((string) ($order['delivery_address'] ?? '')),
-        trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? ''))),
+    trim((string) ($order['delivery_address'] ?? '')),
+    trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? ''))),
     ])));
 ?>
 <div class="adminSplit adminSplit--contact-detail">
@@ -47,11 +47,18 @@
                     <p class="adminSubtitle">Lecture complète du panier, du mode de retrait ou de livraison, puis suivi opérationnel depuis une fiche dédiée.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin/boutique#orders" class="adminBtn">Retour aux commandes</a>
-                    <a href="/admin/contacts#orders" class="adminBtn">Demandes & commandes</a>
-                    <form action="/admin/logout" method="post">
-                        <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
-                    </form>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
+                        <a href="/admin/boutique#orders" class="adminBtn adminBtn--primary">Retour aux commandes</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
+                        <a href="/admin/contacts#orders" class="adminBtn">Demandes & commandes</a>
+                        <a href="/admin" class="adminBtn">Dashboard</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
+                        <form action="/admin/logout" method="post">
+                            <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>
@@ -208,7 +215,7 @@
                                 <select name="status" class="adminSelect">
                                     <?php foreach ($statusOptions as $statusKey => $statusLabel): ?>
                                     <option value="<?php echo $e($statusKey); ?>"
-                                        <?php echo ($order['status'] ?? '') === $statusKey ? 'selected' : ''; ?>>
+                                        <?php echo($order['status'] ?? '') === $statusKey ? 'selected' : ''; ?>>
                                         <?php echo $e($statusLabel); ?>
                                     </option>
                                     <?php endforeach; ?>

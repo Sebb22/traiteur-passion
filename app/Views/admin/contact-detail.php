@@ -39,11 +39,18 @@
                     <p class="adminSubtitle">Lecture du besoin, qualification commerciale et suivi du devis depuis une fiche plus directe.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin/contacts" class="adminBtn">Retour aux demandes</a>
-                    <a href="/admin/catalog" class="adminBtn">Editer la carte</a>
-                    <form action="/admin/logout" method="post">
-                        <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
-                    </form>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
+                        <a href="/admin/contacts" class="adminBtn adminBtn--primary">Retour aux demandes</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
+                        <a href="/admin" class="adminBtn">Dashboard</a>
+                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
+                        <form action="/admin/logout" method="post">
+                            <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>

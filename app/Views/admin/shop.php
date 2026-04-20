@@ -1,10 +1,7 @@
 <?php
     $sections      = is_array($sections ?? null) ? $sections : [];
     $stats         = is_array($stats ?? null) ? $stats : [];
-    $orderStats    = is_array($orderStats ?? null) ? $orderStats : [];
-    $recentOrders  = is_array($recentOrders ?? null) ? $recentOrders : [];
     $lowStockItems = is_array($lowStockItems ?? null) ? $lowStockItems : [];
-    $statusOptions = is_array($statusOptions ?? null) ? $statusOptions : [];
     $imageRuntime  = is_array($imageRuntime ?? null) ? $imageRuntime : [];
     $flash         = is_array($flash ?? null) ? $flash : null;
     $loadError     = is_string($loadError ?? null) ? $loadError : null;
@@ -38,11 +35,6 @@
     return number_format(((int) $cents) / 100, 2, ',', ' ') . ' EUR';
     };
 
-    $formatDateTime = static function ($value): string {
-    $timestamp = strtotime((string) $value);
-    return $timestamp ? date('d/m/Y H:i', $timestamp) : '-';
-    };
-
     $formatItemPrice = static function (array $item) use ($formatPrice): string {
     $priceLabel = trim((string) ($item['price_label'] ?? ''));
     return $priceLabel !== '' ? $priceLabel : $formatPrice($item['price_cents'] ?? 0);
@@ -70,15 +62,22 @@
                 <div>
                     <h2 class="adminTitle">Editer la boutique</h2>
                     <p class="adminSubtitle">Le flux boutique reste distinct de la carte : ici vous gerez les sections,
-                        les produits, le stock reel et le suivi des commandes.</p>
+                        les produits et le stock reel.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin" class="adminBtn">Dashboard</a>
-                    <a href="/admin/catalog" class="adminBtn">Carte evenementielle</a>
-                    <a href="/boutique-en-ligne" class="adminBtn adminBtn--primary">Voir la boutique</a>
-                    <form action="/admin/logout" method="post">
-                        <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
-                    </form>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
+                        <a href="/boutique-en-ligne" class="adminBtn adminBtn--primary">Voir la boutique</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
+                        <a href="/admin" class="adminBtn">Dashboard</a>
+                        <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
+                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
+                        <form action="/admin/logout" method="post">
+                            <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>
@@ -111,10 +110,6 @@
             <div class="statCard">
                 <div class="statCard__label">Stocks bas</div>
                 <div class="statCard__value"><?php echo (int) ($stats['low_stock_items'] ?? 0); ?></div>
-            </div>
-            <div class="statCard">
-                <div class="statCard__label">Nouvelles commandes</div>
-                <div class="statCard__value"><?php echo (int) ($orderStats['new_count'] ?? 0); ?></div>
             </div>
         </section>
 
@@ -156,10 +151,9 @@
 
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Repere stock & suivi</div>
+                    <div class="adminCard__title">Repere stock</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint">La boutique se pilote par disponibilite immediate et non par options de
-                            devis</span>
+                        <span class="adminHint">La boutique se pilote par disponibilite immediate et visibilite des produits</span>
                     </div>
                 </div>
 
@@ -177,9 +171,8 @@
                         <div class="adminStatusPill__value"><?php echo (int) ($stats['sold_out_items'] ?? 0); ?></div>
                     </div>
                     <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Commandes confirmees</div>
-                        <div class="adminStatusPill__value"><?php echo (int) ($orderStats['confirmed_count'] ?? 0); ?>
-                        </div>
+                        <div class="adminStatusPill__label">Stocks bas</div>
+                        <div class="adminStatusPill__value"><?php echo (int) ($stats['low_stock_items'] ?? 0); ?></div>
                     </div>
                 </div>
             </article>
@@ -677,77 +670,7 @@
             <?php endforeach; ?>
         </div>
 
-        <section class="adminDashboardGrid" id="orders">
-            <article class="adminCard adminCard--table">
-                <div class="adminCard__head">
-                    <div class="adminCard__title">Commandes recentes</div>
-                    <div class="adminCard__meta">
-                        <span class="adminHint"><?php echo (int) ($orderStats['total'] ?? 0); ?> commande(s)</span>
-                    </div>
-                </div>
-                <?php if ($recentOrders === []): ?>
-                <div class="adminEmptyState">Aucune commande boutique pour le moment.</div>
-                <?php else: ?>
-                <div class="adminTableWrap">
-                    <table class="adminTable">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Retrait</th>
-                                <th>Volume</th>
-                                <th>Total</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($recentOrders as $order): ?>
-                            <tr>
-                                <td>
-                                    <strong>
-                                        <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminLink">
-                                            #<?php echo (int) ($order['id'] ?? 0); ?> · <?php echo $e($order['customer_name'] ?? ''); ?>
-                                        </a>
-                                    </strong><br>
-                                    <?php echo $e($order['customer_email'] ?? ''); ?><br>
-                                    <span
-                                        class="adminHint"><?php echo $e($formatDateTime($order['created_at'] ?? '')); ?></span>
-                                </td>
-                                <td>
-                                    <strong><?php echo $e(($order['fulfillment_method'] ?? 'pickup') === 'delivery' ? 'Livraison' : 'Retrait'); ?></strong><br>
-                                    <?php echo $e($order['pickup_date'] ?? ''); ?><br>
-                                    <span class="adminHint"><?php echo $e($order['pickup_slot'] ?? ''); ?></span>
-                                    <?php if (($order['fulfillment_method'] ?? 'pickup') === 'delivery'): ?><br>
-                                    <span class="adminHint"><?php echo $e(trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? '')))); ?></span>
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo (int) ($order['item_count'] ?? 0); ?> article(s)</td>
-                                <td><?php echo $e($formatPrice($order['total_cents'] ?? 0)); ?></td>
-                                <td>
-                                    <form
-                                        action="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>/status"
-                                        method="post">
-                                        <select class="adminSelect" name="status">
-                                            <?php foreach ($statusOptions as $statusKey => $statusLabel): ?>
-                                            <option value="<?php echo $e($statusKey); ?>"
-                                                <?php echo (string) ($order['status'] ?? '') === (string) $statusKey ? 'selected' : ''; ?>>
-                                                <?php echo $e($statusLabel); ?>
-                                            </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <div class="adminInlineActions">
-                                            <button type="submit" class="adminBtn">Enregistrer</button>
-                                            <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminBtn">Détail</a>
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </article>
-
+        <section class="adminDashboardGrid">
             <article class="adminCard adminCard--table">
                 <div class="adminCard__head">
                     <div class="adminCard__title">Stocks bas</div>

@@ -958,7 +958,9 @@ body.shop-summary-open {
         min-height: 78px;
         padding: 14px 16px;
         border-radius: 20px;
-        background: linear-gradient(135deg, rgba(239, 231, 210, 0.12), rgba(239, 231, 210, 0.03)), rgba(11, 11, 11, 0.98);
+        background:
+            linear-gradient(135deg, rgba(239, 231, 210, 0.12), rgba(239, 231, 210, 0.03)),
+            rgba(11, 11, 11, 0.98);
         box-shadow: 0 20px 36px rgba(0, 0, 0, 0.32);
         transform: translateY(18px);
         opacity: 0;
@@ -1041,7 +1043,9 @@ body.shop-summary-open {
         transform: translateY(0) scale(1);
     }
     .shopSummaryDock.is-open .shopSummaryTab {
-        background: linear-gradient(135deg, rgba(239, 231, 210, 0.16), rgba(239, 231, 210, 0.05)), rgba(11, 11, 11, 0.99);
+        background:
+            linear-gradient(135deg, rgba(239, 231, 210, 0.16), rgba(239, 231, 210, 0.05)),
+            rgba(11, 11, 11, 0.99);
         animation: none;
     }
     .shopSummary__hero,

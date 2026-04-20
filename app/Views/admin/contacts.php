@@ -52,14 +52,20 @@
                     <p class="adminSubtitle">Retrouvez les nouveaux besoins, les devis et les commandes boutique depuis un seul écran de suivi.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin" class="adminBtn">Dashboard</a>
-                    <a href="/admin/boutique#orders" class="adminBtn">Commandes boutique</a>
-                    <a href="/admin/catalog" class="adminBtn adminBtn--primary">Editer la carte</a>
-                    <a href="/admin/contacts/export" class="adminBtn">Exporter CSV</a>
-                    <a href="/" class="adminBtn">Retour au site</a>
-                    <form action="/admin/logout" method="post">
-                        <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>
-                    </form>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
+                        <a href="/admin/contacts/export" class="adminBtn adminBtn--primary">Exporter CSV</a>
+                        <a href="/admin/boutique#orders" class="adminBtn">Commandes boutique</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
+                        <a href="/admin" class="adminBtn">Dashboard</a>
+                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
+                        <a href="/" class="adminBtn">Retour au site</a>
+                        <form action="/admin/logout" method="post">
+                            <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>

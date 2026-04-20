@@ -59,13 +59,19 @@
                     <p class="adminSubtitle">Creer, corriger, publier ou retirer des articles sans toucher au code.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin" class="adminBtn">Dashboard</a>
-                    <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
-                    <a href="/admin/catalog" class="adminBtn">Carte</a>
-                    <a href="/blog" class="adminBtn adminBtn--primary">Voir le blog</a>
-                    <form action="/admin/logout" method="post">
-                        <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
-                    </form>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
+                        <a href="/blog" class="adminBtn adminBtn--primary">Voir le blog</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
+                        <a href="/admin" class="adminBtn">Dashboard</a>
+                        <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
+                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
+                        <form action="/admin/logout" method="post">
+                            <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>

@@ -79,12 +79,19 @@
                     <p class="adminSubtitle">Organisez vos rubriques, mettez à jour vos produits et gérez leurs images depuis une interface plus directe.</p>
                 </div>
                 <div class="adminPanelHead__actions">
-                    <a href="/admin" class="adminBtn">Dashboard</a>
-                    <a href="/carte-évènementielle" class="adminBtn adminBtn--primary">Voir la carte évènementielle</a>
-                    <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
-                    <form action="/admin/logout" method="post">
-                        <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>
-                    </form>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
+                        <a href="/carte-évènementielle" class="adminBtn adminBtn--primary">Voir la carte</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
+                        <a href="/admin" class="adminBtn">Dashboard</a>
+                        <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
+                        <a href="/admin/boutique" class="adminBtn">Boutique</a>
+                    </div>
+                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
+                        <form action="/admin/logout" method="post">
+                            <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>

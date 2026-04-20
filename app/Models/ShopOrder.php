@@ -113,8 +113,8 @@ final class ShopOrder
 
             $orderTotalCents = 0;
             foreach ($requested as $itemId => $quantity) {
-                $item           = $itemsById[$itemId];
-                $unitPriceCents = max(0, (int) ($item['price_cents'] ?? 0));
+                $item             = $itemsById[$itemId];
+                $unitPriceCents   = max(0, (int) ($item['price_cents'] ?? 0));
                 $orderTotalCents += $unitPriceCents * $quantity;
             }
 
@@ -129,17 +129,17 @@ final class ShopOrder
             }
 
             $orderPayload = [
-                'customer_name'         => trim((string) ($customerData['name'] ?? '')),
-                'customer_email'        => trim((string) ($customerData['email'] ?? '')),
-                'customer_phone'        => $this->nullableTrim($customerData['phone'] ?? null),
-                'fulfillment_method'    => $fulfillmentMethod,
-                'pickup_date'           => $this->nullableTrim($customerData['pickup_date'] ?? null),
-                'pickup_slot'           => $this->nullableTrim($customerData['pickup_slot'] ?? null),
-                'delivery_address'      => $this->nullableTrim($customerData['delivery_address'] ?? null),
-                'delivery_postal_code'  => $this->nullableTrim($customerData['delivery_postal_code'] ?? null),
-                'delivery_city'         => $this->nullableTrim($customerData['delivery_city'] ?? null),
-                'message'               => $this->nullableTrim($customerData['message'] ?? null),
-                'status'                => 'new',
+                'customer_name'        => trim((string) ($customerData['name'] ?? '')),
+                'customer_email'       => trim((string) ($customerData['email'] ?? '')),
+                'customer_phone'       => $this->nullableTrim($customerData['phone'] ?? null),
+                'fulfillment_method'   => $fulfillmentMethod,
+                'pickup_date'          => $this->nullableTrim($customerData['pickup_date'] ?? null),
+                'pickup_slot'          => $this->nullableTrim($customerData['pickup_slot'] ?? null),
+                'delivery_address'     => $this->nullableTrim($customerData['delivery_address'] ?? null),
+                'delivery_postal_code' => $this->nullableTrim($customerData['delivery_postal_code'] ?? null),
+                'delivery_city'        => $this->nullableTrim($customerData['delivery_city'] ?? null),
+                'message'              => $this->nullableTrim($customerData['message'] ?? null),
+                'status'               => 'new',
             ];
 
             $availableColumns = array_values(array_filter(
@@ -154,7 +154,7 @@ final class ShopOrder
             ));
             $orderStmt->execute(array_intersect_key($orderPayload, array_flip($availableColumns)));
 
-            $orderId = (int) $this->db->lastInsertId();
+            $orderId  = (int) $this->db->lastInsertId();
 
             $lineStmt = $this->db->prepare(
                 'INSERT INTO boutique_order_items (

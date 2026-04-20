@@ -302,7 +302,8 @@ export function initShopPage() {
 
     const syncFulfillmentState = () => {
         const wantsDelivery = fulfillmentInputs.some(
-            (input) => input instanceof HTMLInputElement && input.checked && input.value === "delivery",
+            (input) =>
+                input instanceof HTMLInputElement && input.checked && input.value === "delivery",
         );
 
         if (deliveryPanel instanceof HTMLElement) {

@@ -27,14 +27,48 @@ final class AdminController
         $catalogStats   = $menuModel->getAdminSummary();
         $recentContacts = $contactModel->getRecentWithMenuFlag(8);
         $typeBreakdown  = $contactModel->getTypeBreakdown(6);
+        $orderStats     = [
+            'total'           => 0,
+            'new_count'       => 0,
+            'confirmed_count' => 0,
+            'preparing_count' => 0,
+            'completed_count' => 0,
+            'cancelled_count' => 0,
+        ];
+        $recentOrders = [];
+        $shopStats    = [
+            'total_sections'  => 0,
+            'active_sections' => 0,
+            'total_items'     => 0,
+            'active_items'    => 0,
+            'sold_out_items'  => 0,
+            'low_stock_items' => 0,
+        ];
+        $shopLoadError = null;
+
+        try {
+            $shopModel    = new Shop();
+            $orderModel   = new ShopOrder();
+            $shopStats    = $shopModel->getAdminSummary();
+            $orderStats   = $orderModel->getAdminSummary();
+            $recentOrders = $orderModel->getRecentOrders(5);
+        } catch (\Throwable $e) {
+            error_log('Dashboard shop load error: ' . $e->getMessage());
+            $shopLoadError = 'Les donnees boutique sont temporairement indisponibles.';
+        }
 
         View::render('admin/dashboard', [
-            'title'          => 'Administration — Dashboard',
-            'contactStats'   => $contactStats,
-            'blogStats'      => $blogStats,
-            'catalogStats'   => $catalogStats,
-            'recentContacts' => $recentContacts,
-            'typeBreakdown'  => $typeBreakdown,
+            'title'             => 'Administration — Dashboard',
+            'contactStats'      => $contactStats,
+            'blogStats'         => $blogStats,
+            'catalogStats'      => $catalogStats,
+            'recentContacts'    => $recentContacts,
+            'typeBreakdown'     => $typeBreakdown,
+            'orderStats'        => $orderStats,
+            'orderStatusLabels' => ShopOrder::STATUS_LABELS,
+            'recentOrders'      => $recentOrders,
+            'shopStats'         => $shopStats,
+            'shopLoadError'     => $shopLoadError,
         ]);
     }
 
@@ -153,25 +187,13 @@ final class AdminController
             'sold_out_items'  => 0,
             'low_stock_items' => 0,
         ];
-        $orderStats = [
-            'total'           => 0,
-            'new_count'       => 0,
-            'confirmed_count' => 0,
-            'preparing_count' => 0,
-            'completed_count' => 0,
-            'cancelled_count' => 0,
-        ];
-        $recentOrders  = [];
         $lowStockItems = [];
         $loadError     = null;
 
         try {
             $shopModel     = new Shop();
-            $orderModel    = new ShopOrder();
             $sections      = $shopModel->getCatalogForAdmin();
             $stats         = $shopModel->getAdminSummary();
-            $orderStats    = $orderModel->getAdminSummary();
-            $recentOrders  = $orderModel->getRecentOrders(10);
             $lowStockItems = $shopModel->getLowStockItems(10);
         } catch (\Throwable $e) {
             error_log('Shop admin load error: ' . $e->getMessage());
@@ -182,10 +204,7 @@ final class AdminController
             'title'         => 'Administration — Boutique en ligne',
             'sections'      => $sections,
             'stats'         => $stats,
-            'orderStats'    => $orderStats,
-            'recentOrders'  => $recentOrders,
             'lowStockItems' => $lowStockItems,
-            'statusOptions' => ShopOrder::STATUS_LABELS,
             'imageRuntime'  => (new MenuImageService(null, 'shop'))->getRuntimeStatus(),
             'flash'         => $this->pullFlash(),
             'loadError'     => $loadError,

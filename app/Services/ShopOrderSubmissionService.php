@@ -5,7 +5,7 @@ namespace App\Services;
 
 final class ShopOrderSubmissionService
 {
-    private const FULFILLMENT_PICKUP = 'pickup';
+    private const FULFILLMENT_PICKUP   = 'pickup';
     private const FULFILLMENT_DELIVERY = 'delivery';
 
     /**
