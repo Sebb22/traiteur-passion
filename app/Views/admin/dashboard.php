@@ -47,7 +47,8 @@
                     <a href="/admin/contacts" class="adminBtn adminBtn--primary">Voir les demandes</a>
                     <a href="/admin/blog" class="adminBtn">Gerer le blog</a>
                     <a href="/admin/catalog" class="adminBtn">Editer la carte</a>
-                    <a href="/menu" class="adminBtn">Voir le menu</a>
+                    <a href="/admin/boutique" class="adminBtn">Gerer la boutique</a>
+                    <a href="/carte-évènementielle" class="adminBtn">Voir la carte évènementielle</a>
                     <a href="/" class="adminBtn">Retour au site</a>
                     <form action="/admin/logout" method="post">
                         <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
@@ -70,7 +71,7 @@
                 <div class="statCard__value"><?php echo (int) ($contactStats['in_progress_count'] ?? 0); ?></div>
             </div>
             <div class="statCard">
-                <div class="statCard__label">Avec menu</div>
+                <div class="statCard__label">Avec sélection</div>
                 <div class="statCard__value"><?php echo (int) ($contactStats['with_menu_items'] ?? 0); ?></div>
             </div>
             <div class="statCard">
@@ -78,11 +79,11 @@
                 <div class="statCard__value"><?php echo (int) ($blogStats['published'] ?? 0); ?></div>
             </div>
             <div class="statCard">
-                <div class="statCard__label">Sections menu</div>
+                <div class="statCard__label">Sections carte</div>
                 <div class="statCard__value"><?php echo (int) ($catalogStats['sections'] ?? 0); ?></div>
             </div>
             <div class="statCard">
-                <div class="statCard__label">Items menu</div>
+                <div class="statCard__label">Items carte</div>
                 <div class="statCard__value"><?php echo (int) ($catalogStats['items'] ?? 0); ?></div>
             </div>
         </section>
@@ -148,7 +149,7 @@
                             </div>
 
                             <div class="adminMiniList__aside">
-                                <?php echo (int) ($contact['menu_items_count'] ?? 0); ?> selection(s) menu<br>
+                                <?php echo (int) ($contact['menu_items_count'] ?? 0); ?> selection(s) carte<br>
                                 Creee le <?php echo $formatDate($contact['created_at'] ?? null, 'd/m/Y H:i'); ?>
                             </div>
                         </div>

@@ -9,6 +9,8 @@ use App\Core\View;
 use App\Models\Blog;
 use App\Models\Contact;
 use App\Models\Menu;
+use App\Models\Shop;
+use App\Models\ShopOrder;
 use App\Services\MenuImageService;
 
 final class AdminController
@@ -136,6 +138,218 @@ final class AdminController
             'imageRuntime' => (new MenuImageService())->getRuntimeStatus(),
             'flash'        => $this->pullFlash(),
         ]);
+    }
+
+    public function shop(): void
+    {
+        AdminAuth::requireAuth();
+
+        $sections = [];
+        $stats    = [
+            'total_sections'  => 0,
+            'active_sections' => 0,
+            'total_items'     => 0,
+            'active_items'    => 0,
+            'sold_out_items'  => 0,
+            'low_stock_items' => 0,
+        ];
+        $orderStats = [
+            'total'           => 0,
+            'new_count'       => 0,
+            'confirmed_count' => 0,
+            'preparing_count' => 0,
+            'completed_count' => 0,
+            'cancelled_count' => 0,
+        ];
+        $recentOrders  = [];
+        $lowStockItems = [];
+        $loadError     = null;
+
+        try {
+            $shopModel     = new Shop();
+            $orderModel    = new ShopOrder();
+            $sections      = $shopModel->getCatalogForAdmin();
+            $stats         = $shopModel->getAdminSummary();
+            $orderStats    = $orderModel->getAdminSummary();
+            $recentOrders  = $orderModel->getRecentOrders(10);
+            $lowStockItems = $shopModel->getLowStockItems(10);
+        } catch (\Throwable $e) {
+            error_log('Shop admin load error: ' . $e->getMessage());
+            $loadError = 'Les tables de boutique ne sont pas encore disponibles. Lancez la migration SQL avant d’utiliser cet écran.';
+        }
+
+        View::render('admin/shop', [
+            'title'         => 'Administration — Boutique en ligne',
+            'sections'      => $sections,
+            'stats'         => $stats,
+            'orderStats'    => $orderStats,
+            'recentOrders'  => $recentOrders,
+            'lowStockItems' => $lowStockItems,
+            'statusOptions' => ShopOrder::STATUS_LABELS,
+            'flash'         => $this->pullFlash(),
+            'loadError'     => $loadError,
+        ]);
+    }
+
+    public function updateShopSection(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        try {
+            (new Shop())->updateSection((int) $id, $_POST);
+            $this->pushFlash('success', 'Section boutique mise à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop section update error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de mettre à jour la section boutique.');
+        }
+
+        $this->redirectShop('#section-' . (int) $id);
+    }
+
+    public function createShopSection(): void
+    {
+        AdminAuth::requireAuth();
+
+        try {
+            $newId = (new Shop())->createSection($_POST);
+            $this->pushFlash('success', 'Section boutique créée.');
+            $this->redirectShop('#section-' . $newId);
+        } catch (\Throwable $e) {
+            error_log('Shop section create error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de créer la section boutique.');
+            $this->redirectShop();
+        }
+    }
+
+    public function deleteShopSection(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        try {
+            (new Shop())->deleteSection((int) $id);
+            $this->pushFlash('success', 'Section boutique supprimée.');
+        } catch (\Throwable $e) {
+            error_log('Shop section delete error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de supprimer la section boutique.');
+        }
+
+        $this->redirectShop();
+    }
+
+    public function reorderShopSections(): void
+    {
+        AdminAuth::requireAuth();
+
+        $sectionIds = $_POST['section_ids'] ?? [];
+        if (is_string($sectionIds)) {
+            $sectionIds = array_filter(array_map('trim', explode(',', $sectionIds)));
+        }
+
+        if (! is_array($sectionIds) || $sectionIds === []) {
+            $this->pushFlash('error', 'Ordre des sections boutique invalide.');
+            $this->redirectShop();
+        }
+
+        try {
+            (new Shop())->reorderSections(array_map('intval', $sectionIds));
+            $this->pushFlash('success', 'Ordre des sections boutique mis à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop section reorder error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de réordonner les sections boutique.');
+        }
+
+        $this->redirectShop();
+    }
+
+    public function createShopItem(string $sectionId): void
+    {
+        AdminAuth::requireAuth();
+
+        $sectionIdInt = (int) $sectionId;
+        try {
+            $newId = (new Shop())->createItem($sectionIdInt, $_POST);
+            $this->pushFlash('success', 'Produit boutique créé.');
+            $this->redirectShop('#item-' . $newId);
+        } catch (\Throwable $e) {
+            error_log('Shop item create error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de créer le produit boutique.');
+            $this->redirectShop('#section-' . $sectionIdInt);
+        }
+    }
+
+    public function updateShopItem(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        $itemId = (int) $id;
+        try {
+            (new Shop())->updateItem($itemId, $_POST);
+            $this->pushFlash('success', 'Produit boutique mis à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop item update error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de mettre à jour le produit boutique.');
+        }
+
+        $this->redirectShop('#item-' . $itemId);
+    }
+
+    public function deleteShopItem(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        $sectionId = (int) ($_POST['section_id'] ?? 0);
+
+        try {
+            (new Shop())->deleteItem((int) $id);
+            $this->pushFlash('success', 'Produit boutique supprimé.');
+        } catch (\Throwable $e) {
+            error_log('Shop item delete error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de supprimer le produit boutique.');
+        }
+
+        $anchor = $sectionId > 0 ? '#section-' . $sectionId : '';
+        $this->redirectShop($anchor);
+    }
+
+    public function reorderShopItems(string $sectionId): void
+    {
+        AdminAuth::requireAuth();
+
+        $itemIds = $_POST['item_ids'] ?? [];
+        if (is_string($itemIds)) {
+            $itemIds = array_filter(array_map('trim', explode(',', $itemIds)));
+        }
+
+        if (! is_array($itemIds) || $itemIds === []) {
+            $this->pushFlash('error', 'Ordre des produits boutique invalide.');
+            $this->redirectShop('#section-' . (int) $sectionId);
+        }
+
+        try {
+            (new Shop())->reorderItems((int) $sectionId, array_map('intval', $itemIds));
+            $this->pushFlash('success', 'Ordre des produits boutique mis à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop item reorder error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de réordonner les produits boutique.');
+        }
+
+        $this->redirectShop('#section-' . (int) $sectionId);
+    }
+
+    public function updateShopOrderStatus(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        $orderId = (int) $id;
+        $status  = trim((string) ($_POST['status'] ?? ''));
+
+        if ((new ShopOrder())->updateStatus($orderId, $status)) {
+            $this->pushFlash('success', 'Statut de commande boutique mis à jour.');
+        } else {
+            $this->pushFlash('error', 'Impossible de mettre à jour ce statut de commande boutique.');
+        }
+
+        $this->redirectShop('#orders');
     }
 
     public function updateCatalogSection(string $id): void
@@ -527,6 +741,12 @@ final class AdminController
     private function redirectCatalog(string $anchor = ''): void
     {
         header('Location: /admin/catalog' . $anchor);
+        exit;
+    }
+
+    private function redirectShop(string $anchor = ''): void
+    {
+        header('Location: /admin/boutique' . $anchor);
         exit;
     }
 

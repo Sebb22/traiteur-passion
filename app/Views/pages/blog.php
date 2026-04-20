@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="blogPanelHead__actions">
-                    <a href="/menu" class="btn btn--ghost">Voir la carte</a>
+                    <a href="/carte-évènementielle" class="btn btn--ghost">Voir la carte évènementielle</a>
                     <a href="/contact" class="btn btn--primary">Demander un devis</a>
                 </div>
             </header>

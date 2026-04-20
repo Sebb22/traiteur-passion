@@ -82,6 +82,7 @@ final class Router
 
     private function normalize(string $path): string
     {
+        $path = rawurldecode($path);
         $path = '/' . ltrim($path, '/');
         // enlève le slash final sauf pour "/"
         return $path !== '/' ? rtrim($path, '/') : '/';

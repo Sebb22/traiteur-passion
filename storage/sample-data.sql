@@ -1,4 +1,3 @@
--- ====================================================
 -- Sample data for testing the contact system
 -- Données de test pour le système de contact
 -- ====================================================
@@ -333,5 +332,143 @@ ON DUPLICATE KEY UPDATE
     price_cents = VALUES(price_cents),
     price_label = VALUES(price_label),
     is_quote_only = VALUES(is_quote_only),
+    sort_order = VALUES(sort_order),
+    is_active = VALUES(is_active);
+
+-- ====================================================
+-- Boutique en ligne sample data
+-- ====================================================
+
+INSERT INTO boutique_sections (slug, name, description, sort_order, is_active)
+VALUES
+('sales-gourmandes', 'Sales gourmandes', 'Bouchées salées, pièces à partager et formats cocktail prêts à commander.', 10, 1),
+('douceurs-maison', 'Douceurs maison', 'Desserts et formats sucrés produits en petite série selon la saison.', 20, 1),
+('brunch-du-week-end', 'Brunch du week-end', 'Kits et compositions à retirer pour vos brunchs du samedi et du dimanche.', 30, 1)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    description = VALUES(description),
+    sort_order = VALUES(sort_order),
+    is_active = VALUES(is_active);
+
+SET @shop_savory = (SELECT id FROM boutique_sections WHERE slug = 'sales-gourmandes' LIMIT 1);
+SET @shop_sweet = (SELECT id FROM boutique_sections WHERE slug = 'douceurs-maison' LIMIT 1);
+SET @shop_brunch = (SELECT id FROM boutique_sections WHERE slug = 'brunch-du-week-end' LIMIT 1);
+
+INSERT INTO boutique_items (
+    section_id,
+    slug,
+    name,
+    short_description,
+    image_path,
+    image_alt,
+    price_cents,
+    price_label,
+    stock_quantity,
+    low_stock_threshold,
+    max_order_quantity,
+    sort_order,
+    is_active
+)
+VALUES
+(
+    @shop_savory,
+    'mini-burgers-brioche',
+    'Mini burgers briochés',
+    'Pain brioché maison, steak haché assaisonné, compotée d’oignons et cheddar affiné.',
+    '/uploads/pages/menu/aperitif/FormatDinatoire-1200.webp',
+    'Mini burgers briochés',
+    240,
+    '2,40 € pièce',
+    36,
+    8,
+    12,
+    10,
+    1
+),
+(
+    @shop_savory,
+    'wraps-poulet-curry',
+    'Wraps poulet curry',
+    'Petits wraps roulés au poulet mariné, crudités croquantes et sauce curry douce.',
+    '/uploads/pages/menu/aperitif/PiecesCocktail-1200.webp',
+    'Wraps poulet curry',
+    320,
+    '3,20 € pièce',
+    20,
+    5,
+    8,
+    20,
+    1
+),
+(
+    @shop_sweet,
+    'tartelette-citron',
+    'Tartelettes citron meringuées',
+    'Fond sablé pur beurre, crémeux citron et meringue italienne légère.',
+    '/uploads/pages/menu/brunch/Brunch-1200.webp',
+    'Tartelettes citron meringuées',
+    450,
+    '4,50 € pièce',
+    14,
+    4,
+    6,
+    10,
+    1
+),
+(
+    @shop_sweet,
+    'financier-pistache-framboise',
+    'Financiers pistache framboise',
+    'Moelleux pistache, framboise fraîche et finition maison en petite série.',
+    '/uploads/pages/menu/buffet/BuffetFroid24-1200.webp',
+    'Financiers pistache framboise',
+    280,
+    '2,80 € pièce',
+    10,
+    4,
+    6,
+    20,
+    1
+),
+(
+    @shop_brunch,
+    'box-brunch-signature',
+    'Box brunch signature',
+    'Sélection salée et sucrée pour deux personnes: viennoiseries, buns, fruits frais et boissons.',
+    '/uploads/pages/menu/brunch/Brunch-1200.webp',
+    'Box brunch signature',
+    3600,
+    '36,00 € la box',
+    8,
+    3,
+    2,
+    10,
+    1
+),
+(
+    @shop_brunch,
+    'cookie-giant-partage',
+    'Cookie giant à partager',
+    'Grand cookie fondant chocolat noir et noisettes torréfiées, idéal pour 6 à 8 parts.',
+    '/uploads/pages/menu/paniers/SaveursSurBraise-1200.webp',
+    'Cookie giant à partager',
+    1800,
+    '18,00 € pièce',
+    5,
+    2,
+    1,
+    20,
+    1
+)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    short_description = VALUES(short_description),
+    image_path = VALUES(image_path),
+    image_alt = VALUES(image_alt),
+    price_cents = VALUES(price_cents),
+    price_label = VALUES(price_label),
+    stock_quantity = VALUES(stock_quantity),
+    low_stock_threshold = VALUES(low_stock_threshold),
+    max_order_quantity = VALUES(max_order_quantity),
     sort_order = VALUES(sort_order),
     is_active = VALUES(is_active);

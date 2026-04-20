@@ -152,7 +152,7 @@ final class ContactNotificationService
             'introCopy'           => $this->clientIntroCopy($requestKind),
             'nextStepCopy'        => $this->clientNextStepCopy($requestKind),
             'messageBlockTitle'   => $requestKind === 'quote' ? 'Votre brief de départ' : 'Votre message',
-            'selectionBlockTitle' => $requestKind === 'quote' ? 'Votre sélection menu' : 'Les éléments mentionnés',
+            'selectionBlockTitle' => $requestKind === 'quote' ? 'Votre sélection de carte évènementielle' : 'Les éléments mentionnés',
             'ctaBackground'       => $theme['buttonBackground'],
             'ctaTextColor'        => $theme['buttonTextColor'],
             'closingCopy'         => $this->clientClosingCopy($requestKind),
@@ -297,10 +297,10 @@ final class ContactNotificationService
     private function renderMenuItemsText(array $menuItems): string
     {
         if ($menuItems === []) {
-            return "Sélection menu\n- Aucun item sélectionné.\n";
+            return "Sélection de carte évènementielle\n- Aucun item sélectionné.\n";
         }
 
-        $lines = ["Sélection menu"];
+        $lines = ["Sélection de carte évènementielle"];
         foreach ($menuItems as $item) {
             $lines[] = sprintf(
                 '- %s | %s | %s | Qté %s',
@@ -316,7 +316,7 @@ final class ContactNotificationService
 
     /**
      * @param array<string,mixed> $data
-        * @param array{title:string,preheader:string,eyebrow:string,heroBadge:string,heroSummary:string,accentColor:string,pageBackground:string,panelBackground:string,footerBackground:string,borderColor:string,eyebrowColor:string,heroBackground:string,heroTextColor:string,heroAccent:string,badgeBackground:string,badgeColor:string,footerNote:string} $layout
+     * @param array{title:string,preheader:string,eyebrow:string,heroBadge:string,heroSummary:string,accentColor:string,pageBackground:string,panelBackground:string,footerBackground:string,borderColor:string,eyebrowColor:string,heroBackground:string,heroTextColor:string,heroAccent:string,badgeBackground:string,badgeColor:string,footerNote:string} $layout
      */
     private function renderEmailTemplate(string $template, array $data, array $layout): string
     {
@@ -393,7 +393,7 @@ final class ContactNotificationService
 
     private function clientCtaLabel(string $requestKind): ?string
     {
-        return $requestKind === 'quote' ? 'Découvrir le menu' : 'Revenir sur le site';
+        return $requestKind === 'quote' ? 'Découvrir la carte évènementielle' : 'Revenir sur le site';
     }
 
     private function clientCtaUrl(string $requestKind): ?string
@@ -403,13 +403,13 @@ final class ContactNotificationService
             return null;
         }
 
-        return $requestKind === 'quote' ? $appUrl . '/menu' : $appUrl . '/contact';
+        return $requestKind === 'quote' ? $appUrl . '/carte-évènementielle' : $appUrl . '/contact';
     }
 
     private function clientClosingCopy(string $requestKind): string
     {
         if ($requestKind === 'quote') {
-            return 'Si vous souhaitez compléter votre sélection avant notre retour, vous pouvez continuer à parcourir le menu et noter les éléments qui comptent le plus pour votre événement.';
+            return 'Si vous souhaitez compléter votre sélection avant notre retour, vous pouvez continuer à parcourir la carte évènementielle et noter les éléments qui comptent le plus pour votre événement.';
         }
 
         return 'Si votre demande comporte un délai ou une contrainte forte, n’hésitez pas à nous le rappeler en réponse à cet email afin que nous puissions prioriser le bon cadrage.';
@@ -445,7 +445,7 @@ final class ContactNotificationService
     private function adminActionCopy(string $requestKind): string
     {
         if ($requestKind === 'quote') {
-            return 'Point d’attention: vérifiez d’abord la date, le nombre de personnes et la sélection menu afin de confirmer la faisabilité et le bon calibrage de la proposition.';
+            return 'Point d’attention: vérifiez d’abord la date, le nombre de personnes et la sélection de carte afin de confirmer la faisabilité et le bon calibrage de la proposition.';
         }
 
         return 'Point d’attention: qualifiez rapidement le besoin, le contexte et l’échéance pour orienter le client vers la bonne formule ou préparer un devis si nécessaire.';

@@ -6,26 +6,29 @@ namespace App\Core;
 final class Navigation
 {
     private static array $pageLabels = [
-        '/'         => 'Accueil',
-        '/menu'     => 'Menu',
-        '/blog'     => 'Blog',
-        '/a-propos' => 'À propos',
-        '/contact'  => 'Contact',
-        '/devis'    => 'Devis',
+        '/'                     => 'Accueil',
+        '/carte-évènementielle' => 'Carte évènementielle',
+        '/boutique-en-ligne'    => 'Boutique en ligne',
+        '/blog'                 => 'Blog',
+        '/a-propos'             => 'À propos',
+        '/contact'              => 'Contact',
+        '/devis'                => 'Devis',
     ];
 
     private static array $descriptions = [
-        '/'         => 'Traiteur à Compiègne spécialisé en mariages, réceptions privées et événements d\'entreprise. Cuisine de saison, prestation sur mesure.',
-        '/menu'     => 'Découvrez nos formules traiteur : buffets, cocktails, brunch et plats signature pour vos événements à Compiègne et alentours.',
-        '/blog'     => 'Conseils, recettes et actualités Traiteur Passion : inspirations culinaires et organisation d\'événements.',
-        '/a-propos' => 'Découvrez Traiteur Passion : notre équipe, notre méthode et nos engagements pour des réceptions mémorables.',
-        '/contact'  => 'Contactez Traiteur Passion pour votre mariage, réception privée ou événement professionnel. Réponse rapide et accompagnement personnalisé.',
-        '/devis'    => 'Demandez votre devis traiteur sur mesure à Compiègne. Menus adaptés, budget maîtrisé et accompagnement complet.',
+        '/'                     => 'Traiteur à Compiègne spécialisé en mariages, réceptions privées et événements d\'entreprise. Cuisine de saison, prestation sur mesure.',
+        '/carte-évènementielle' => 'Découvrez notre carte évènementielle : buffets, cocktails, brunch et plats signature pour vos événements à Compiègne et alentours.',
+        '/boutique-en-ligne'    => 'Boutique en ligne Traiteur Passion : commandez nos créations du moment avec des stocks limités mis à jour en temps réel.',
+        '/blog'                 => 'Conseils, recettes et actualités Traiteur Passion : inspirations culinaires et organisation d\'événements.',
+        '/a-propos'             => 'Découvrez Traiteur Passion : notre équipe, notre méthode et nos engagements pour des réceptions mémorables.',
+        '/contact'              => 'Contactez Traiteur Passion pour votre mariage, réception privée ou événement professionnel. Réponse rapide et accompagnement personnalisé.',
+        '/devis'                => 'Demandez votre devis traiteur sur mesure à Compiègne. Menus adaptés, budget maîtrisé et accompagnement complet.',
     ];
 
     public static function getCurrentPath(): string
     {
         $currentPath = (string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/');
+        $currentPath = rawurldecode($currentPath);
         return rtrim($currentPath, '/') ?: '/';
     }
 
@@ -77,12 +80,13 @@ final class Navigation
         }
 
         $bodyClasses = [
-            '/'         => 'page--home',
-            '/menu'     => 'page--menu',
-            '/blog'     => 'page--blog',
-            '/a-propos' => 'page--about',
-            '/contact'  => 'page--contact',
-            '/devis'    => 'page--devis',
+            '/'                     => 'page--home',
+            '/carte-évènementielle' => 'page--menu',
+            '/boutique-en-ligne'    => 'page--shop',
+            '/blog'                 => 'page--blog',
+            '/a-propos'             => 'page--about',
+            '/contact'              => 'page--contact',
+            '/devis'                => 'page--devis',
         ];
 
         return $bodyClasses[$currentPath] ?? 'page--generic';

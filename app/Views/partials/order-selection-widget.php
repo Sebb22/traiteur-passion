@@ -17,8 +17,8 @@
 
     $selectedSectionSlug    = isset($selectedSectionSlug) ? trim((string) $selectedSectionSlug) : '';
     $limitToSelectedSection = (bool) ($limitToSelectedSection ?? false);
-    $accordionTitle         = trim((string) ($accordionTitle ?? 'Sélectionner des items du menu (optionnel)'));
-    $accordionSummary       = trim((string) ($accordionSummary ?? 'Choisir parmi nos menus'));
+    $accordionTitle         = trim((string) ($accordionTitle ?? 'Sélectionner des items de la carte évènementielle (optionnel)'));
+    $accordionSummary       = trim((string) ($accordionSummary ?? 'Choisir dans la carte évènementielle'));
     $accordionContext       = trim((string) ($accordionContext ?? 'Cette sélection sert à préparer votre devis. Notre équipe vous recontacte systématiquement pour confirmer le format, la livraison et les derniers détails.'));
 
     $renderCategoryIcon = static function (string $iconKey): string {

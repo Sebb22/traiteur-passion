@@ -27,7 +27,7 @@
 
                         <div class="home-hero__actions">
                             <a class="btn btn--primary" href="/devis">Demander un devis</a>
-                            <a class="btn btn--ghost" href="/menu">Voir la carte</a>
+                            <a class="btn btn--ghost" href="/carte-évènementielle">Voir la carte évènementielle</a>
                         </div>
                     </div>
 
@@ -70,12 +70,12 @@
 
         <!-- Colonne droite : tiles -->
         <aside class="home-grid__side" aria-label="Accès rapides">
-            <a class="home-tile motion-card" href="/menu" data-reveal="up" data-stagger>
+            <a class="home-tile motion-card" href="/carte-évènementielle" data-reveal="up" data-stagger>
                 <div class="home-tile__media"
                     style="--tile-bg:url('/uploads/pages/home/images/carteDuMomentIllu.jpg');">
                     <!-- SLOT TILE (inside) -->
                     <span class="corner-slot corner-slot--tile" aria-hidden="true">
-                        <span class="corner-slot__label">Carte</span>
+                        <span class="corner-slot__label">Carte évènementielle</span>
                         <span class="corner-slot__plus">+</span>
                     </span>
                 </div>

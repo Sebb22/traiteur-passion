@@ -8,6 +8,12 @@ use App\Models\Menu;
 
 final class MenuController
 {
+    public function redirectLegacy(): void
+    {
+        header('Location: /carte-évènementielle', true, 301);
+        exit;
+    }
+
     public function index(): void
     {
         $sections = [];
@@ -20,7 +26,7 @@ final class MenuController
         }
 
         View::render('pages/menu', [
-            'title'    => 'Traiteur Passion — Menu',
+            'title'    => 'Traiteur Passion — Carte évènementielle',
             'sections' => $sections,
         ]);
     }

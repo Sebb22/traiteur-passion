@@ -31,7 +31,7 @@
     'boissons'            => [
         'eyebrow' => 'Les bons equilibres',
         'lead'    => 'Softs, vins, bulles ou options chaudes: la carte boissons vient completer votre selection sans surcharger l\'organisation.',
-        'note'    => 'Ajoutez simplement ce qu\'il faut pour accompagner le menu choisi, nous vous aidons ensuite a ajuster les volumes.',
+        'note'    => 'Ajoutez simplement ce qu\'il faut pour accompagner la selection choisie, nous vous aidons ensuite a ajuster les volumes.',
         'cta'     => 'Ajouter les boissons a mon devis',
     ],
     ];
@@ -48,7 +48,7 @@
             <div class="menuHero">
                 <img class="menuHero__img" src="/uploads/pages/menu/images/menu3Illu.webp" alt="" aria-hidden="true">
                 <div>
-                    <h1 class="menuHero__title">Menu</h1>
+                    <h1 class="menuHero__title">Carte évènementielle</h1>
                 </div>
             </div>
         </div>

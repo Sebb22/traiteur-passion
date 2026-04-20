@@ -14,9 +14,12 @@
                 loading="eager">
         </a>
         <nav class="header__nav header__nav--desktop" aria-label="Navigation principale">
-            <a href="/menu"
-                class="header__link<?php echo Navigation::isActivePath('/menu') ? ' header__link--active' : ''; ?>"
-                <?php echo Navigation::isActivePath('/menu') ? ' aria-current="page"' : ''; ?>>Carte</a>
+            <a href="/carte-évènementielle"
+                class="header__link<?php echo Navigation::isActivePath('/carte-évènementielle') ? ' header__link--active' : ''; ?>"
+                <?php echo Navigation::isActivePath('/carte-évènementielle') ? ' aria-current="page"' : ''; ?>>Carte évènementielle</a>
+            <a href="/boutique-en-ligne"
+                class="header__link<?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' header__link--active' : ''; ?>"
+                <?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' aria-current="page"' : ''; ?>>Boutique en ligne</a>
             <a href="/blog"
                 class="header__link<?php echo Navigation::isActivePath('/blog') ? ' header__link--active' : ''; ?>"
                 <?php echo Navigation::isActivePath('/blog') ? ' aria-current="page"' : ''; ?>>Blog</a>
@@ -51,10 +54,15 @@
                     <?php echo Navigation::isActivePath('/') ? ' aria-current="page"' : ''; ?>>
                     <span class="menu__label">Accueil</span>
                 </a>
-                <a class="menu__link<?php echo Navigation::isActivePath('/menu') ? ' menu__link--active' : ''; ?>"
-                    href="/menu" <?php echo Navigation::isActivePath('/menu') ? ' aria-current="page"' : ''; ?>>
-                    <span class="menu__label">Carte</span>
+                <a class="menu__link<?php echo Navigation::isActivePath('/carte-évènementielle') ? ' menu__link--active' : ''; ?>"
+                    href="/carte-évènementielle" <?php echo Navigation::isActivePath('/carte-évènementielle') ? ' aria-current="page"' : ''; ?>>
+                    <span class="menu__label">Carte évènementielle</span>
                     <span class="menu__desc">Menus de saison, pièces cocktail, buffets</span>
+                </a>
+                <a class="menu__link<?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' menu__link--active' : ''; ?>"
+                    href="/boutique-en-ligne" <?php echo Navigation::isActivePath('/boutique-en-ligne') ? ' aria-current="page"' : ''; ?>>
+                    <span class="menu__label">Boutique en ligne</span>
+                    <span class="menu__desc">Commander nos créations du moment, stock mis à jour en direct</span>
                 </a>
                 <a class="menu__link<?php echo Navigation::isActivePath('/blog') ? ' menu__link--active' : ''; ?>"
                     href="/blog" <?php echo Navigation::isActivePath('/blog') ? ' aria-current="page"' : ''; ?>>

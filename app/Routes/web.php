@@ -7,7 +7,11 @@ use App\Core\Router;
 
 // Public routes
 $router->get('/', 'HomeController@index');
-$router->get('/menu', 'MenuController@index');
+$router->get('/carte-évènementielle', 'MenuController@index');
+$router->get('/menu', 'MenuController@redirectLegacy');
+$router->get('/boutique-en-ligne', 'ShopController@index');
+$router->post('/boutique-en-ligne', 'ShopController@store');
+$router->get('/api/boutique/stock', 'ShopController@stock');
 $router->get('/blog', 'HomeController@blog');
 $router->get('/blog/{slug}', 'HomeController@blogPost');
 $router->get('/contact', 'ContactController@show');
@@ -41,6 +45,16 @@ $router->post('/admin/catalog/items/{id}/delete', 'AdminController@deleteCatalog
 $router->post('/admin/catalog/items/{id}/options/create', 'AdminController@createCatalogOption');
 $router->post('/admin/catalog/options/{id}', 'AdminController@updateCatalogOption');
 $router->post('/admin/catalog/options/{id}/delete', 'AdminController@deleteCatalogOption');
+$router->get('/admin/boutique', 'AdminController@shop');
+$router->post('/admin/boutique/sections/create', 'AdminController@createShopSection');
+$router->post('/admin/boutique/sections/reorder', 'AdminController@reorderShopSections');
+$router->post('/admin/boutique/sections/{id}', 'AdminController@updateShopSection');
+$router->post('/admin/boutique/sections/{id}/delete', 'AdminController@deleteShopSection');
+$router->post('/admin/boutique/sections/{id}/items/create', 'AdminController@createShopItem');
+$router->post('/admin/boutique/sections/{id}/items/reorder', 'AdminController@reorderShopItems');
+$router->post('/admin/boutique/items/{id}', 'AdminController@updateShopItem');
+$router->post('/admin/boutique/items/{id}/delete', 'AdminController@deleteShopItem');
+$router->post('/admin/boutique/orders/{id}/status', 'AdminController@updateShopOrderStatus');
 $router->get('/admin/contacts/export', 'AdminController@exportContacts');
 $router->get('/admin/contacts', 'AdminController@contacts');
 $router->post('/admin/contacts/{id}/status', 'AdminController@updateContactStatus');

@@ -7,6 +7,7 @@ import { initAboutSlider } from "./about/initAboutSlider";
 import { initContactForm } from "./contact/contactForm";
 import { initMenuTabs } from "./menu/menuTabs";
 import { initMenuOrder } from "./menu/menuOrder";
+import { initShopPage } from "./shop/shopPage";
 import { initAdminCatalog } from "./admin/catalog";
 import { initAdminBlog } from "./admin/blog";
 import { initAdminLogin } from "./admin/login";
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initContactForm();
     initMenuTabs();
     initMenuOrder();
+    initShopPage();
     initAdminCatalog();
     initAdminBlog();
     initAdminLogin();

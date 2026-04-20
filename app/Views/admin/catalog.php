@@ -67,7 +67,7 @@
 
         <div class="adminMediaTitle">
             <h1 class="adminMediaTitle__h1">La carte</h1>
-            <p class="adminMediaTitle__sub">Menu • edition & image</p>
+            <p class="adminMediaTitle__sub">Carte évènementielle • edition & image</p>
         </div>
     </aside>
 
@@ -80,7 +80,7 @@
                 </div>
                 <div class="adminPanelHead__actions">
                     <a href="/admin" class="adminBtn">Dashboard</a>
-                    <a href="/menu" class="adminBtn adminBtn--primary">Voir la carte</a>
+                    <a href="/carte-évènementielle" class="adminBtn adminBtn--primary">Voir la carte évènementielle</a>
                     <a href="/admin/contacts" class="adminBtn">Demandes</a>
                     <form action="/admin/logout" method="post">
                         <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>

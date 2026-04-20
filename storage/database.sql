@@ -117,6 +117,86 @@ CREATE TABLE IF NOT EXISTS menu_item_options (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ====================================================
+-- Tables: boutique_*
+-- Online shop catalog, stock and orders
+-- ====================================================
+
+CREATE TABLE IF NOT EXISTS boutique_sections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    slug VARCHAR(80) NOT NULL UNIQUE,
+    name VARCHAR(120) NOT NULL,
+    description TEXT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_boutique_sections_order (sort_order),
+    INDEX idx_boutique_sections_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS boutique_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    section_id INT NOT NULL,
+    slug VARCHAR(120) NOT NULL,
+    name VARCHAR(160) NOT NULL,
+    short_description TEXT NULL,
+    image_path VARCHAR(255) NULL,
+    image_alt VARCHAR(255) NULL,
+    price_cents INT NOT NULL DEFAULT 0,
+    price_label VARCHAR(80) NULL,
+    stock_quantity INT NOT NULL DEFAULT 0,
+    low_stock_threshold INT NOT NULL DEFAULT 5,
+    max_order_quantity INT NOT NULL DEFAULT 10,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (section_id) REFERENCES boutique_sections(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_boutique_item_slug_in_section (section_id, slug),
+    INDEX idx_boutique_items_order (section_id, sort_order),
+    INDEX idx_boutique_items_active (is_active),
+    INDEX idx_boutique_items_stock (stock_quantity)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS boutique_orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(50) NULL,
+    pickup_date DATE NOT NULL,
+    pickup_slot VARCHAR(120) NULL,
+    message TEXT NULL,
+    status ENUM('new', 'confirmed', 'preparing', 'completed', 'cancelled') NOT NULL DEFAULT 'new',
+    stock_restored_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_boutique_orders_status (status),
+    INDEX idx_boutique_orders_created (created_at),
+    INDEX idx_boutique_orders_pickup (pickup_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS boutique_order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    item_id INT NOT NULL,
+    item_name_snapshot VARCHAR(255) NOT NULL,
+    section_name_snapshot VARCHAR(120) NOT NULL,
+    unit_price_cents INT NOT NULL DEFAULT 0,
+    unit_price_label VARCHAR(80) NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    line_total_cents INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (order_id) REFERENCES boutique_orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES boutique_items(id) ON DELETE RESTRICT,
+    INDEX idx_boutique_order_items_order (order_id),
+    INDEX idx_boutique_order_items_item (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ====================================================
 -- Tables: blog_*
 -- Mini CMS blog content managed from admin
 -- ====================================================

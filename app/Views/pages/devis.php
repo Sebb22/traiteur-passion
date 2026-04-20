@@ -21,12 +21,12 @@
     $limitToSelectedSection = false;
     $accordionTitle         = $selectedCategoryName !== ''
     ? 'Composer ma commande pour ' . $selectedCategoryName
-    : 'Sélectionner des items du menu (optionnel)';
+    : 'Sélectionner des items de la carte évènementielle (optionnel)';
     $accordionSummary = $selectedCategoryName !== ''
     ? 'Composer ma commande de ' . $selectedCategoryName
-    : 'Choisir parmi nos menus';
+    : 'Choisir dans la carte évènementielle';
     $accordionContext = $selectedCategoryName !== ''
-    ? 'La catégorie choisie est mise en avant ci-dessous, mais vous pouvez compléter votre devis avec n’importe quelle autre catégorie sans revenir au menu.'
+    ? 'La catégorie choisie est mise en avant ci-dessous, mais vous pouvez compléter votre devis avec n’importe quelle autre catégorie sans revenir à la carte évènementielle.'
     : 'Sélectionnez les éléments qui vous intéressent et nous vous recontactons pour finaliser votre devis.';
     $selectionSummaryHint = $selectedCategoryName !== ''
     ? 'Votre catégorie de départ est déjà mise en avant. Vous pouvez enrichir la demande avec d’autres catégories juste en dessous.'

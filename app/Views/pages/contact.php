@@ -6,8 +6,8 @@
     $formSubmitLabel        = 'Recevoir une première proposition';
     $selectedSectionSlug    = '';
     $limitToSelectedSection = false;
-    $accordionTitle         = 'Sélectionner des items du menu (optionnel)';
-    $accordionSummary       = 'Choisir parmi nos menus';
+    $accordionTitle         = 'Sélectionner des items de la carte évènementielle (optionnel)';
+    $accordionSummary       = 'Choisir dans la carte évènementielle';
     $accordionContext       = 'Cette sélection sert à préparer votre devis. Notre équipe vous recontacte systématiquement pour confirmer le format, la livraison et les derniers détails.';
 ?>
 
