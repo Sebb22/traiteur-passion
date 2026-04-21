@@ -58,7 +58,7 @@ final class ShopOrder
             $this->db->beginTransaction();
 
             $stmt = $this->db->prepare(
-                "SELECT bi.id, bi.name, bi.price_cents, bi.price_label, bi.stock_quantity, bi.max_order_quantity, bi.is_active,
+                "SELECT bi.id, bi.name, bi.price_cents, bi.price_label, bi.stock_quantity, bi.is_active,
                         bs.name AS section_name, bs.is_active AS section_active
                  FROM boutique_items bi
                  INNER JOIN boutique_sections bs ON bs.id = bi.section_id
@@ -88,8 +88,7 @@ final class ShopOrder
 
                 $available   = max(0, (int) ($row['stock_quantity'] ?? 0));
                 $isAvailable = ! empty($row['is_active']) && ! empty($row['section_active']);
-                $maxOrder    = max(1, (int) ($row['max_order_quantity'] ?? 1));
-                $allowed     = min($available, $maxOrder);
+                $allowed     = $available;
 
                 if (! $isAvailable || $quantity > $allowed) {
                     $conflicts[] = [

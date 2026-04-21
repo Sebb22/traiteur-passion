@@ -39,6 +39,14 @@
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     };
 
+    $formatPriceInput = static function ($cents): string {
+    if ($cents === null || $cents === '') {
+        return '';
+    }
+
+    return number_format(((int) $cents) / 100, 2, ',', '');
+    };
+
     $deriveImageVariants = static function (string $imagePath): array {
     $desktop = trim($imagePath);
     $mobile  = $desktop;
@@ -226,19 +234,12 @@
                             <span class="adminField__label">Nom</span>
                             <input class="adminInput" type="text" name="name" required>
                         </label>
-                        <label class="adminField">
-                            <span class="adminField__label">Slug (optionnel)</span>
-                            <input class="adminInput" type="text" name="slug" placeholder="auto-généré si vide">
-                        </label>
-                        <label class="adminField adminField--sm">
-                            <span class="adminField__label">Ordre</span>
-                            <input class="adminInput" type="number" name="sort_order" value="0">
-                        </label>
                         <label class="adminField adminField--checkbox">
                             <span class="adminField__label">Visible</span>
                             <input class="adminCheckbox" type="checkbox" name="is_active" value="1" checked>
                         </label>
                     </div>
+                    <span class="adminHint">Le slug et l'ordre d'affichage sont gérés automatiquement.</span>
 
                     <label class="adminField">
                         <span class="adminField__label">Description</span>
@@ -303,22 +304,13 @@
                                         <input class="adminInput" type="text" name="name"
                                             value="<?php echo $e($section['name'] ?? ''); ?>" required>
                                     </label>
-                                    <label class="adminField">
-                                        <span class="adminField__label">Slug</span>
-                                        <input class="adminInput adminInput--readonly" type="text"
-                                            value="<?php echo $e($section['slug'] ?? ''); ?>" readonly>
-                                    </label>
-                                    <label class="adminField adminField--sm">
-                                        <span class="adminField__label">Ordre</span>
-                                        <input class="adminInput" type="number" name="sort_order"
-                                            value="<?php echo (int) ($section['sort_order'] ?? 0); ?>">
-                                    </label>
                                     <label class="adminField adminField--checkbox">
                                         <span class="adminField__label">Visible</span>
                                         <input class="adminCheckbox" type="checkbox" name="is_active" value="1"
                                             <?php echo ! empty($section['is_active']) ? 'checked' : ''; ?>>
                                     </label>
                                 </div>
+                                <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la liste.</span>
 
                                 <label class="adminField">
                                     <span class="adminField__label">Description</span>
@@ -357,23 +349,16 @@
                                                 <input class="adminInput" type="text" name="name" required>
                                             </label>
                                             <label class="adminField">
-                                                <span class="adminField__label">Slug (optionnel)</span>
-                                                <input class="adminInput" type="text" name="slug" placeholder="auto-généré si vide">
-                                            </label>
-                                            <label class="adminField">
                                                 <span class="adminField__label">Prix affiché</span>
                                                 <input class="adminInput" type="text" name="price_from_label"
                                                     placeholder="Ex: 16,50€/kg">
-                                            </label>
-                                            <label class="adminField adminField--sm">
-                                                <span class="adminField__label">Ordre</span>
-                                                <input class="adminInput" type="number" name="sort_order" value="0">
                                             </label>
                                             <label class="adminField adminField--checkbox">
                                                 <span class="adminField__label">Visible</span>
                                                 <input class="adminCheckbox" type="checkbox" name="is_active" value="1" checked>
                                             </label>
                                         </div>
+                                        <span class="adminHint">Le slug et l'ordre d'affichage sont geres automatiquement.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
@@ -486,19 +471,9 @@
                                                         value="<?php echo $e($item['name'] ?? ''); ?>" required>
                                                 </label>
                                                 <label class="adminField">
-                                                    <span class="adminField__label">Slug</span>
-                                                    <input class="adminInput adminInput--readonly" type="text"
-                                                        value="<?php echo $e($item['slug'] ?? ''); ?>" readonly>
-                                                </label>
-                                                <label class="adminField">
                                                     <span class="adminField__label">Prix affiché</span>
                                                     <input class="adminInput" type="text" name="price_from_label"
                                                         value="<?php echo $e($item['price_from_label'] ?? ''); ?>">
-                                                </label>
-                                                <label class="adminField adminField--sm">
-                                                    <span class="adminField__label">Ordre</span>
-                                                    <input class="adminInput" type="number" name="sort_order"
-                                                        value="<?php echo (int) ($item['sort_order'] ?? 0); ?>">
                                                 </label>
                                                 <label class="adminField adminField--checkbox">
                                                     <span class="adminField__label">Visible</span>
@@ -506,6 +481,7 @@
                                                         <?php echo ! empty($item['is_active']) ? 'checked' : ''; ?>>
                                                 </label>
                                             </div>
+                                            <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la section.</span>
                                         </section>
 
                                         <section class="adminEditorBlock adminEditorBlock--nested">
@@ -601,17 +577,13 @@
                                             <input class="adminInput" type="text" name="label" required>
                                         </label>
                                         <label class="adminField">
-                                            <span class="adminField__label">Clé (optionnel)</span>
-                                            <input class="adminInput" type="text" name="option_key"
-                                                placeholder="auto-générée si vide">
-                                        </label>
-                                        <label class="adminField">
                                             <span class="adminField__label">Prix affiché</span>
                                             <input class="adminInput" type="text" name="price_label">
                                         </label>
                                         <label class="adminField adminField--sm">
-                                            <span class="adminField__label">Prix cents</span>
-                                            <input class="adminInput" type="number" name="price_cents">
+                                            <span class="adminField__label">Prix</span>
+                                            <input class="adminInput" type="text" name="price_euros"
+                                                inputmode="decimal" placeholder="Ex: 2,50">
                                         </label>
                                         <label class="adminField adminField--sm">
                                             <span class="adminField__label">Ordre</span>
@@ -631,6 +603,7 @@
                                         <span class="adminField__label">Description</span>
                                         <input class="adminInput" type="text" name="description">
                                     </label>
+                                        <span class="adminHint">Le prix est saisi en euros, la clé technique est générée automatiquement.</span>
                                     <div class="adminInlineActions">
                                         <button type="submit" class="adminBtn">Ajouter l'option</button>
                                     </div>
@@ -650,19 +623,15 @@
                                                     value="<?php echo $e($option['label'] ?? ''); ?>" required>
                                             </label>
                                             <label class="adminField">
-                                                <span class="adminField__label">Clé</span>
-                                                <input class="adminInput adminInput--readonly" type="text"
-                                                    value="<?php echo $e($option['option_key'] ?? ''); ?>" readonly>
-                                            </label>
-                                            <label class="adminField">
                                                 <span class="adminField__label">Prix affiché</span>
                                                 <input class="adminInput" type="text" name="price_label"
                                                     value="<?php echo $e($option['price_label'] ?? ''); ?>">
                                             </label>
                                             <label class="adminField adminField--sm">
-                                                <span class="adminField__label">Prix cents</span>
-                                                <input class="adminInput" type="number" name="price_cents"
-                                                    value="<?php echo $e($option['price_cents'] ?? ''); ?>">
+                                                <span class="adminField__label">Prix</span>
+                                                <input class="adminInput" type="text" name="price_euros"
+                                                    inputmode="decimal"
+                                                    value="<?php echo $e($formatPriceInput($option['price_cents'] ?? null)); ?>">
                                             </label>
                                             <label class="adminField adminField--sm">
                                                 <span class="adminField__label">Ordre</span>
@@ -687,6 +656,8 @@
                                             <input class="adminInput" type="text" name="description"
                                                 value="<?php echo $e($option['description'] ?? ''); ?>">
                                         </label>
+
+                                        <span class="adminHint">Le prix saisi ici est converti automatiquement en cents au moment de l'enregistrement.</span>
 
                                         <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>">
 

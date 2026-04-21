@@ -180,7 +180,7 @@ final class Menu
             'id'          => $id,
             'name'        => trim((string) ($data['name'] ?? '')),
             'description' => $this->nullableString($data['description'] ?? null),
-            'sort_order'  => $this->toInt($data['sort_order'] ?? 0),
+            'sort_order'  => $this->resolveSortOrderForUpdate('menu_sections', $id, $data),
             'is_active'   => $this->toBoolInt($data['is_active'] ?? null),
         ]);
     }
@@ -207,7 +207,7 @@ final class Menu
             'slug'        => $slug,
             'name'        => $name,
             'description' => $this->nullableString($data['description'] ?? null),
-            'sort_order'  => $this->toInt($data['sort_order'] ?? 0),
+            'sort_order'  => $this->resolveSortOrderForCreate('menu_sections', $data),
             'is_active'   => $this->toBoolInt($data['is_active'] ?? null),
         ]);
 
@@ -255,7 +255,7 @@ final class Menu
             'image_path'        => $this->nullableString($data['image_path'] ?? null),
             'image_alt'         => $this->nullableString($data['image_alt'] ?? null),
             'price_from_label'  => $this->nullableString($data['price_from_label'] ?? null),
-            'sort_order'        => $this->toInt($data['sort_order'] ?? 0),
+            'sort_order'        => $this->resolveSortOrderForUpdate('menu_items', $id, $data),
             'is_active'         => $this->toBoolInt($data['is_active'] ?? null),
         ]);
     }
@@ -278,7 +278,7 @@ final class Menu
             'id'            => $id,
             'label'         => trim((string) ($data['label'] ?? '')),
             'description'   => $this->nullableString($data['description'] ?? null),
-            'price_cents'   => $this->nullableInt($data['price_cents'] ?? null),
+            'price_cents'   => $this->resolveNullablePriceCents($data),
             'price_label'   => $this->nullableString($data['price_label'] ?? null),
             'is_quote_only' => $this->toBoolInt($data['is_quote_only'] ?? null),
             'sort_order'    => $this->toInt($data['sort_order'] ?? 0),
@@ -312,7 +312,7 @@ final class Menu
             'image_path'        => $this->nullableString($data['image_path'] ?? null),
             'image_alt'         => $this->nullableString($data['image_alt'] ?? null),
             'price_from_label'  => $this->nullableString($data['price_from_label'] ?? null),
-            'sort_order'        => $this->toInt($data['sort_order'] ?? 0),
+            'sort_order'        => $this->resolveSortOrderForCreate('menu_items', $data, 'section_id', $sectionId),
             'is_active'         => $this->toBoolInt($data['is_active'] ?? null),
         ]);
 
@@ -367,7 +367,7 @@ final class Menu
             'option_key'    => $optionKey,
             'label'         => $label,
             'description'   => $this->nullableString($data['description'] ?? null),
-            'price_cents'   => $this->nullableInt($data['price_cents'] ?? null),
+            'price_cents'   => $this->resolveNullablePriceCents($data),
             'price_label'   => $this->nullableString($data['price_label'] ?? null),
             'is_quote_only' => $this->toBoolInt($data['is_quote_only'] ?? null),
             'sort_order'    => $this->toInt($data['sort_order'] ?? 0),
@@ -456,6 +456,85 @@ final class Menu
         return $value === '' ? null : (int) $value;
     }
 
+    private function resolveNullablePriceCents(array $data): ?int
+    {
+        $priceEuros = trim((string) ($data['price_euros'] ?? ''));
+        if ($priceEuros !== '') {
+            return $this->parseMoneyToCents($priceEuros);
+        }
+
+        return $this->nullableInt($data['price_cents'] ?? null);
+    }
+
+    private function resolveSortOrderForCreate(string $table, array $data, ?string $parentColumn = null, ?int $parentId = null): int
+    {
+        if ($this->hasNonEmptyInput($data, 'sort_order')) {
+            return $this->toInt($data['sort_order']);
+        }
+
+        return $this->nextSortOrder($table, $parentColumn, $parentId);
+    }
+
+    private function resolveSortOrderForUpdate(string $table, int $id, array $data): int
+    {
+        if ($this->hasNonEmptyInput($data, 'sort_order')) {
+            return $this->toInt($data['sort_order']);
+        }
+
+        return $this->currentSortOrder($table, $id);
+    }
+
+    private function hasNonEmptyInput(array $data, string $key): bool
+    {
+        return array_key_exists($key, $data) && trim((string) $data[$key]) !== '';
+    }
+
+    private function nextSortOrder(string $table, ?string $parentColumn = null, ?int $parentId = null): int
+    {
+        $this->assertSortableTable($table);
+        if ($parentColumn !== null) {
+            $this->assertSortableParentColumn($parentColumn);
+        }
+
+        $sql    = 'SELECT COALESCE(MAX(sort_order), 0) FROM ' . $table;
+        $params = [];
+
+        if ($parentColumn !== null && $parentId !== null) {
+            $sql                 .= ' WHERE ' . $parentColumn . ' = :parent_id';
+            $params['parent_id']  = $parentId;
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return ((int) $stmt->fetchColumn()) + 10;
+    }
+
+    private function currentSortOrder(string $table, int $id): int
+    {
+        $this->assertSortableTable($table);
+
+        $stmt = $this->db->prepare('SELECT sort_order FROM ' . $table . ' WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+
+        $value = $stmt->fetchColumn();
+        return $value === false ? 0 : (int) $value;
+    }
+
+    private function assertSortableTable(string $table): void
+    {
+        if (! in_array($table, ['menu_sections', 'menu_items'], true)) {
+            throw new \InvalidArgumentException('Table de tri non autorisee.');
+        }
+    }
+
+    private function assertSortableParentColumn(string $column): void
+    {
+        if (! in_array($column, ['section_id'], true)) {
+            throw new \InvalidArgumentException('Colonne parente non autorisee.');
+        }
+    }
+
     private function toInt($value): int
     {
         return (int) ($value ?? 0);
@@ -464,6 +543,23 @@ final class Menu
     private function toBoolInt($value): int
     {
         return $value === null ? 0 : 1;
+    }
+
+    private function parseMoneyToCents(string $value): int
+    {
+        $normalized = str_replace([' ', "\xc2\xa0"], '', trim($value));
+        $normalized = str_replace(',', '.', $normalized);
+
+        if ($normalized === '' || ! preg_match('/^\d+(?:\.\d{1,2})?$/', $normalized)) {
+            throw new \InvalidArgumentException('Le prix doit etre saisi au format 12,50.');
+        }
+
+        $amount = (float) $normalized;
+        if ($amount < 0) {
+            throw new \InvalidArgumentException('Le prix ne peut pas etre negatif.');
+        }
+
+        return (int) round($amount * 100);
     }
 
     private function slugify(string $value): string

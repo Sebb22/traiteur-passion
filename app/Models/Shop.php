@@ -53,7 +53,6 @@ final class Shop
                 'price_label'         => (string) ($item['price_label'] ?? ''),
                 'stock_quantity'      => $stock,
                 'low_stock_threshold' => max(0, (int) ($item['low_stock_threshold'] ?? 0)),
-                'max_order_quantity'  => max(1, (int) ($item['max_order_quantity'] ?? 1)),
                 'is_sold_out'         => $stock <= 0,
                 'is_low_stock'        => $stock > 0 && $stock <= max(0, (int) ($item['low_stock_threshold'] ?? 0)),
             ];
@@ -125,7 +124,7 @@ final class Shop
             'id'          => $id,
             'name'        => trim((string) ($data['name'] ?? '')),
             'description' => $this->nullableString($data['description'] ?? null),
-            'sort_order'  => $this->toInt($data['sort_order'] ?? 0),
+            'sort_order'  => $this->resolveSortOrderForUpdate('boutique_sections', $id, $data),
             'is_active'   => $this->toBoolInt($data['is_active'] ?? null),
         ]);
     }
@@ -152,7 +151,7 @@ final class Shop
             'slug'        => $slug,
             'name'        => $name,
             'description' => $this->nullableString($data['description'] ?? null),
-            'sort_order'  => $this->toInt($data['sort_order'] ?? 0),
+            'sort_order'  => $this->resolveSortOrderForCreate('boutique_sections', $data),
             'is_active'   => $this->toBoolInt($data['is_active'] ?? null),
         ]);
 
@@ -211,12 +210,12 @@ final class Shop
             'short_description'   => $this->nullableString($data['short_description'] ?? null),
             'image_path'          => $this->nullableString($data['image_path'] ?? null),
             'image_alt'           => $this->nullableString($data['image_alt'] ?? null),
-            'price_cents'         => $this->requiredPositiveInt($data['price_cents'] ?? 0),
+            'price_cents'         => $this->resolvePriceCents($data),
             'price_label'         => $this->nullableString($data['price_label'] ?? null),
             'stock_quantity'      => max(0, $this->toInt($data['stock_quantity'] ?? 0)),
             'low_stock_threshold' => max(0, $this->toInt($data['low_stock_threshold'] ?? 0)),
-            'max_order_quantity'  => max(1, $this->toInt($data['max_order_quantity'] ?? 1)),
-            'sort_order'          => $this->toInt($data['sort_order'] ?? 0),
+            'max_order_quantity'  => $this->resolveMaxOrderQuantityForCreate($data),
+            'sort_order'          => $this->resolveSortOrderForCreate('boutique_items', $data, 'section_id', $sectionId),
             'is_active'           => $this->toBoolInt($data['is_active'] ?? null),
         ]);
 
@@ -247,12 +246,12 @@ final class Shop
             'short_description'   => $this->nullableString($data['short_description'] ?? null),
             'image_path'          => $this->nullableString($data['image_path'] ?? null),
             'image_alt'           => $this->nullableString($data['image_alt'] ?? null),
-            'price_cents'         => $this->requiredPositiveInt($data['price_cents'] ?? 0),
+            'price_cents'         => $this->resolvePriceCents($data),
             'price_label'         => $this->nullableString($data['price_label'] ?? null),
             'stock_quantity'      => max(0, $this->toInt($data['stock_quantity'] ?? 0)),
             'low_stock_threshold' => max(0, $this->toInt($data['low_stock_threshold'] ?? 0)),
-            'max_order_quantity'  => max(1, $this->toInt($data['max_order_quantity'] ?? 1)),
-            'sort_order'          => $this->toInt($data['sort_order'] ?? 0),
+            'max_order_quantity'  => $this->resolveMaxOrderQuantityForUpdate($id, $data),
+            'sort_order'          => $this->resolveSortOrderForUpdate('boutique_items', $id, $data),
             'is_active'           => $this->toBoolInt($data['is_active'] ?? null),
         ]);
     }
@@ -354,7 +353,7 @@ final class Shop
     public function getStockSnapshot(): array
     {
         $rows = $this->db->query(
-            "SELECT id, name, stock_quantity, max_order_quantity, is_active
+            "SELECT id, name, stock_quantity, is_active
              FROM boutique_items
              ORDER BY id ASC",
         )->fetchAll();
@@ -363,11 +362,10 @@ final class Shop
         foreach ($rows as $row) {
             $itemId            = (int) ($row['id'] ?? 0);
             $snapshot[$itemId] = [
-                'id'                 => $itemId,
-                'name'               => (string) ($row['name'] ?? ''),
-                'stock_quantity'     => max(0, (int) ($row['stock_quantity'] ?? 0)),
-                'max_order_quantity' => max(1, (int) ($row['max_order_quantity'] ?? 1)),
-                'is_active'          => ! empty($row['is_active']),
+                'id'             => $itemId,
+                'name'           => (string) ($row['name'] ?? ''),
+                'stock_quantity' => max(0, (int) ($row['stock_quantity'] ?? 0)),
+                'is_active'      => ! empty($row['is_active']),
             ];
         }
 
@@ -390,6 +388,97 @@ final class Shop
         return $value === null ? 0 : 1;
     }
 
+    private function resolveSortOrderForCreate(string $table, array $data, ?string $parentColumn = null, ?int $parentId = null): int
+    {
+        if ($this->hasNonEmptyInput($data, 'sort_order')) {
+            return $this->toInt($data['sort_order']);
+        }
+
+        return $this->nextSortOrder($table, $parentColumn, $parentId);
+    }
+
+    private function resolveSortOrderForUpdate(string $table, int $id, array $data): int
+    {
+        if ($this->hasNonEmptyInput($data, 'sort_order')) {
+            return $this->toInt($data['sort_order']);
+        }
+
+        return $this->currentSortOrder($table, $id);
+    }
+
+    private function hasNonEmptyInput(array $data, string $key): bool
+    {
+        return array_key_exists($key, $data) && trim((string) $data[$key]) !== '';
+    }
+
+    private function nextSortOrder(string $table, ?string $parentColumn = null, ?int $parentId = null): int
+    {
+        $this->assertSortableTable($table);
+        if ($parentColumn !== null) {
+            $this->assertSortableParentColumn($parentColumn);
+        }
+
+        $sql    = 'SELECT COALESCE(MAX(sort_order), 0) FROM ' . $table;
+        $params = [];
+
+        if ($parentColumn !== null && $parentId !== null) {
+            $sql                 .= ' WHERE ' . $parentColumn . ' = :parent_id';
+            $params['parent_id']  = $parentId;
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return ((int) $stmt->fetchColumn()) + 10;
+    }
+
+    private function currentSortOrder(string $table, int $id): int
+    {
+        $this->assertSortableTable($table);
+
+        $stmt = $this->db->prepare('SELECT sort_order FROM ' . $table . ' WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+
+        $value = $stmt->fetchColumn();
+        return $value === false ? 0 : (int) $value;
+    }
+
+    private function resolveMaxOrderQuantityForCreate(array $data): int
+    {
+        if ($this->hasNonEmptyInput($data, 'max_order_quantity')) {
+            return max(1, $this->toInt($data['max_order_quantity']));
+        }
+
+        return max(1, $this->toInt($data['stock_quantity'] ?? 0));
+    }
+
+    private function resolveMaxOrderQuantityForUpdate(int $id, array $data): int
+    {
+        if ($this->hasNonEmptyInput($data, 'max_order_quantity')) {
+            return max(1, $this->toInt($data['max_order_quantity']));
+        }
+
+        $stmt = $this->db->prepare('SELECT max_order_quantity FROM boutique_items WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+
+        $value = $stmt->fetchColumn();
+        return $value === false ? max(1, $this->toInt($data['stock_quantity'] ?? 0)) : max(1, (int) $value);
+    }
+
+    private function assertSortableTable(string $table): void
+    {
+        if (! in_array($table, ['boutique_sections', 'boutique_items'], true)) {
+            throw new \InvalidArgumentException('Table de tri non autorisee.');
+        }
+    }
+
+    private function assertSortableParentColumn(string $column): void
+    {
+        if (! in_array($column, ['section_id'], true)) {
+            throw new \InvalidArgumentException('Colonne parente non autorisee.');
+        }
+    }
+
     private function requiredPositiveInt($value): int
     {
         $number = (int) ($value ?? 0);
@@ -398,6 +487,33 @@ final class Shop
         }
 
         return $number;
+    }
+
+    private function resolvePriceCents(array $data): int
+    {
+        $priceEuros = trim((string) ($data['price_euros'] ?? ''));
+        if ($priceEuros !== '') {
+            return $this->parseMoneyToCents($priceEuros);
+        }
+
+        return $this->requiredPositiveInt($data['price_cents'] ?? 0);
+    }
+
+    private function parseMoneyToCents(string $value): int
+    {
+        $normalized = str_replace([' ', "\xc2\xa0"], '', trim($value));
+        $normalized = str_replace(',', '.', $normalized);
+
+        if ($normalized === '' || ! preg_match('/^\d+(?:\.\d{1,2})?$/', $normalized)) {
+            throw new \InvalidArgumentException('Le prix doit être saisi au format 12,50.');
+        }
+
+        $amount = (float) $normalized;
+        if ($amount < 0) {
+            throw new \InvalidArgumentException('Le prix ne peut pas être négatif.');
+        }
+
+        return (int) round($amount * 100);
     }
 
     private function slugify(string $value): string

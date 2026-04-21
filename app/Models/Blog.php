@@ -170,11 +170,14 @@ final class Blog
             throw new \InvalidArgumentException('Le titre est requis.');
         }
 
-        $slug = trim((string) ($data['slug'] ?? ''));
-        if ($slug === '') {
-            $slug = $this->slugify($title);
-        } else {
+        $slugInputProvided = array_key_exists('slug', $data);
+        $slug              = trim((string) ($data['slug'] ?? ''));
+        if ($slugInputProvided && $slug !== '') {
             $slug = $this->slugify($slug);
+        } elseif (! $slugInputProvided && trim((string) ($existing['slug'] ?? '')) !== '') {
+            $slug = (string) $existing['slug'];
+        } else {
+            $slug = $this->slugify($title);
         }
 
         $dateIso = $this->normalizeDate((string) ($data['date_iso'] ?? ($existing['date_iso'] ?? '')));

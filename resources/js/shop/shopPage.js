@@ -24,6 +24,39 @@ function formatPrice(cents) {
     }).format((Number.parseInt(cents, 10) || 0) / 100);
 }
 
+function clearElementChildren(element) {
+    if (!element) {
+        return;
+    }
+
+    if (typeof element.replaceChildren === "function") {
+        element.replaceChildren();
+        return;
+    }
+
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}
+
+function bindMediaQueryChange(mediaQueryList, listener) {
+    if (!mediaQueryList || typeof listener !== "function") {
+        return () => {};
+    }
+
+    if (typeof mediaQueryList.addEventListener === "function") {
+        mediaQueryList.addEventListener("change", listener);
+        return () => mediaQueryList.removeEventListener("change", listener);
+    }
+
+    if (typeof mediaQueryList.addListener === "function") {
+        mediaQueryList.addListener(listener);
+        return () => mediaQueryList.removeListener(listener);
+    }
+
+    return () => {};
+}
+
 export function initShopPage() {
     const form = document.querySelector("[data-shop-form]");
     if (!form) {
@@ -74,6 +107,7 @@ export function initShopPage() {
     let touchCurrentY = 0;
     let isDraggingSummary = false;
     const desktopToastMedia = window.matchMedia("(min-width: 981px)");
+    let unbindDesktopToastMedia = () => {};
 
     const isDesktopToast = () => desktopToastMedia.matches;
 
@@ -221,7 +255,6 @@ export function initShopPage() {
         const addButton = form.querySelector(`[data-shop-add][data-item-id="${itemId}"]`);
         const controls = form.querySelector(`[data-shop-controls][data-item-id="${itemId}"]`);
         const stockQuantity = Number.parseInt(node.getAttribute("data-item-stock") || "0", 10);
-        const maxOrder = Number.parseInt(node.getAttribute("data-item-max-order") || "1", 10);
         const priceCents = Number.parseInt(node.getAttribute("data-item-price-cents") || "0", 10);
 
         items.set(itemId, {
@@ -235,7 +268,6 @@ export function initShopPage() {
             addButton,
             controls,
             stockQuantity,
-            maxOrder,
         });
     });
 
@@ -326,7 +358,7 @@ export function initShopPage() {
         let totalItems = 0;
 
         if (summaryLines) {
-            summaryLines.replaceChildren();
+            clearElementChildren(summaryLines);
         }
 
         items.forEach((item) => {
@@ -474,11 +506,9 @@ export function initShopPage() {
             }
 
             const stockQuantity = Math.max(0, Number.parseInt(entry.stock_quantity || 0, 10));
-            const maxOrder = Math.max(1, Number.parseInt(entry.max_order_quantity || 1, 10));
-            const allowed = Math.min(stockQuantity, maxOrder);
+            const allowed = stockQuantity;
 
             item.stockQuantity = stockQuantity;
-            item.maxOrder = maxOrder;
             item.input.max = String(allowed);
             item.input.value = String(clampQuantity(item.input.value, allowed));
             item.input.disabled = allowed <= 0 || entry.is_active === false;
@@ -758,7 +788,7 @@ export function initShopPage() {
         );
     }
 
-    desktopToastMedia.addEventListener("change", () => {
+    unbindDesktopToastMedia = bindMediaQueryChange(desktopToastMedia, () => {
         clearSummaryHideTimeout();
         clearSummaryPromptTimeout();
         isSummaryPinned = false;
@@ -768,6 +798,10 @@ export function initShopPage() {
         setSummaryOpen(false);
         syncSummaryDockBounds();
         renderSummary();
+    });
+
+    window.addEventListener("beforeunload", () => {
+        unbindDesktopToastMedia();
     });
 
     window.addEventListener("resize", syncSummaryDockBounds);

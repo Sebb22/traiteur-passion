@@ -170,10 +170,6 @@
                                     <span class="adminField__label">Titre</span>
                                     <input class="adminInput" type="text" name="title" required>
                                 </label>
-                                <label class="adminField">
-                                    <span class="adminField__label">Slug</span>
-                                    <input class="adminInput" type="text" name="slug" placeholder="auto-genere si vide">
-                                </label>
                                 <label class="adminField adminField--sm">
                                     <span class="adminField__label">Date</span>
                                     <input class="adminInput" type="date" name="date_iso" value="<?php echo date('Y-m-d'); ?>">
@@ -183,6 +179,7 @@
                                     <input class="adminCheckbox" type="checkbox" name="is_published" value="1" checked>
                                 </label>
                             </div>
+                            <span class="adminHint">Le slug est genere automatiquement a partir du titre.</span>
                             <div class="adminFieldGrid adminFieldGrid--two">
                                 <label class="adminField">
                                     <span class="adminField__label">Auteur</span>
@@ -310,11 +307,6 @@
                                         <input class="adminInput" type="text" name="title"
                                             value="<?php echo $e($post['title'] ?? ''); ?>" required>
                                     </label>
-                                    <label class="adminField">
-                                        <span class="adminField__label">Slug</span>
-                                        <input class="adminInput" type="text" name="slug"
-                                            value="<?php echo $e($post['slug'] ?? ''); ?>">
-                                    </label>
                                     <label class="adminField adminField--sm">
                                         <span class="adminField__label">Date</span>
                                         <input class="adminInput" type="date" name="date_iso"
@@ -326,6 +318,7 @@
                                             <?php echo ! empty($post['is_published']) ? 'checked' : ''; ?>>
                                     </label>
                                 </div>
+                                <span class="adminHint">L'URL actuelle reste conservee automatiquement meme si le titre evolue.</span>
                                 <div class="adminFieldGrid adminFieldGrid--two">
                                     <label class="adminField">
                                         <span class="adminField__label">Auteur</span>

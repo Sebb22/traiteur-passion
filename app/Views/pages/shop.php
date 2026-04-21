@@ -23,7 +23,8 @@
     <section class="menuSplit shopSplit" data-wheel-redirect data-wheel-target=".menuSplit__right">
         <div class="menuSplit__left" aria-label="Visuel de la boutique en ligne">
             <div class="menuHero shopHero">
-                <img class="menuHero__img" src="/uploads/pages/menu/images/menu3Illu.webp" alt="" aria-hidden="true">
+                <img class="menuHero__img" src="/uploads/pages/shop/images/shopIllu-1200.webp" alt=""
+                    aria-hidden="true">
                 <div class="shopHero__content">
                     <h1 class="menuHero__title">Commande en ligne</h1>
                 </div>
@@ -48,11 +49,10 @@
                     <div class="shopIntro__highlight">
                         <strong class="shopIntro__highlightTitle">Carte courte, rotation hebdo, fait maison
                             uniquement</strong>
-                        <p class="shopIntro__highlightCopy">Chaque quantité envoyée est revérifiée au moment de la
-                            commande pour éviter la survente et préserver la qualité des produits réellement
-                            disponibles,
-                            sans compromis sur la fraîcheur. Selon votre zone, nous pouvons aussi valider une livraison
-                            autour de Compiègne dans un rayon de 20 km dès 15 € de commande.</p>
+                        <p class="shopIntro__highlightCopy">Chaque commande fait l’objet d’une vérification attentive
+                            afin de garantir des produits disponibles, sélectionnés avec exigence pour leur fraîcheur.
+                            La livraison est également proposée autour de Compiègne, dans un rayon de 20 km, dès 15 € de
+                            commande, selon votre localisation.</p>
                     </div>
                     <div class="shopIntro__meta">
                         <span class="shopPill">Renouvelée chaque semaine</span>
@@ -182,8 +182,7 @@
                                     <?php
                                         $itemId        = (int) ($item['id'] ?? 0);
                                         $stockQuantity = max(0, (int) ($item['stock_quantity'] ?? 0));
-                                        $maxOrder      = max(1, (int) ($item['max_order_quantity'] ?? 1));
-                                        $allowed       = min($stockQuantity, $maxOrder);
+                                        $allowed       = $stockQuantity;
                                         $isSoldOut     = ! empty($item['is_sold_out']) || $stockQuantity <= 0;
                                         $isLowStock    = ! empty($item['is_low_stock']);
                                         $statusLabel   = $isSoldOut
@@ -195,8 +194,7 @@
                                         data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
                                         data-item-price="<?php echo $e($formatPrice($item)); ?>"
                                         data-item-price-cents="<?php echo (int) ($item['price_cents'] ?? 0); ?>"
-                                        data-item-stock="<?php echo $stockQuantity; ?>"
-                                        data-item-max-order="<?php echo $maxOrder; ?>">
+                                        data-item-stock="<?php echo $stockQuantity; ?>">
                                         <div class="shopItemCard__media">
                                             <?php if (($item['image_path'] ?? '') !== ''): ?>
                                             <img src="<?php echo $e($item['image_path'] ?? ''); ?>"
@@ -230,8 +228,6 @@
                                                     class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
                                                     data-shop-stock
                                                     data-item-id="<?php echo $itemId; ?>"><?php echo $e($statusLabel); ?></span>
-                                                <span class="shopItemCard__limit">Jusqu'à <?php echo $allowed; ?> par
-                                                    commande</span>
                                             </div>
 
                                             <div class="shopItemCard__footer">
@@ -336,14 +332,16 @@
                                             <span class="shopField__label">Mode souhaité</span>
                                             <div class="shopFulfillmentChoices">
                                                 <label class="shopFulfillmentChoice">
-                                                    <input type="radio" name="fulfillment_method" value="pickup" data-shop-fulfillment checked>
+                                                    <input type="radio" name="fulfillment_method" value="pickup"
+                                                        data-shop-fulfillment checked>
                                                     <span class="shopFulfillmentChoice__body">
                                                         <strong>Retrait</strong>
                                                         <small>Créneau confirmé avec vous</small>
                                                     </span>
                                                 </label>
                                                 <label class="shopFulfillmentChoice">
-                                                    <input type="radio" name="fulfillment_method" value="delivery" data-shop-fulfillment>
+                                                    <input type="radio" name="fulfillment_method" value="delivery"
+                                                        data-shop-fulfillment>
                                                     <span class="shopFulfillmentChoice__body">
                                                         <strong>Livraison</strong>
                                                         <small>Dans un rayon de 20 km dès 15 €</small>
@@ -361,20 +359,28 @@
                                             <input class="shopInput" type="text" name="pickup_slot"
                                                 placeholder="Ex: samedi 11h00 - 12h00">
                                         </label>
-                                        <div class="shopDeliveryFields shopFieldGrid shopField--full" data-shop-delivery-panel hidden>
+                                        <div class="shopDeliveryFields shopFieldGrid shopField--full"
+                                            data-shop-delivery-panel hidden>
                                             <label class="shopField shopField--full">
                                                 <span class="shopField__label">Adresse de livraison</span>
-                                                <input class="shopInput" type="text" name="delivery_address" data-shop-delivery-field placeholder="Numéro, rue, complément d’adresse">
+                                                <input class="shopInput" type="text" name="delivery_address"
+                                                    data-shop-delivery-field
+                                                    placeholder="Numéro, rue, complément d’adresse">
                                             </label>
                                             <label class="shopField">
                                                 <span class="shopField__label">Code postal</span>
-                                                <input class="shopInput" type="text" name="delivery_postal_code" data-shop-delivery-field inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="60200">
+                                                <input class="shopInput" type="text" name="delivery_postal_code"
+                                                    data-shop-delivery-field inputmode="numeric" pattern="[0-9]{5}"
+                                                    maxlength="5" placeholder="60200">
                                             </label>
                                             <label class="shopField">
                                                 <span class="shopField__label">Ville</span>
-                                                <input class="shopInput" type="text" name="delivery_city" data-shop-delivery-field placeholder="Compiègne">
+                                                <input class="shopInput" type="text" name="delivery_city"
+                                                    data-shop-delivery-field placeholder="Compiègne">
                                             </label>
-                                            <p class="shopDeliveryFields__note">La livraison reste validée par l’équipe selon l’adresse, la zone desservie et un minimum de 15 € de commande.</p>
+                                            <p class="shopDeliveryFields__note">La livraison reste validée par l’équipe
+                                                selon l’adresse, la zone desservie et un minimum de 15 € de commande.
+                                            </p>
                                         </div>
                                         <label class="shopField shopField--full">
                                             <span class="shopField__label">Message</span>

@@ -35,6 +35,10 @@
     return number_format(((int) $cents) / 100, 2, ',', ' ') . ' EUR';
     };
 
+    $formatPriceInput = static function ($cents): string {
+    return number_format(((int) $cents) / 100, 2, ',', '');
+    };
+
     $formatItemPrice = static function (array $item) use ($formatPrice): string {
     $priceLabel = trim((string) ($item['price_label'] ?? ''));
     return $priceLabel !== '' ? $priceLabel : $formatPrice($item['price_cents'] ?? 0);
@@ -222,19 +226,12 @@
                             <span class="adminField__label">Nom</span>
                             <input class="adminInput" type="text" name="name" required>
                         </label>
-                        <label class="adminField">
-                            <span class="adminField__label">Slug (optionnel)</span>
-                            <input class="adminInput" type="text" name="slug" placeholder="auto-genere si vide">
-                        </label>
-                        <label class="adminField adminField--sm">
-                            <span class="adminField__label">Ordre</span>
-                            <input class="adminInput" type="number" name="sort_order" value="0">
-                        </label>
                         <label class="adminField adminField--checkbox">
                             <span class="adminField__label">Visible</span>
                             <input class="adminCheckbox" type="checkbox" name="is_active" value="1" checked>
                         </label>
                     </div>
+                    <span class="adminHint">Le slug et l'ordre d'affichage sont geres automatiquement.</span>
 
                     <label class="adminField">
                         <span class="adminField__label">Description</span>
@@ -305,22 +302,13 @@
                                         <input class="adminInput" type="text" name="name"
                                             value="<?php echo $e($section['name'] ?? ''); ?>" required>
                                     </label>
-                                    <label class="adminField">
-                                        <span class="adminField__label">Slug</span>
-                                        <input class="adminInput adminInput--readonly" type="text"
-                                            value="<?php echo $e($section['slug'] ?? ''); ?>" readonly>
-                                    </label>
-                                    <label class="adminField adminField--sm">
-                                        <span class="adminField__label">Ordre</span>
-                                        <input class="adminInput" type="number" name="sort_order"
-                                            value="<?php echo (int) ($section['sort_order'] ?? 0); ?>">
-                                    </label>
                                     <label class="adminField adminField--checkbox">
                                         <span class="adminField__label">Visible</span>
                                         <input class="adminCheckbox" type="checkbox" name="is_active" value="1"
                                             <?php echo ! empty($section['is_active']) ? 'checked' : ''; ?>>
                                     </label>
                                 </div>
+                                <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la liste.</span>
 
                                 <label class="adminField">
                                     <span class="adminField__label">Description</span>
@@ -362,23 +350,14 @@
                                                 <input class="adminInput" type="text" name="name" required>
                                             </label>
                                             <label class="adminField">
-                                                <span class="adminField__label">Slug (optionnel)</span>
-                                                <input class="adminInput" type="text" name="slug"
-                                                    placeholder="auto-genere si vide">
-                                            </label>
-                                            <label class="adminField">
                                                 <span class="adminField__label">Libelle prix</span>
                                                 <input class="adminInput" type="text" name="price_label"
                                                     placeholder="Ex: 12 EUR piece">
                                             </label>
                                             <label class="adminField adminField--sm">
-                                                <span class="adminField__label">Prix cents</span>
-                                                <input class="adminInput" type="number" min="0" name="price_cents"
-                                                    value="0" required>
-                                            </label>
-                                            <label class="adminField adminField--sm">
-                                                <span class="adminField__label">Ordre</span>
-                                                <input class="adminInput" type="number" name="sort_order" value="0">
+                                                <span class="adminField__label">Prix</span>
+                                                <input class="adminInput" type="text" name="price_euros"
+                                                    inputmode="decimal" placeholder="Ex: 12,50" required>
                                             </label>
                                             <label class="adminField adminField--checkbox">
                                                 <span class="adminField__label">Visible</span>
@@ -386,6 +365,7 @@
                                                     checked>
                                             </label>
                                         </div>
+                                        <span class="adminHint">Le prix est saisi en euros, puis le slug et l'ordre d'affichage sont geres automatiquement.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
@@ -401,14 +381,8 @@
                                                 <input class="adminInput" type="number" min="0"
                                                     name="low_stock_threshold" value="5">
                                             </label>
-                                            <label class="adminField adminField--sm">
-                                                <span class="adminField__label">Max / commande</span>
-                                                <input class="adminInput" type="number" min="1"
-                                                    name="max_order_quantity" value="5">
-                                            </label>
                                         </div>
-                                        <span class="adminHint">Le panier public se limite automatiquement au minimum
-                                            entre le stock reel et cette quantite maximale.</span>
+                                        <span class="adminHint">Le stock saisi ici correspond directement a la quantite commandable.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
@@ -490,7 +464,6 @@
                             $itemVisibilityLabel = ! empty($item['is_active']) ? 'Visible' : 'Masque';
                             $itemDescription     = trim((string) ($item['short_description'] ?? ''));
                             $itemStock           = max(0, (int) ($item['stock_quantity'] ?? 0));
-                            $itemMaxOrder        = max(1, (int) ($item['max_order_quantity'] ?? 1));
                         ?>
                         <details class="adminCatalogItem" id="item-<?php echo (int) ($item['id'] ?? 0); ?>"
                             data-item-id="<?php echo (int) ($item['id'] ?? 0); ?>" draggable="true" data-catalog-item
@@ -502,7 +475,6 @@
                                         <span><?php echo $e($item['slug'] ?? ''); ?></span>
                                         <span><?php echo $e($formatItemPrice($item)); ?></span>
                                         <span>Stock : <?php echo $itemStock; ?></span>
-                                        <span>Max / cmd : <?php echo $itemMaxOrder; ?></span>
                                         <span><?php echo $itemVisibilityLabel; ?></span>
                                     </div>
                                     <?php if ($itemDescription !== ''): ?>
@@ -525,25 +497,16 @@
                                                         value="<?php echo $e($item['name'] ?? ''); ?>" required>
                                                 </label>
                                                 <label class="adminField">
-                                                    <span class="adminField__label">Slug</span>
-                                                    <input class="adminInput adminInput--readonly" type="text"
-                                                        value="<?php echo $e($item['slug'] ?? ''); ?>" readonly>
-                                                </label>
-                                                <label class="adminField">
                                                     <span class="adminField__label">Libelle prix</span>
                                                     <input class="adminInput" type="text" name="price_label"
                                                         value="<?php echo $e($item['price_label'] ?? ''); ?>">
                                                 </label>
                                                 <label class="adminField adminField--sm">
-                                                    <span class="adminField__label">Prix cents</span>
-                                                    <input class="adminInput" type="number" min="0" name="price_cents"
-                                                        value="<?php echo (int) ($item['price_cents'] ?? 0); ?>"
+                                                    <span class="adminField__label">Prix</span>
+                                                    <input class="adminInput" type="text" name="price_euros"
+                                                        inputmode="decimal"
+                                                        value="<?php echo $e($formatPriceInput($item['price_cents'] ?? 0)); ?>"
                                                         required>
-                                                </label>
-                                                <label class="adminField adminField--sm">
-                                                    <span class="adminField__label">Ordre</span>
-                                                    <input class="adminInput" type="number" name="sort_order"
-                                                        value="<?php echo (int) ($item['sort_order'] ?? 0); ?>">
                                                 </label>
                                                 <label class="adminField adminField--checkbox">
                                                     <span class="adminField__label">Visible</span>
@@ -552,6 +515,7 @@
                                                         <?php echo ! empty($item['is_active']) ? 'checked' : ''; ?>>
                                                 </label>
                                             </div>
+                                            <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la section.</span>
                                         </section>
 
                                         <section class="adminEditorBlock adminEditorBlock--nested">
@@ -569,12 +533,8 @@
                                                         name="low_stock_threshold"
                                                         value="<?php echo (int) ($item['low_stock_threshold'] ?? 0); ?>">
                                                 </label>
-                                                <label class="adminField adminField--sm">
-                                                    <span class="adminField__label">Max / commande</span>
-                                                    <input class="adminInput" type="number" min="1"
-                                                        name="max_order_quantity" value="<?php echo $itemMaxOrder; ?>">
-                                                </label>
                                             </div>
+                                            <span class="adminHint">Le prix saisi ici est converti automatiquement en cents au moment de l'enregistrement.</span>
                                             <div class="adminCatalogMeta adminCatalogMeta--inline">
                                                 <span>Prix public : <?php echo $e($formatItemPrice($item)); ?></span>
                                                 <span><?php echo $itemStock <= 0 ? 'Rupture' : 'Disponible'; ?></span>
