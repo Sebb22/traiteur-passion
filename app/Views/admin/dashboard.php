@@ -9,6 +9,8 @@
     $recentOrders      = is_array($recentOrders ?? null) ? $recentOrders : [];
     $typeBreakdown     = is_array($typeBreakdown ?? null) ? $typeBreakdown : [];
     $shopLoadError     = is_string($shopLoadError ?? null) ? $shopLoadError : null;
+    $shopPromo         = is_array($shopPromo ?? null) ? $shopPromo : [];
+    $flash             = is_array($flash ?? null) ? $flash : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -108,6 +110,15 @@
         'meta'  => (int) ($contactStats['completed_count'] ?? 0) . ' finalise(s)',
     ],
     ];
+
+    $promoStatusLabels = [
+    'inactive'  => 'Inactive',
+    'scheduled' => 'Programmée',
+    'active'    => 'Active',
+    'expired'   => 'Terminée',
+    ];
+
+    $promoStatus = (string) ($shopPromo['status'] ?? 'inactive');
 ?>
 <div class="adminSplit adminSplit--dashboard">
     <main class="adminSplit__panel">
@@ -155,6 +166,12 @@
             </a>
             <?php endforeach; ?>
         </section>
+
+        <?php if ($flash !== null): ?>
+        <div class="adminFlash adminFlash--<?php echo $e($flash['type'] ?? 'success'); ?>">
+            <?php echo $e($flash['message'] ?? 'Modification enregistrée.'); ?>
+        </div>
+        <?php endif; ?>
 
         <?php if ($shopLoadError !== null): ?>
         <div class="adminFlash adminFlash--error"><?php echo $e($shopLoadError); ?></div>
@@ -220,6 +237,11 @@
                     <?php else: ?>
                     <div class="adminMiniList adminMiniList--actions">
                         <?php foreach ($recentOrders as $order): ?>
+                        <?php
+                            $orderDiscountCents = max(0, (int) ($order['discount_cents'] ?? 0));
+                            $orderSubtotalCents = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
+                            $orderPromoCode     = trim((string) ($order['promo_code'] ?? ''));
+                        ?>
                         <div class="adminMiniList__item">
                             <div>
                                 <div class="adminMiniList__title">
@@ -240,6 +262,12 @@
                             <div class="adminMiniList__aside">
                                 <?php echo (int) ($order['item_count'] ?? 0); ?> article(s)<br>
                                 Total <?php echo $e($formatPrice($order['total_cents'] ?? 0)); ?>
+                                <?php if ($orderDiscountCents > 0): ?><br>
+                                <span class="adminPromoState">
+                                    Promo <?php echo $e($orderPromoCode !== '' ? $orderPromoCode : 'appliquee'); ?> · -<?php echo $e($formatPrice($orderDiscountCents)); ?>
+                                </span><br>
+                                <span class="adminHint">Sous-total <?php echo $e($formatPrice($orderSubtotalCents)); ?></span>
+                                <?php endif; ?>
                                 <div class="adminMiniList__actions">
                                     <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminBtn adminBtn--sm">Voir commande</a>
                                 </div>
@@ -252,6 +280,76 @@
             </div>
 
             <div class="adminDashboardStack">
+                <section class="adminCard adminCard--padded">
+                    <div class="adminCard__head" id="shop-promo">
+                        <div class="adminCard__title">Promotion boutique</div>
+                        <div class="adminCard__meta">
+                            <span class="adminHint">Bannière sticky globale, minuteur et code promo panier.</span>
+                        </div>
+                    </div>
+
+                    <div class="adminDashboardPromoStatus">
+                        <span class="adminBadge adminBadge--<?php echo $e($promoStatus === 'active' ? 'completed' : ($promoStatus === 'scheduled' ? 'quoted' : 'new')); ?>">
+                            <?php echo $e($promoStatusLabels[$promoStatus] ?? 'Inactive'); ?>
+                        </span>
+                        <div class="adminDashboardPromoMeta">
+                            <strong><?php echo $e($shopPromo['title'] ?? 'Offre de lancement'); ?></strong>
+                            <span>Code <?php echo $e($shopPromo['promo_code'] ?? '-'); ?> • -<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>%</span>
+                            <span>Du <?php echo $formatDate($shopPromo['starts_at'] ?? null, 'd/m/Y H:i'); ?> au <?php echo $formatDate($shopPromo['ends_at'] ?? null, 'd/m/Y H:i'); ?></span>
+                        </div>
+                    </div>
+
+                    <form action="/admin/dashboard/shop-promo" method="post" class="adminForm adminInlineForm--stack">
+                        <div class="adminFieldGrid">
+                            <label class="adminField adminField--checkbox">
+                                <span class="adminField__label">Activer l'offre</span>
+                                <input class="adminCheckbox" type="checkbox" name="is_enabled" value="1"
+                                    <?php echo ! empty($shopPromo['is_enabled']) ? 'checked' : ''; ?>>
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Titre</span>
+                                <input class="adminInput" type="text" name="title"
+                                    value="<?php echo $e($shopPromo['title'] ?? 'Offre de lancement'); ?>">
+                            </label>
+                            <label class="adminField adminField--sm">
+                                <span class="adminField__label">Remise (%)</span>
+                                <input class="adminInput" type="number" name="discount_percent" min="1" max="90"
+                                    value="<?php echo (int) ($shopPromo['discount_percent'] ?? 10); ?>">
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Code promo</span>
+                                <input class="adminInput" type="text" name="promo_code"
+                                    value="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>" placeholder="LANCEMENT10">
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Début</span>
+                                <input class="adminInput" type="datetime-local" name="starts_at"
+                                    value="<?php echo $e($shopPromo['starts_at_input'] ?? ''); ?>">
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Fin</span>
+                                <input class="adminInput" type="datetime-local" name="ends_at"
+                                    value="<?php echo $e($shopPromo['ends_at_input'] ?? ''); ?>">
+                            </label>
+                            <label class="adminField adminField--full">
+                                <span class="adminField__label">Texte bannière</span>
+                                <input class="adminInput" type="text" name="banner_text"
+                                    value="<?php echo $e($shopPromo['banner_text'] ?? ''); ?>"
+                                    placeholder="-10% sur les articles de la boutique pendant l'offre de lancement.">
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Libellé bouton</span>
+                                <input class="adminInput" type="text" name="cta_label"
+                                    value="<?php echo $e($shopPromo['cta_label'] ?? 'Voir la boutique'); ?>">
+                            </label>
+                        </div>
+
+                        <div class="adminInlineActions">
+                            <button type="submit" class="adminBtn adminBtn--primary">Enregistrer la promo boutique</button>
+                        </div>
+                    </form>
+                </section>
+
                 <section class="adminCard adminCard--padded">
                     <div class="adminCard__head">
                         <div class="adminCard__title">Etat du business</div>

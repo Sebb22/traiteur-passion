@@ -1,0 +1,11 @@
+{
+    "is_enabled": true,
+    "title": "Offre de lancement",
+    "banner_text": "Profitez de notre offre boutique pendant une durée limitée.",
+    "cta_label": "Voir la boutique",
+    "promo_code": "TOP46",
+    "discount_percent": 10,
+    "starts_at": "2026-04-23 16:08:00",
+    "ends_at": "2026-05-14 16:46:00",
+    "updated_at": "2026-04-23 16:07:51"
+}

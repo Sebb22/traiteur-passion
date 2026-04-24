@@ -1,6 +1,7 @@
 <?php
     $sections  = is_array($sections ?? null) ? $sections : [];
     $loadError = is_string($loadError ?? null) ? $loadError : null;
+    $shopPromo = is_array($shopPromo ?? null) ? $shopPromo : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -34,6 +35,7 @@
         <div class="menuSplit__right">
             <div class="menuPanel shopPanel">
                 <header class="shopIntro">
+                    <span class="shopIntro__eyebrow">Compiègne • retrait organisé • livraison locale</span>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
                     <h2 class="shopIntro__title">Une carte renouvelée chaque semaine, produits frais et locaux</h2>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
@@ -45,6 +47,23 @@
                             du fait maison, produit en petites séries, avec une sélection volontairement courte pour
                             préserver le goût, la régularité et la qualité d’exécution. Une livraison peut aussi être
                             proposée ensuite par l’équipe dans un rayon de 20 km dès 15 € de commande.</p>
+                    </div>
+                    <div class="shopIntro__story" aria-label="Esprit de la boutique">
+                        <article class="shopIntroCard">
+                            <span class="shopIntroCard__kicker">Sélection</span>
+                            <strong class="shopIntroCard__title">Une boutique courte mais vraiment suivie</strong>
+                            <p class="shopIntroCard__copy">Chaque semaine, la carte se concentre sur peu de références pour garder de la fraîcheur, du goût et une exécution régulière.</p>
+                        </article>
+                        <article class="shopIntroCard">
+                            <span class="shopIntroCard__kicker">Commande</span>
+                            <strong class="shopIntroCard__title">Vous composez, nous revérifions</strong>
+                            <p class="shopIntroCard__copy">Le panier donne une lecture claire de la commande, puis le stock et les créneaux sont revus avant validation finale.</p>
+                        </article>
+                        <article class="shopIntroCard">
+                            <span class="shopIntroCard__kicker">Service</span>
+                            <strong class="shopIntroCard__title">Retrait simple, livraison selon votre zone</strong>
+                            <p class="shopIntroCard__copy">La boutique est pensée pour aller vite sans devenir impersonnelle, avec un retrait cadré et une livraison locale quand elle est possible.</p>
+                        </article>
                     </div>
                     <div class="shopIntro__highlight">
                         <strong class="shopIntro__highlightTitle">Carte courte, rotation hebdo, fait maison
@@ -79,7 +98,12 @@
                 <?php endif; ?>
 
                 <form class="shopOrderForm" id="shopOrderForm" data-shop-form action="/boutique-en-ligne" method="post"
-                    data-stock-endpoint="/api/boutique/stock" data-submit-endpoint="/boutique-en-ligne">
+                    data-stock-endpoint="/api/boutique/stock" data-submit-endpoint="/boutique-en-ligne"
+                    data-promo-active="<?php echo $shopPromo !== null ? '1' : '0'; ?>"
+                    data-promo-code="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>"
+                    data-promo-percent="<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>"
+                    data-promo-title="<?php echo $e($shopPromo['title'] ?? ''); ?>"
+                    data-promo-ends-at="<?php echo $e($shopPromo['countdown_iso'] ?? ''); ?>">
                     <div class="shopOrderTop">
                         <div class="shopSummaryDock" data-shop-summary-dock>
                             <button type="button" class="shopSummaryTab" data-shop-summary-toggle aria-expanded="false"
@@ -147,9 +171,35 @@
                                 </div>
 
                                 <div class="shopSummary__totals">
-                                    <span>Total estimatif</span>
+                                    <div class="shopSummary__totalsMain">
+                                        <span>Total estimatif</span>
+                                        <small data-shop-summary-subtotal hidden></small>
+                                        <small class="shopSummary__discount" data-shop-summary-discount hidden></small>
+                                    </div>
                                     <strong data-shop-summary-total>0,00 €</strong>
                                 </div>
+
+                                <?php if ($shopPromo !== null): ?>
+                                <div class="shopSummary__promoBox" data-shop-promo-box>
+                                    <div class="shopSummary__promoHead">
+                                        <div>
+                                            <span class="shopStep">Promo</span>
+                                            <strong><?php echo $e($shopPromo['title'] ?? 'Offre boutique'); ?></strong>
+                                        </div>
+                                        <span class="shopSummary__promoCountdown" data-countdown-target="<?php echo $e($shopPromo['countdown_iso'] ?? ''); ?>">Fin dans --</span>
+                                    </div>
+                                    <p class="shopSummary__promoCopy"><?php echo $e($shopPromo['banner_text'] ?? ''); ?></p>
+                                    <div class="shopPromoCodeRow">
+                                        <label class="shopField shopField--full">
+                                            <span class="shopField__label">Code promo</span>
+                                            <input class="shopInput" type="text" name="promo_code" data-shop-promo-input placeholder="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>">
+                                        </label>
+                                        <button type="button" class="btn btn--ghost shopPromoCodeRow__apply" data-shop-promo-apply>Appliquer</button>
+                                    </div>
+                                    <p class="shopSummary__promoHint">Code actif : <strong><?php echo $e($shopPromo['promo_code'] ?? ''); ?></strong> pour -<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>% sur les articles boutique.</p>
+                                    <p class="shopSummary__promoState" data-shop-promo-state></p>
+                                </div>
+                                <?php endif; ?>
 
                                 <div class="shopSummary__cta">
                                     <button type="button" class="btn btn--primary shopSummary__submit"

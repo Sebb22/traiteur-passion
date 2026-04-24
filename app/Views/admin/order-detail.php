@@ -23,6 +23,8 @@
 
     $fulfillmentMethod = trim((string) ($order['fulfillment_method'] ?? 'pickup')) === 'delivery' ? 'delivery' : 'pickup';
     $orderItems        = is_array($order['items'] ?? null) ? $order['items'] : [];
+    $subtotalCents     = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
+    $discountCents     = max(0, (int) ($order['discount_cents'] ?? 0));
     $deliveryAddress   = trim(implode(', ', array_filter([
     trim((string) ($order['delivery_address'] ?? '')),
     trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? ''))),
@@ -101,6 +103,20 @@
                             <span class="adminInfoItem__label">Total</span>
                             <span class="adminInfoItem__value"><?php echo $formatPrice($order['total_cents'] ?? 0); ?></span>
                         </div>
+                        <?php if ($discountCents > 0): ?>
+                        <div class="adminInfoItem">
+                            <span class="adminInfoItem__label">Code promo</span>
+                            <span class="adminInfoItem__value"><?php echo $e($order['promo_code'] ?? '-'); ?></span>
+                        </div>
+                        <div class="adminInfoItem">
+                            <span class="adminInfoItem__label">Sous-total</span>
+                            <span class="adminInfoItem__value"><?php echo $formatPrice($subtotalCents); ?></span>
+                        </div>
+                        <div class="adminInfoItem">
+                            <span class="adminInfoItem__label">Remise</span>
+                            <span class="adminInfoItem__value">- <?php echo $formatPrice($discountCents); ?></span>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </section>
 

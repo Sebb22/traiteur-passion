@@ -5,7 +5,7 @@ export function initMenuTabs() {
 
     if (!nav || !panel) return;
 
-    const isMobileViewport = () => window.matchMedia("(max-width: 980px)").matches;
+    const isMobileViewport = () => window.matchMedia("(max-width: 1279px)").matches;
 
     const getClosestTab = (target) => {
         if (target instanceof Element) return target.closest(".menuTabs__tab");
@@ -200,8 +200,7 @@ export function initMenuTabs() {
             if (!isMobileViewport()) {
                 scrollActiveTabIntoView(active.link);
             }
-        },
-        {
+        }, {
             root: isPanelScrollable() ? panel : null,
             rootMargin: "-18% 0px -60% 0px",
             threshold: [0.15, 0.35, 0.6],

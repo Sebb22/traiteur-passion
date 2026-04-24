@@ -1699,6 +1699,27 @@
     color: rgba(229, 229, 229, 0.82);
 }
 
+.adminDashboardPromoStatus {
+    display: grid;
+    gap: 10px;
+    padding: 0 14px 14px;
+}
+
+.adminDashboardPromoMeta {
+    display: grid;
+    gap: 4px;
+    color: rgba(239, 231, 210, 0.78);
+    font:
+        400 13px/1.6 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminDashboardPromoMeta strong {
+    color: rgba(239, 231, 210, 0.96);
+}
+
 .adminMiniList {
     display: flex;
     flex-direction: column;
@@ -1744,6 +1765,20 @@
 
 .adminMiniList__aside {
     text-align: right;
+}
+
+.adminPromoState {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(206, 237, 195, 0.96);
+    font:
+        600 11px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .adminTypeList {

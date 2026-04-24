@@ -173,14 +173,26 @@
     /* ✅ évite les débordements en grid */
 }
 
+.aboutCard__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(239, 231, 210, 0.16);
+    background: rgba(239, 231, 210, 0.05);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.74);
+}
+
 .aboutCard__title {
     font-family: "Forum", serif;
-    letter-spacing: 0.02em;
-    font-family: "Forum", serif;
-    font-size: clamp(2.6rem, 4vw, 4.2rem);
+    letter-spacing: 0.04em;
+    font-size: clamp(24px, 2.6vw, 34px);
     text-transform: uppercase;
-    font-weight: 700;
-    font-size: 1.05rem;
+    font-weight: 400;
     margin: 0 0 10px;
     opacity: 0.95;
 }
@@ -195,6 +207,57 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.aboutCard--intro {
+    background:
+        radial-gradient(120% 150% at 0% 0%, rgba(181, 155, 104, 0.14), transparent 42%),
+        radial-gradient(120% 150% at 100% 0%, rgba(196, 126, 54, 0.12), transparent 38%),
+        rgba(255, 255, 255, 0.045);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 18px 38px rgba(0, 0, 0, 0.18);
+}
+
+.aboutIntroStory {
+    margin: 16px 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.aboutIntroCard {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    padding: 16px 16px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(239, 231, 210, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+        rgba(12, 9, 7, 0.28);
+}
+
+.aboutIntroCard__kicker {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.56);
+}
+
+.aboutIntroCard__title {
+    font-family: "Forum", serif;
+    font-size: 22px;
+    line-height: 1.12;
+    font-weight: 400;
+    color: rgba(239, 231, 210, 0.92);
+}
+
+.aboutIntroCard__copy {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.72;
+    color: rgba(239, 231, 210, 0.72);
 }
 
 /* =========================================================
@@ -328,7 +391,9 @@
 .aboutStat {
     border-radius: 16px;
     padding: 14px 12px;
-    background: rgba(0, 0, 0, 0.18);
+    background:
+        radial-gradient(120% 120% at 50% 0%, rgba(181, 155, 104, 0.08), transparent 40%),
+        rgba(0, 0, 0, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: grid;
     gap: 10px;
@@ -376,7 +441,9 @@
 .aboutFacts__item {
     border-radius: 18px;
     padding: 14px;
-    background: rgba(0, 0, 0, 0.18);
+    background:
+        radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.05), transparent 42%),
+        rgba(0, 0, 0, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.1);
     min-width: 0;
 }
@@ -410,12 +477,13 @@
     padding: 16px;
     min-width: 0;
     background:
-        radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 52%),
+        radial-gradient(120% 120% at 0% 0%, rgba(181, 155, 104, 0.08), transparent 52%),
         rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: grid;
     gap: 10px;
     align-content: start;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .aboutTeamMember__role {
@@ -601,6 +669,9 @@
     .aboutRatingsRow {
         grid-template-columns: 1fr;
     }
+    .aboutIntroStory {
+        grid-template-columns: 1fr;
+    }
     .aboutFacts {
         grid-template-columns: 1fr;
     }
@@ -645,6 +716,12 @@
     .menuSection--about {
         padding: 14px;
         border-radius: 18px;
+    }
+    .aboutIntroCard {
+        padding: 14px 14px 16px;
+    }
+    .aboutIntroCard__title {
+        font-size: 20px;
     }
 }
 
@@ -724,6 +801,7 @@
     /* ton main doit prendre le viewport */
     .siteMain {
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
         scroll-snap-type: none;
         /* si snapY te gêne sur cette page */
@@ -731,23 +809,28 @@
     .menuSplit--about {
         height: 100vh;
         min-height: 100vh;
+        height: 100dvh;
+        min-height: 100dvh;
         overflow: hidden;
         /* important */
     }
     /* gauche fixe */
     .menuSplit--about .menuSplit__left {
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
     }
     /* conteneur droite */
     .menuSplit--about .menuSplit__right {
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
         /* le scroll doit être sur .menuPanel */
     }
     /* ✅ le scroll est ici */
     .menuPanel--about {
         height: 100vh;
+        height: 100dvh;
         overflow-y: auto;
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;

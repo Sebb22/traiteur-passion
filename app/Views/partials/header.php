@@ -10,8 +10,7 @@
             <span class="header__burger" aria-hidden="true"></span>
         </button>
         <a href="/" class="header__logo" aria-label="Traiteur Passion - Accueil">
-            <img src="/uploads/images/logos/logoNav.png" alt="Traiteur Passion" width="auto" height="80px"
-                loading="eager">
+            <img src="/uploads/images/logos/logoNav.png" alt="Traiteur Passion" loading="eager">
         </a>
         <nav class="header__nav header__nav--desktop" aria-label="Navigation principale">
             <a href="/carte-évènementielle"

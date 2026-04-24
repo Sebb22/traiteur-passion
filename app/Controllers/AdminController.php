@@ -12,6 +12,7 @@ use App\Models\Menu;
 use App\Models\Shop;
 use App\Models\ShopOrder;
 use App\Services\MenuImageService;
+use App\Services\ShopPromoService;
 
 final class AdminController
 {
@@ -44,6 +45,7 @@ final class AdminController
             'sold_out_items'  => 0,
             'low_stock_items' => 0,
         ];
+        $shopPromo     = (new ShopPromoService())->getAdminPromo();
         $shopLoadError = null;
 
         try {
@@ -68,8 +70,26 @@ final class AdminController
             'orderStatusLabels' => ShopOrder::STATUS_LABELS,
             'recentOrders'      => $recentOrders,
             'shopStats'         => $shopStats,
+            'shopPromo'         => $shopPromo,
             'shopLoadError'     => $shopLoadError,
+            'flash'             => $this->pullFlash(),
         ]);
+    }
+
+    public function updateDashboardShopPromo(): void
+    {
+        AdminAuth::requireAuth();
+
+        try {
+            (new ShopPromoService())->saveFromInput($_POST);
+            $this->pushFlash('success', 'Promotion boutique mise à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop promo update error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de mettre à jour la promotion boutique.');
+        }
+
+        header('Location: /admin/dashboard#shop-promo');
+        exit;
     }
 
     public function blog(): void

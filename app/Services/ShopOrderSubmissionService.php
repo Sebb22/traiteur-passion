@@ -121,6 +121,7 @@ final class ShopOrderSubmissionService
                 'delivery_postal_code' => $deliveryPostalCode,
                 'delivery_city'        => $deliveryCity,
                 'message'              => $this->nullableTrim($post['message'] ?? null),
+                'promo_code'           => $this->nullableTrim($post['promo_code'] ?? null),
             ],
             'quantities'   => $quantities,
         ];

@@ -24,6 +24,14 @@ function formatPrice(cents) {
     }).format((Number.parseInt(cents, 10) || 0) / 100);
 }
 
+function normalizePromoCode(value) {
+    return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9_-]+/g, "")
+        .slice(0, 40);
+}
+
 function clearElementChildren(element) {
     if (!element) {
         return;
@@ -84,6 +92,8 @@ export function initShopPage() {
     const summaryBoundsHost = form.closest(".shopPanel") || form.closest(".menuSplit__right");
     const summaryLines = form.querySelector("[data-shop-summary-lines]");
     const summaryTotal = form.querySelector("[data-shop-summary-total]");
+    const summarySubtotal = form.querySelector("[data-shop-summary-subtotal]");
+    const summaryDiscount = form.querySelector("[data-shop-summary-discount]");
     const feedback = form.querySelector("[data-shop-feedback]");
     const submitButton = form.querySelector("[data-shop-submit]");
     const goCheckoutButton = form.querySelector("[data-shop-go-checkout]");
@@ -98,6 +108,9 @@ export function initShopPage() {
     const increaseButtons = Array.from(form.querySelectorAll("[data-shop-increase]"));
     const decreaseButtons = Array.from(form.querySelectorAll("[data-shop-decrease]"));
     const removeButtons = Array.from(form.querySelectorAll("[data-shop-remove]"));
+    const promoInput = form.querySelector("[data-shop-promo-input]");
+    const promoApplyButton = form.querySelector("[data-shop-promo-apply]");
+    const promoState = form.querySelector("[data-shop-promo-state]");
     let isSummaryOpen = false;
     let isSummaryPinned = false;
     let hideSummaryTimeout = null;
@@ -106,10 +119,103 @@ export function initShopPage() {
     let touchStartY = 0;
     let touchCurrentY = 0;
     let isDraggingSummary = false;
-    const desktopToastMedia = window.matchMedia("(min-width: 981px)");
+    const desktopToastMedia = window.matchMedia("(min-width: 1320px)");
     let unbindDesktopToastMedia = () => {};
+    const promoEndsAt = form.getAttribute("data-promo-ends-at") || "";
+    const promoEndsAtDate = promoEndsAt ? new Date(promoEndsAt) : null;
+    const promoConfig = {
+        active: form.getAttribute("data-promo-active") === "1",
+        code: normalizePromoCode(form.getAttribute("data-promo-code") || ""),
+        title: form.getAttribute("data-promo-title") || "Offre boutique",
+        percent: Number.parseInt(form.getAttribute("data-promo-percent") || "0", 10) || 0,
+        endsAt: promoEndsAtDate,
+    };
 
     const isDesktopToast = () => desktopToastMedia.matches;
+
+    const isPromoAvailable = () => {
+        if (!promoConfig.active || !promoConfig.code || promoConfig.percent <= 0) {
+            return false;
+        }
+
+        if (!(promoConfig.endsAt instanceof Date) || Number.isNaN(promoConfig.endsAt.getTime())) {
+            return false;
+        }
+
+        return promoConfig.endsAt.getTime() > Date.now();
+    };
+
+    const getPromoEvaluation = (subtotalCents) => {
+        const normalizedCode = normalizePromoCode(
+            promoInput instanceof HTMLInputElement ? promoInput.value : "",
+        );
+
+        if (!isPromoAvailable()) {
+            return {
+                valid: normalizedCode === "",
+                code: normalizedCode,
+                discountCents: 0,
+                totalCents: subtotalCents,
+                message: normalizedCode === "" ? "" : "Ce code promo n’est plus disponible.",
+            };
+        }
+
+        if (normalizedCode === "") {
+            return {
+                valid: true,
+                code: "",
+                discountCents: 0,
+                totalCents: subtotalCents,
+                message: "",
+            };
+        }
+
+        if (normalizedCode !== promoConfig.code) {
+            return {
+                valid: false,
+                code: normalizedCode,
+                discountCents: 0,
+                totalCents: subtotalCents,
+                message: "Le code promo saisi est invalide.",
+            };
+        }
+
+        const discountCents = Math.floor(subtotalCents * (promoConfig.percent / 100));
+        return {
+            valid: true,
+            code: normalizedCode,
+            discountCents,
+            totalCents: Math.max(0, subtotalCents - discountCents),
+            message: `${promoConfig.title} appliquée: -${promoConfig.percent}%`,
+        };
+    };
+
+    const syncPromoState = (evaluation) => {
+        if (!promoState) {
+            return;
+        }
+
+        if (!promoConfig.active) {
+            promoState.textContent = "";
+            promoState.className = "shopSummary__promoState";
+            return;
+        }
+
+        if (evaluation.discountCents > 0) {
+            promoState.textContent = evaluation.message;
+            promoState.className = "shopSummary__promoState is-applied";
+            return;
+        }
+
+        if (evaluation.code !== "" && !evaluation.valid) {
+            promoState.textContent = evaluation.message;
+            promoState.className = "shopSummary__promoState is-error";
+            return;
+        }
+
+        promoState.textContent = "";
+        promoState.className = "shopSummary__promoState";
+    };
 
     const clearSummaryDragResetTimeout = () => {
         if (summaryDragResetTimeout) {
@@ -354,7 +460,7 @@ export function initShopPage() {
 
     const renderSummary = () => {
         let totalCount = 0;
-        let totalCents = 0;
+        let subtotalCents = 0;
         let totalItems = 0;
 
         if (summaryLines) {
@@ -378,7 +484,7 @@ export function initShopPage() {
 
             totalItems += 1;
             totalCount += quantity;
-            totalCents += quantity * item.priceCents;
+            subtotalCents += quantity * item.priceCents;
 
             if (summaryLines) {
                 const line = document.createElement("div");
@@ -433,6 +539,23 @@ export function initShopPage() {
             summaryState.textContent = totalCount === 0 ? "Panier vide" : "Panier prêt";
         }
 
+        const promoEvaluation = getPromoEvaluation(subtotalCents);
+        const totalCents = promoEvaluation.totalCents;
+
+        if (summarySubtotal) {
+            summarySubtotal.hidden = promoEvaluation.discountCents <= 0;
+            summarySubtotal.textContent =
+                promoEvaluation.discountCents > 0 ? `Sous-total ${formatPrice(subtotalCents)}` : "";
+        }
+
+        if (summaryDiscount) {
+            summaryDiscount.hidden = promoEvaluation.discountCents <= 0;
+            summaryDiscount.textContent =
+                promoEvaluation.discountCents > 0
+                    ? `Remise -${formatPrice(promoEvaluation.discountCents)}`
+                    : "";
+        }
+
         if (summaryTotal) {
             summaryTotal.textContent = formatPrice(totalCents);
         }
@@ -440,6 +563,8 @@ export function initShopPage() {
         if (summaryTabTotal) {
             summaryTabTotal.textContent = formatPrice(totalCents);
         }
+
+        syncPromoState(promoEvaluation);
 
         if (summaryDock) {
             summaryDock.classList.add("is-available");
@@ -602,6 +727,19 @@ export function initShopPage() {
             setQuantity(item, 0);
         });
     });
+
+    if (promoInput instanceof HTMLInputElement) {
+        promoInput.addEventListener("input", () => {
+            promoInput.value = normalizePromoCode(promoInput.value);
+            renderSummary();
+        });
+    }
+
+    if (promoApplyButton) {
+        promoApplyButton.addEventListener("click", () => {
+            renderSummary();
+        });
+    }
 
     if (goCheckoutButton) {
         goCheckoutButton.addEventListener("click", () => {
@@ -819,6 +957,18 @@ export function initShopPage() {
             return;
         }
 
+        const promoEvaluation = getPromoEvaluation(
+            Array.from(items.values()).reduce(
+                (sum, item) => sum + getQuantity(item) * item.priceCents,
+                0,
+            ),
+        );
+
+        if (promoEvaluation.code !== "" && !promoEvaluation.valid) {
+            setFeedback(promoEvaluation.message, "error");
+            return;
+        }
+
         if (submitButton) {
             submitButton.disabled = true;
         }
@@ -865,6 +1015,9 @@ export function initShopPage() {
                 applyStockSnapshot(payload.stock);
             } else {
                 renderSummary();
+            }
+            if (promoInput instanceof HTMLInputElement) {
+                promoInput.value = "";
             }
             setFeedback(payload.message || "Votre commande a bien été enregistrée.", "success");
         } catch {

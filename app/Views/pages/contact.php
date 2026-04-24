@@ -27,6 +27,7 @@
             <div class="menuPanel menuPanel--contact">
 
                 <header class="contactHead">
+                    <span class="contactHead__eyebrow">Compiègne • Oise • accompagnement sur mesure</span>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
                     <h2 class="contactHead__title">Demander un devis</h2>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
@@ -36,13 +37,35 @@
                     </p>
                     <p class="contactHead__meta">Plateaux repas : prévoir un minimum de 72h avant l'événement ou la
                         livraison. Intervention et livraison selon votre zone.</p>
+                    <div class="contactHead__story" aria-label="Approche de la demande">
+                        <article class="contactHeadCard">
+                            <span class="contactHeadCard__kicker">Méthode</span>
+                            <strong class="contactHeadCard__title">Un cadrage simple avant le devis</strong>
+                            <p class="contactHeadCard__copy">Nombre de convives, format, lieu, contraintes et ambiance
+                                souhaitée: nous utilisons ces éléments pour proposer une base réellement exploitable.
+                            </p>
+                        </article>
+                        <article class="contactHeadCard">
+                            <span class="contactHeadCard__kicker">Réactivité</span>
+                            <strong class="contactHeadCard__title">Un retour clair, pas un échange flou</strong>
+                            <p class="contactHeadCard__copy">L’objectif n’est pas seulement de répondre vite, mais de
+                                formuler une proposition structurée, lisible et cohérente avec votre réception.</p>
+                        </article>
+                        <article class="contactHeadCard">
+                            <span class="contactHeadCard__kicker">Zone</span>
+                            <strong class="contactHeadCard__title">Compiègne, Oise et alentours</strong>
+                            <p class="contactHeadCard__copy">Mariage, événement professionnel, cocktail ou repas privé:
+                                nous ajustons ensuite la logistique, la livraison et le niveau de service selon votre
+                                contexte.</p>
+                        </article>
+                    </div>
                 </header>
                 <?php require dirname(__DIR__) . '/partials/request-form.php'; ?>
                 <section class="contactInfos" aria-label="Coordonnées">
                     <div class="contactInfo">
                         <span class="contactInfo__k">Téléphone</span>
-                        <a class="contactInfo__v" href="tel:+33659215349">0659215349</a>
-                        <a class="contactInfo__v" href="tel:+330761603538">0761603538</a>
+                        <a class="contactInfo__v" href="tel:+33659215349">0659215349 - Mylène - relation clientèle</a>
+                        <a class="contactInfo__v" href="tel:+330761603538">0761603538 - Kevin - gérant </a>
                     </div>
                     <div class="contactInfo">
                         <span class="contactInfo__k">Email</span>

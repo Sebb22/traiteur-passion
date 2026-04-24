@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace App\Models;
 
 use App\Core\Database;
+use App\Services\ShopPromoService;
 use PDO;
 
 final class ShopOrder
@@ -117,8 +118,25 @@ final class ShopOrder
                 $orderTotalCents += $unitPriceCents * $quantity;
             }
 
+            $promoEvaluation = (new ShopPromoService())->evaluateCheckout(
+                $orderTotalCents,
+                isset($customerData['promo_code']) ? (string) $customerData['promo_code'] : null,
+            );
+
+            if (($promoEvaluation['valid'] ?? false) !== true) {
+                $this->db->rollBack();
+                return [
+                    'success' => false,
+                    'status'  => 400,
+                    'error'   => (string) ($promoEvaluation['error'] ?? 'Le code promo est invalide.'),
+                ];
+            }
+
+            $discountCents   = max(0, (int) ($promoEvaluation['discount_cents'] ?? 0));
+            $finalTotalCents = max(0, (int) ($promoEvaluation['total_cents'] ?? $orderTotalCents));
+
             $fulfillmentMethod = $this->normalizeFulfillmentMethod($customerData['fulfillment_method'] ?? null);
-            if ($fulfillmentMethod === 'delivery' && $orderTotalCents < self::DELIVERY_MINIMUM_CENTS) {
+            if ($fulfillmentMethod === 'delivery' && $finalTotalCents < self::DELIVERY_MINIMUM_CENTS) {
                 $this->db->rollBack();
                 return [
                     'success' => false,
@@ -138,6 +156,10 @@ final class ShopOrder
                 'delivery_postal_code' => $this->nullableTrim($customerData['delivery_postal_code'] ?? null),
                 'delivery_city'        => $this->nullableTrim($customerData['delivery_city'] ?? null),
                 'message'              => $this->nullableTrim($customerData['message'] ?? null),
+                'promo_code'           => $discountCents > 0 ? $this->nullableTrim($promoEvaluation['promo_code'] ?? null) : null,
+                'promo_label'          => $discountCents > 0 ? $this->nullableTrim($promoEvaluation['promo_label'] ?? null) : null,
+                'discount_percent'     => $discountCents > 0 ? max(0, (int) ($promoEvaluation['discount_percent'] ?? 0)) : 0,
+                'discount_cents'       => $discountCents,
                 'status'               => 'new',
             ];
 
@@ -153,7 +175,7 @@ final class ShopOrder
             ));
             $orderStmt->execute(array_intersect_key($orderPayload, array_flip($availableColumns)));
 
-            $orderId  = (int) $this->db->lastInsertId();
+            $orderId = (int) $this->db->lastInsertId();
 
             $lineStmt = $this->db->prepare(
                 'INSERT INTO boutique_order_items (
@@ -237,10 +259,16 @@ final class ShopOrder
 
     public function getRecentOrders(int $limit = 12): array
     {
+        $discountSelect = $this->hasOrderColumn('discount_cents')
+            ? 'COALESCE(bo.discount_cents, 0)'
+            : '0';
+
         $stmt = $this->db->prepare(
             "SELECT bo.*, COUNT(boi.id) AS line_count,
                     COALESCE(SUM(boi.quantity), 0) AS item_count,
-                    COALESCE(SUM(boi.line_total_cents), 0) AS total_cents
+                    COALESCE(SUM(boi.line_total_cents), 0) AS subtotal_cents,
+                    {$discountSelect} AS discount_cents,
+                    COALESCE(SUM(boi.line_total_cents), 0) - {$discountSelect} AS total_cents
              FROM boutique_orders bo
              LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
              GROUP BY bo.id
@@ -255,10 +283,16 @@ final class ShopOrder
 
     public function getByIdWithItems(int $orderId): ?array
     {
+        $discountSelect = $this->hasOrderColumn('discount_cents')
+            ? 'COALESCE(bo.discount_cents, 0)'
+            : '0';
+
         $stmt = $this->db->prepare(
             "SELECT bo.*, COUNT(boi.id) AS line_count,
                     COALESCE(SUM(boi.quantity), 0) AS item_count,
-                    COALESCE(SUM(boi.line_total_cents), 0) AS total_cents
+                    COALESCE(SUM(boi.line_total_cents), 0) AS subtotal_cents,
+                    {$discountSelect} AS discount_cents,
+                    COALESCE(SUM(boi.line_total_cents), 0) - {$discountSelect} AS total_cents
              FROM boutique_orders bo
              LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
              WHERE bo.id = :id

@@ -17,6 +17,7 @@
     grid-template-columns: 1.15fr 1fr;
     gap: 18px;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 
@@ -96,8 +97,25 @@
     align-items: center;
     justify-items: center;
     gap: 18px;
-    padding: 18px 8px 10px;
+    padding: 18px 16px 20px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: radial-gradient(120% 150% at 0% 0%, rgba(181, 155, 104, 0.14), transparent 42%), radial-gradient(120% 150% at 100% 0%, rgba(196, 126, 54, 0.12), transparent 38%), rgba(255, 255, 255, 0.025);
     text-align: center;
+    &__eyebrow {
+        grid-column: 1 / -1;
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(239, 231, 210, 0.16);
+        background: rgba(239, 231, 210, 0.05);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(239, 231, 210, 0.72);
+    }
     &__title {
         margin: 0;
         font-family: "Forum", serif;
@@ -122,6 +140,46 @@
         color: rgba(239, 231, 210, 0.62);
         justify-self: center;
     }
+    &__story {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        width: 100%;
+        margin-top: 6px;
+    }
+}
+
+.contactHeadCard {
+    display: grid;
+    gap: 8px;
+    padding: 16px 16px 18px;
+    text-align: left;
+    border-radius: 18px;
+    border: 1px solid rgba(239, 231, 210, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)), rgba(12, 9, 7, 0.24);
+}
+
+.contactHeadCard__kicker {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 231, 210, 0.56);
+}
+
+.contactHeadCard__title {
+    font-family: "Forum", serif;
+    font-size: 22px;
+    line-height: 1.12;
+    font-weight: 400;
+    color: rgba(239, 231, 210, 0.92);
+}
+
+.contactHeadCard__copy {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(239, 231, 210, 0.72);
 }
 
 
@@ -255,10 +313,17 @@ select.field__input {
 
 .contactInfo {
     border-radius: 18px;
-    padding: 14px;
-    background: rgba(255, 255, 255, 0.04);
+    padding: 16px;
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, 0.04), transparent 40%), rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
     min-width: 0;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    &:hover {
+        transform: translateY(-1px);
+        border-color: rgba(239, 231, 210, 0.18);
+        background: radial-gradient(120% 120% at 50% 0%, rgba(181, 155, 104, 0.08), transparent 40%), rgba(255, 255, 255, 0.045);
+    }
     &__k {
         display: block;
         opacity: 0.65;
@@ -268,9 +333,10 @@ select.field__input {
     }
     &__v {
         display: block;
-        margin-top: 6px;
+        margin-top: 8px;
         color: rgba(239, 231, 210, 0.9);
         text-decoration: none;
+        line-height: 1.55;
     }
 }
 
@@ -577,22 +643,22 @@ select.field__input {
             text-transform: uppercase;
         }
         &--amber {
-            background: linear-gradient(135deg, rgba(196, 126, 54, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(196, 126, 54, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--sand {
-            background: linear-gradient(135deg, rgba(181, 155, 104, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(181, 155, 104, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--gold {
-            background: linear-gradient(135deg, rgba(179, 136, 48, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(179, 136, 48, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--sage {
-            background: linear-gradient(135deg, rgba(98, 130, 107, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(98, 130, 107, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--terracotta {
             background: linear-gradient(135deg, rgba(169, 92, 65, 0.26), rgba(239, 231, 210, 0.08));
         }
         &--copper {
-            background: linear-gradient(135deg, rgba(160, 110, 80, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(160, 110, 80, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--ember {
             background: linear-gradient(135deg, rgba(132, 74, 42, 0.26), rgba(239, 231, 210, 0.08));
@@ -854,22 +920,22 @@ select.field__input {
             filter: saturate(0.84) contrast(1.02);
         }
         &--amber {
-            background: linear-gradient(135deg, rgba(196, 126, 54, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(196, 126, 54, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--sand {
-            background: linear-gradient(135deg, rgba(181, 155, 104, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(181, 155, 104, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--gold {
-            background: linear-gradient(135deg, rgba(179, 136, 48, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(179, 136, 48, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--sage {
-            background: linear-gradient(135deg, rgba(98, 130, 107, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(98, 130, 107, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--terracotta {
             background: linear-gradient(135deg, rgba(169, 92, 65, 0.26), rgba(239, 231, 210, 0.08));
         }
         &--copper {
-            background: linear-gradient(135deg, rgba(160, 110, 80, 0.24), rgba(239, 231, 210, 0.08));
+            background: linear-gradient( 135deg, rgba(160, 110, 80, 0.24), rgba(239, 231, 210, 0.08));
         }
         &--ember {
             background: linear-gradient(135deg, rgba(132, 74, 42, 0.26), rgba(239, 231, 210, 0.08));
@@ -934,13 +1000,42 @@ select.field__input {
 /* TABLET / <=1279 : split en 1 colonne */
 
 @media (max-width: 1279px) {
+    body.page--contact,
+    body.page--devis {
+        height: auto;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+    .siteMain {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
     .menuSplit--contact {
         grid-template-columns: 1fr;
+        height: auto;
         min-height: auto;
     }
+    .menuSplit--contact,
+    .menuSplit--contact .menuSplit__right {
+        min-height: 0;
+        height: auto;
+        overflow: visible;
+    }
     .menuSplit--contact .menuSplit__left {
-        height: 52vh;
         position: relative;
+        top: auto;
+        min-height: 52vh;
+        height: 52vh;
+        overflow: hidden;
+    }
+    .menuSplit--contact .menuSplit__right {
+        overflow-x: hidden;
+    }
+    .menuPanel--contact {
+        min-height: 0;
+        height: auto;
+        overflow: visible;
     }
 }
 
@@ -952,6 +1047,15 @@ select.field__input {
         padding: 16px;
         gap: 16px;
     }
+    .contactHead {
+        padding: 16px 14px 18px;
+    }
+    .contactHead__story {
+        grid-template-columns: 1fr;
+    }
+    .contactHeadCard {
+        padding: 14px 14px 16px;
+    }
     .contactCard {
         padding: 18px 16px;
     }
@@ -961,6 +1065,10 @@ select.field__input {
     }
     .contactInfos {
         grid-template-columns: 1fr;
+    }
+    .contactHeadCard,
+    .contactInfo {
+        text-align: left;
     }
     .selectionSummary__head {
         align-items: stretch;
@@ -1071,24 +1179,30 @@ select.field__input {
     }
     .siteMain {
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
         scroll-snap-type: none;
     }
     .menuSplit--contact {
         height: 100vh;
         min-height: 100vh;
+        height: 100dvh;
+        min-height: 100dvh;
         overflow: hidden;
     }
     .menuSplit--contact .menuSplit__left {
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
     }
     .menuSplit--contact .menuSplit__right {
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
     }
     .menuPanel--contact {
         height: 100vh;
+        height: 100dvh;
         overflow-y: auto;
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;

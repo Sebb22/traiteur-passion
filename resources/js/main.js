@@ -13,6 +13,7 @@ import { initAdminBlog } from "./admin/blog";
 import { initAdminLogin } from "./admin/login";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
+import { initShopPromoBanner } from "./generic/shopPromoBanner";
 document.addEventListener("DOMContentLoaded", () => {
     initReveal();
     //initHeaderScroll();
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initAdminCatalog();
     initAdminBlog();
     initAdminLogin();
+    initShopPromoBanner();
 
     enableWheelRedirect();
     console.log("Traiteur Passion ready 🔥");

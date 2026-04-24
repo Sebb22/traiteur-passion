@@ -230,6 +230,11 @@
                     </thead>
                     <tbody>
                         <?php foreach ($recentOrders as $order): ?>
+                        <?php
+                            $orderDiscountCents = max(0, (int) ($order['discount_cents'] ?? 0));
+                            $orderSubtotalCents = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
+                            $orderPromoCode     = trim((string) ($order['promo_code'] ?? ''));
+                        ?>
                         <tr>
                             <td>
                                 <strong>
@@ -251,7 +256,15 @@
                                 <?php endif; ?>
                             </td>
                             <td><?php echo (int) ($order['item_count'] ?? 0); ?> article(s)</td>
-                            <td><?php echo $e($formatPrice($order['total_cents'] ?? 0)); ?></td>
+                            <td>
+                                <?php echo $e($formatPrice($order['total_cents'] ?? 0)); ?>
+                                <?php if ($orderDiscountCents > 0): ?><br>
+                                <span class="adminPromoState">
+                                    Promo <?php echo $e($orderPromoCode !== '' ? $orderPromoCode : 'appliquee'); ?> · -<?php echo $e($formatPrice($orderDiscountCents)); ?>
+                                </span><br>
+                                <span class="adminHint">Sous-total <?php echo $e($formatPrice($orderSubtotalCents)); ?></span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <form action="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>/status" method="post">
                                     <input type="hidden" name="redirect" value="<?php echo $e($contactRedirect . '#orders'); ?>">

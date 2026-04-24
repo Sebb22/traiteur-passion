@@ -26,8 +26,9 @@ final class MenuController
         }
 
         View::render('pages/menu', [
-            'title'    => 'Traiteur Passion — Carte évènementielle',
-            'sections' => $sections,
+            'title'           => 'Traiteur Passion — Carte évènementielle',
+            'metaDescription' => 'Carte évènementielle Traiteur Passion à Compiègne : buffets, cocktails, brunchs, plateaux repas et boissons pour mariages, réceptions privées et événements d\'entreprise.',
+            'sections'        => $sections,
         ]);
     }
 }

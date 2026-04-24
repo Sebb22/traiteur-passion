@@ -20,8 +20,9 @@ final class HomeController
         $reviews = (new SocialReviewService())->getAboutReviews();
 
         View::render('pages/about', [
-            'title'        => 'Traiteur Passion — À propos',
-            'aboutReviews' => $reviews,
+            'title'           => 'Traiteur Passion — À propos',
+            'metaDescription' => 'Découvrez Traiteur Passion à Vignemont près de Compiègne : une maison familiale, une équipe de terrain et un savoir-faire traiteur 100% maison pour mariages, cocktails et réceptions.',
+            'aboutReviews'    => $reviews,
         ]);
     }
 

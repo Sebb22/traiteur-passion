@@ -16,6 +16,7 @@
 
                 <!-- INTRO (card) -->
                 <section class="aboutCard aboutCard--intro" id="intro" aria-label="Introduction">
+                    <span class="aboutCard__eyebrow">Maison familiale • Vignemont • Oise</span>
                     <h2 class="aboutCard__title">Votre événement, notre passion gourmande</h2>
                     <p class="aboutCard__text">
                         Traiteur Passion, c’est une maison familiale menée par Kévin Brien, charcutier-traiteur formé au
@@ -26,6 +27,24 @@
                         maison,
                         des produits de saison, et une équipe à l’écoute.
                     </p>
+
+                    <div class="aboutIntroStory" aria-label="Repères Traiteur Passion">
+                        <article class="aboutIntroCard">
+                            <span class="aboutIntroCard__kicker">Maison</span>
+                            <strong class="aboutIntroCard__title">Une structure familiale, proche du terrain</strong>
+                            <p class="aboutIntroCard__copy">Traiteur Passion avance avec une équipe resserrée, polyvalente et présente de la production jusqu’au service.</p>
+                        </article>
+                        <article class="aboutIntroCard">
+                            <span class="aboutIntroCard__kicker">Parcours</span>
+                            <strong class="aboutIntroCard__title">Une base métier construite chez les meilleurs</strong>
+                            <p class="aboutIntroCard__copy">Formation au CEPROC, passage chez Joly Traiteur et exigence de charcutier-traiteur: l’approche reste artisanale, cadrée et sincère.</p>
+                        </article>
+                        <article class="aboutIntroCard">
+                            <span class="aboutIntroCard__kicker">Promesse</span>
+                            <strong class="aboutIntroCard__title">Du sur-mesure sans perdre le sens du concret</strong>
+                            <p class="aboutIntroCard__copy">Chaque prestation doit rester lisible, généreuse et bien tenue, autant dans l’assiette que dans l’organisation.</p>
+                        </article>
+                    </div>
 
                     <div class="aboutActions">
                         <a class="btn btn--primary" href="/contact">Demander un devis</a>

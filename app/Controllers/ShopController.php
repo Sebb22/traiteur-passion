@@ -8,6 +8,7 @@ use App\Models\Shop;
 use App\Models\ShopOrder;
 use App\Services\ShopOrderNotificationService;
 use App\Services\ShopOrderSubmissionService;
+use App\Services\ShopPromoService;
 
 final class ShopController
 {
@@ -15,10 +16,12 @@ final class ShopController
     {
         $sections  = [];
         $loadError = null;
+        $shopPromo = null;
 
         try {
-            $catalog  = (new Shop())->getCatalog();
-            $sections = is_array($catalog['sections'] ?? null) ? $catalog['sections'] : [];
+            $catalog   = (new Shop())->getCatalog();
+            $sections  = is_array($catalog['sections'] ?? null) ? $catalog['sections'] : [];
+            $shopPromo = (new ShopPromoService())->getPublicPromo();
         } catch (\Throwable $e) {
             error_log('Shop catalog loading error: ' . $e->getMessage());
             $loadError = 'La boutique est temporairement indisponible. Revenez dans quelques instants.';
@@ -30,6 +33,7 @@ final class ShopController
             'metaDescription' => 'Commandez en ligne nos créations du moment. Stocks limités, disponibilité mise à jour en temps réel et retrait organisé simplement.',
             'sections'        => $sections,
             'loadError'       => $loadError,
+            'shopPromo'       => $shopPromo,
         ]);
     }
 

@@ -247,10 +247,23 @@ final class ShopOrderNotificationService
             ['label' => 'Date souhaitée', 'value' => $this->formatDate($orderData['pickup_date'] ?? null)],
             ['label' => 'Créneau', 'value' => $this->valueOrFallback($orderData['pickup_slot'] ?? null)],
             ['label' => 'Articles', 'value' => (string) ((int) ($orderData['item_count'] ?? 0))],
-            ['label' => 'Total', 'value' => $this->formatPrice((int) ($orderData['total_cents'] ?? 0))],
             ['label' => 'Statut', 'value' => ShopOrder::STATUS_LABELS[(string) ($orderData['status'] ?? 'new')] ?? ucfirst((string) ($orderData['status'] ?? 'new'))],
             ['label' => 'Enregistrée le', 'value' => $this->formatDateTime($orderData['created_at'] ?? null)],
         ];
+
+        $subtotalCents = max(0, (int) ($orderData['subtotal_cents'] ?? $orderData['total_cents'] ?? 0));
+        $discountCents = max(0, (int) ($orderData['discount_cents'] ?? 0));
+        if ($discountCents > 0) {
+            $promoCode = trim((string) ($orderData['promo_code'] ?? ''));
+            if ($promoCode !== '') {
+                $fields[] = ['label' => 'Code promo', 'value' => $promoCode];
+            }
+
+            $fields[] = ['label' => 'Sous-total', 'value' => $this->formatPrice($subtotalCents)];
+            $fields[] = ['label' => 'Remise', 'value' => '- ' . $this->formatPrice($discountCents)];
+        }
+
+        $fields[] = ['label' => 'Total', 'value' => $this->formatPrice((int) ($orderData['total_cents'] ?? 0))];
 
         if ($this->fulfillmentCode($orderData['fulfillment_method'] ?? null) === 'delivery') {
             $fields[] = ['label' => 'Adresse de livraison', 'value' => $this->deliveryAddressLabel($orderData)];
