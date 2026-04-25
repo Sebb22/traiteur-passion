@@ -8,6 +8,82 @@ use PDO;
 
 final class Shop
 {
+    /**
+     * Récupère les options d'achat (lots) pour un item donné
+     * @param int $itemId
+     * @return array<int, array<string, mixed>>
+     */
+    public function getItemOptions(int $itemId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active, sort_order
+             FROM boutique_item_options
+             WHERE item_id = :item_id
+             ORDER BY sort_order ASC, id ASC'
+        );
+        $stmt->execute(['item_id' => $itemId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Ajoute une option d'achat (lot) à un item
+     * @param int $itemId
+     * @param array $data
+     * @return int (id de l'option créée)
+     */
+    public function createItemOption(int $itemId, array $data): int
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO boutique_item_options (item_id, label, quantity, price_cents, price_label, is_active, sort_order)
+             VALUES (:item_id, :label, :quantity, :price_cents, :price_label, :is_active, :sort_order)'
+        );
+        $stmt->execute([
+            'item_id'     => $itemId,
+            'label'       => trim((string) ($data['label'] ?? '')),
+            'quantity'    => max(1, (int) ($data['quantity'] ?? 1)),
+            'price_cents' => $this->resolvePriceCents($data),
+            'price_label' => $this->nullableString($data['price_label'] ?? null),
+            'is_active'   => ! empty($data['is_active']) ? 1 : 0,
+            'sort_order'  => $this->resolveItemOptionSortOrderForCreate($itemId),
+        ]);
+        return (int) $this->db->lastInsertId();
+    }
+
+    /**
+     * Met à jour une option d'achat (lot)
+     */
+    public function updateItemOption(int $optionId, array $data): void
+    {
+        $existing = $this->getItemOptionById($optionId);
+        if (! is_array($existing)) {
+            throw new \InvalidArgumentException('Option boutique introuvable.');
+        }
+
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_item_options
+             SET label = :label, quantity = :quantity, price_cents = :price_cents, price_label = :price_label, is_active = :is_active, sort_order = :sort_order
+             WHERE id = :id'
+        );
+        $stmt->execute([
+            'id'          => $optionId,
+            'label'       => trim((string) ($data['label'] ?? '')),
+            'quantity'    => max(1, (int) ($data['quantity'] ?? 1)),
+            'price_cents' => $this->resolvePriceCents($data),
+            'price_label' => $this->resolveItemOptionPriceLabelForUpdate($existing, $data),
+            'is_active'   => ! empty($data['is_active']) ? 1 : 0,
+            'sort_order'  => (int) ($existing['sort_order'] ?? 0),
+        ]);
+    }
+
+    /**
+     * Supprime une option d'achat (lot)
+     */
+    public function deleteItemOption(int $optionId): void
+    {
+        $stmt = $this->db->prepare('DELETE FROM boutique_item_options WHERE id = :id');
+        $stmt->execute(['id' => $optionId]);
+    }
+
     private PDO $db;
 
     public function __construct()
@@ -41,6 +117,10 @@ final class Shop
         foreach ($items as $item) {
             $sectionId = (int) $item['section_id'];
             $stock     = max(0, (int) ($item['stock_quantity'] ?? 0));
+            $options   = array_values(array_filter(
+                $this->getItemOptions((int) $item['id']),
+                static fn(array $option): bool => ! empty($option['is_active']),
+            ));
 
             $itemsBySectionId[$sectionId][] = [
                 'id'                  => (int) $item['id'],
@@ -51,6 +131,7 @@ final class Shop
                 'image_alt'           => (string) ($item['image_alt'] ?? ($item['name'] ?? '')),
                 'price_cents'         => (int) ($item['price_cents'] ?? 0),
                 'price_label'         => (string) ($item['price_label'] ?? ''),
+                'options'             => $options,
                 'stock_quantity'      => $stock,
                 'low_stock_threshold' => max(0, (int) ($item['low_stock_threshold'] ?? 0)),
                 'is_sold_out'         => $stock <= 0,
@@ -95,7 +176,8 @@ final class Shop
             if (! isset($itemsBySectionId[$sectionId])) {
                 $itemsBySectionId[$sectionId] = [];
             }
-
+            // Injection des options d'achat (lots)
+            $item['options']                = $this->getItemOptions((int) $item['id']);
             $itemsBySectionId[$sectionId][] = $item;
         }
 
@@ -487,6 +569,47 @@ final class Shop
         }
 
         return $number;
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
+    private function getItemOptionById(int $optionId): ?array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, item_id, price_label, sort_order
+             FROM boutique_item_options
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $optionId]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return is_array($row) ? $row : null;
+    }
+
+    private function resolveItemOptionSortOrderForCreate(int $itemId): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COALESCE(MAX(sort_order), 0)
+             FROM boutique_item_options
+             WHERE item_id = :item_id'
+        );
+        $stmt->execute(['item_id' => $itemId]);
+
+        return ((int) $stmt->fetchColumn()) + 10;
+    }
+
+    /**
+     * @param array<string,mixed> $existing
+     */
+    private function resolveItemOptionPriceLabelForUpdate(array $existing, array $data): ?string
+    {
+        if (array_key_exists('price_label', $data)) {
+            return $this->nullableString($data['price_label']);
+        }
+
+        return $this->nullableString($existing['price_label'] ?? null);
     }
 
     private function resolvePriceCents(array $data): int

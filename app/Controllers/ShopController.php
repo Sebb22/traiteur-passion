@@ -49,7 +49,7 @@ final class ShopController
 
         $orderResult = (new ShopOrder())->createOrder(
             $result['customerData'] ?? [],
-            $result['quantities'] ?? [],
+            $result['selections'] ?? [],
         );
 
         $status = (int) ($orderResult['status'] ?? 500);
@@ -62,7 +62,13 @@ final class ShopController
             return;
         }
 
-        $orderId = (int) ($orderResult['order_id'] ?? 0);
+        $orderId            = (int) ($orderResult['order_id'] ?? 0);
+        $notificationResult = [
+            'enabled'         => false,
+            'admin_notified'  => false,
+            'client_ack_sent' => false,
+            'errors'          => [],
+        ];
         if ($orderId > 0) {
             $orderData = (new ShopOrder())->getByIdWithItems($orderId);
             if (is_array($orderData)) {
@@ -74,10 +80,12 @@ final class ShopController
         }
 
         $this->json(200, [
-            'success' => true,
-            'message' => 'Votre commande a bien été enregistrée. Nous vous confirmerons rapidement sa préparation.',
-            'id'      => $orderResult['order_id'] ?? null,
-            'stock'   => $this->safeStockSnapshot(),
+            'success'             => true,
+            'message'             => 'Votre commande a bien été enregistrée. Nous vous confirmerons rapidement sa préparation.',
+            'id'                  => $orderResult['order_id'] ?? null,
+            'client_ack_sent'     => (bool) ($notificationResult['client_ack_sent'] ?? false),
+            'email_notifications' => (bool) ($notificationResult['enabled'] ?? false),
+            'stock'               => $this->safeStockSnapshot(),
         ]);
     }
 

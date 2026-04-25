@@ -17,6 +17,34 @@
     return number_format($cents / 100, 2, ',', ' ') . ' €';
     };
 
+    $resolveOptionUnits = static function (array $option): int {
+    $quantity = max(1, (int) ($option['quantity'] ?? 1));
+    if ($quantity > 1) {
+        return $quantity;
+    }
+
+    $label = trim((string) ($option['label'] ?? ''));
+    if ($label !== '' && preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $label, $matches) === 1) {
+        return max(1, (int) ($matches[1] ?? 1));
+    }
+
+    return $quantity;
+    };
+
+    $resolveSectionAnchor = static function (array $section): string {
+    $slug = trim((string) ($section['slug'] ?? ''));
+    if ($slug !== '') {
+        return $slug;
+    }
+
+    return 'section-' . (int) ($section['id'] ?? 0);
+    };
+
+    $visibleProductsCount = 0;
+    foreach ($sections as $section) {
+    $visibleProductsCount += count(is_array($section['items'] ?? null) ? $section['items'] : []);
+    }
+
     $firstAvailable = date('Y-m-d');
 ?>
 
@@ -41,45 +69,33 @@
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
                     <div class="shopIntro__body">
                         <p class="shopIntro__copy">La carte boutique change chaque semaine pour suivre le rythme réel
-                            de production, garantir la fraîcheur et ne proposer que des créations prêtes à être
-                            retirées dans de bonnes conditions.</p>
-                        <p class="shopIntro__copy">Ici, pas de catalogue figé ni d’assemblage standardisé: uniquement
-                            du fait maison, produit en petites séries, avec une sélection volontairement courte pour
-                            préserver le goût, la régularité et la qualité d’exécution. Une livraison peut aussi être
-                            proposée ensuite par l’équipe dans un rayon de 20 km dès 15 € de commande.</p>
+                            de production et garantir la fraîcheur. Vous composez ici la demande, puis nous confirmons
+                            avec vous le retrait ou la livraison possible selon votre zone.</p>
                     </div>
-                    <div class="shopIntro__story" aria-label="Esprit de la boutique">
-                        <article class="shopIntroCard">
-                            <span class="shopIntroCard__kicker">Sélection</span>
-                            <strong class="shopIntroCard__title">Une boutique courte mais vraiment suivie</strong>
-                            <p class="shopIntroCard__copy">Chaque semaine, la carte se concentre sur peu de références pour garder de la fraîcheur, du goût et une exécution régulière.</p>
+                    <div class="shopIntroSteps" aria-label="Parcours de commande boutique">
+                        <article class="shopIntroStep">
+                            <span class="shopIntroStep__index">01</span>
+                            <div>
+                                <strong class="shopIntroStep__title">Choisissez une catégorie</strong>
+                                <p class="shopIntroStep__copy">Repérez vite ce qui est disponible cette semaine.</p>
+                            </div>
                         </article>
-                        <article class="shopIntroCard">
-                            <span class="shopIntroCard__kicker">Commande</span>
-                            <strong class="shopIntroCard__title">Vous composez, nous revérifions</strong>
-                            <p class="shopIntroCard__copy">Le panier donne une lecture claire de la commande, puis le stock et les créneaux sont revus avant validation finale.</p>
+                        <article class="shopIntroStep">
+                            <span class="shopIntroStep__index">02</span>
+                            <div>
+                                <strong class="shopIntroStep__title">Ajoutez les bons formats</strong>
+                                <p class="shopIntroStep__copy">À l’unité ou en lot selon le stock affiché.</p>
+                            </div>
                         </article>
-                        <article class="shopIntroCard">
-                            <span class="shopIntroCard__kicker">Service</span>
-                            <strong class="shopIntroCard__title">Retrait simple, livraison selon votre zone</strong>
-                            <p class="shopIntroCard__copy">La boutique est pensée pour aller vite sans devenir impersonnelle, avec un retrait cadré et une livraison locale quand elle est possible.</p>
+                        <article class="shopIntroStep">
+                            <span class="shopIntroStep__index">03</span>
+                            <div>
+                                <strong class="shopIntroStep__title">Confirmez sans payer</strong>
+                                <p class="shopIntroStep__copy">Nous validons ensuite avec vous le retrait ou la livraison.</p>
+                            </div>
                         </article>
                     </div>
-                    <div class="shopIntro__highlight">
-                        <strong class="shopIntro__highlightTitle">Carte courte, rotation hebdo, fait maison
-                            uniquement</strong>
-                        <p class="shopIntro__highlightCopy">Chaque commande fait l’objet d’une vérification attentive
-                            afin de garantir des produits disponibles, sélectionnés avec exigence pour leur fraîcheur.
-                            La livraison est également proposée autour de Compiègne, dans un rayon de 20 km, dès 15 € de
-                            commande, selon votre localisation.</p>
-                    </div>
-                    <div class="shopIntro__meta">
-                        <span class="shopPill">Renouvelée chaque semaine</span>
-                        <span class="shopPill">100% fait maison</span>
-                        <span class="shopPill">Retrait sur créneau</span>
-                        <span class="shopPill">Livraison 20 km dès 15 €</span>
-                        <span class="shopPill">Stock limité</span>
-                    </div>
+                    <p class="shopIntro__note">Carte courte, fait maison, stock revérifié à l’enregistrement. Retrait sur créneau ou livraison locale selon votre adresse.</p>
                 </header>
 
                 <?php if ($loadError !== null): ?>
@@ -92,7 +108,7 @@
                 <?php if ($sections === [] && $loadError === null): ?>
                 <section class="shopNotice" aria-live="polite">
                     <strong>La boutique n'est pas encore configurée.</strong>
-                    <p>Ajoutez d'abord des sections et des produits depuis l'administration pour ouvrir la commande en
+                    <p>Ajoutez d'abord des catégories et des produits depuis l'administration pour ouvrir la commande en
                         ligne.</p>
                 </section>
                 <?php endif; ?>
@@ -104,6 +120,34 @@
                     data-promo-percent="<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>"
                     data-promo-title="<?php echo $e($shopPromo['title'] ?? ''); ?>"
                     data-promo-ends-at="<?php echo $e($shopPromo['countdown_iso'] ?? ''); ?>">
+                    <?php if ($sections !== []): ?>
+                    <div class="shopCatalogNav">
+                        <div class="shopCatalogNav__head">
+                            <div class="shopCatalogNav__copy">
+                                <span class="shopCatalogNav__eyebrow">Parcourir les catégories</span>
+                                <p class="shopCatalogNav__title">Repérez d'abord votre catégorie, puis composez le panier sans perdre le fil de la carte.</p>
+                            </div>
+                            <div class="shopCatalogNav__stats" aria-label="Repères de navigation boutique">
+                                <span class="shopCatalogNav__stat"><?php echo count($sections); ?> catégorie<?php echo count($sections) > 1 ? 's' : ''; ?></span>
+                                <span class="shopCatalogNav__stat"><?php echo $visibleProductsCount; ?> produit<?php echo $visibleProductsCount > 1 ? 's' : ''; ?></span>
+                            </div>
+                        </div>
+
+                        <nav class="menuTabs shopTabs" aria-label="Catégories boutique" data-menu-tabs>
+                            <?php foreach ($sections as $index => $section): ?>
+                            <?php $sectionAnchor = $resolveSectionAnchor($section); ?>
+                            <a href="#<?php echo $e($sectionAnchor); ?>"
+                                class="menuTabs__tab <?php echo $index === 0 ? 'is-active' : ''; ?>"
+                                <?php echo $index === 0 ? 'aria-current="location"' : ''; ?>><?php echo $e($section['name'] ?? 'Section'); ?></a>
+                            <?php endforeach; ?>
+                        </nav>
+
+                        <button type="button" class="menuTabsShortcut" data-menu-tabs-shortcut>
+                            Catégories
+                        </button>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="shopOrderTop">
                         <div class="shopSummaryDock" data-shop-summary-dock>
                             <button type="button" class="shopSummaryTab" data-shop-summary-toggle aria-expanded="false"
@@ -214,7 +258,8 @@
 
                         <section class="shopCatalog" aria-label="Produits boutique">
                             <?php foreach ($sections as $section): ?>
-                            <article class="shopCatalogSection" id="section-<?php echo (int) ($section['id'] ?? 0); ?>">
+                            <?php $sectionAnchor = $resolveSectionAnchor($section); ?>
+                            <article class="shopCatalogSection" id="<?php echo $e($sectionAnchor); ?>">
                                 <header class="shopSectionHead shopSectionHead--catalog">
                                     <div>
                                         <span class="shopStep">Choisir</span>
@@ -232,19 +277,59 @@
                                     <?php
                                         $itemId        = (int) ($item['id'] ?? 0);
                                         $stockQuantity = max(0, (int) ($item['stock_quantity'] ?? 0));
-                                        $allowed       = $stockQuantity;
-                                        $isSoldOut     = ! empty($item['is_sold_out']) || $stockQuantity <= 0;
-                                        $isLowStock    = ! empty($item['is_low_stock']);
-                                        $statusLabel   = $isSoldOut
+                                        $options       = array_values(array_filter(
+                                            is_array($item['options'] ?? null) ? $item['options'] : [],
+                                            static fn(array $option): bool => ! empty($option['is_active']),
+                                        ));
+                                        $purchaseLines = [];
+                                        if ($options !== []) {
+                                            foreach ($options as $option) {
+                                                $optionId        = (int) ($option['id'] ?? 0);
+                                                $optionUnits     = $resolveOptionUnits($option);
+                                                $purchaseLines[] = [
+                                                    'line_key'      => 'item-' . $itemId . '-option-' . $optionId,
+                                                    'option_id'     => $optionId,
+                                                    'option_label'  => trim((string) ($option['label'] ?? '')),
+                                                    'option_units'  => $optionUnits,
+                                                    'price_cents'   => (int) ($option['price_cents'] ?? 0),
+                                                    'price_display' => $formatPrice($option),
+                                                    'allowed'       => (int) floor($stockQuantity / max(1, $optionUnits)),
+                                                    'hint'          => $optionUnits > 1
+                                                        ? $optionUnits . ' unité(s) par lot'
+                                                        : 'Ajout à l’unité',
+                                                ];
+                                            }
+                                        } else {
+                                            $purchaseLines[] = [
+                                                'line_key'      => 'item-' . $itemId . '-default',
+                                                'option_id'     => 0,
+                                                'option_label'  => '',
+                                                'option_units'  => 1,
+                                                'price_cents'   => (int) ($item['price_cents'] ?? 0),
+                                                'price_display' => $formatPrice($item),
+                                                'allowed'       => $stockQuantity,
+                                                'hint'          => 'Ajout direct au panier',
+                                            ];
+                                        }
+                                        $cardPriceDisplay  = $purchaseLines[0]['price_display'] ?? $formatPrice($item);
+                                        if (count($purchaseLines) > 1) {
+                                            $cardPriceDisplay = 'Dès ' . $cardPriceDisplay;
+                                        }
+                                        $hasAvailableLine = false;
+                                        foreach ($purchaseLines as $purchaseLine) {
+                                            if ((int) ($purchaseLine['allowed'] ?? 0) > 0) {
+                                                $hasAvailableLine = true;
+                                                break;
+                                            }
+                                        }
+                                        $isSoldOut   = ! empty($item['is_sold_out']) || $stockQuantity <= 0 || ! $hasAvailableLine;
+                                        $isLowStock  = ! empty($item['is_low_stock']);
+                                        $statusLabel = $isSoldOut
                                             ? 'Rupture'
-                                            : ($isLowStock ? 'Plus que ' . $stockQuantity . ' disponible(s)' : $stockQuantity . ' disponible(s)');
+                                            : ($isLowStock ? 'Plus que ' . $stockQuantity . ' unité(s)' : $stockQuantity . ' unité(s)');
                                     ?>
                                     <article class="shopItemCard<?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
-                                        data-shop-item data-item-id="<?php echo $itemId; ?>"
-                                        data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
-                                        data-item-price="<?php echo $e($formatPrice($item)); ?>"
-                                        data-item-price-cents="<?php echo (int) ($item['price_cents'] ?? 0); ?>"
-                                        data-item-stock="<?php echo $stockQuantity; ?>">
+                                        data-item-id="<?php echo $itemId; ?>">
                                         <div class="shopItemCard__media">
                                             <?php if (($item['image_path'] ?? '') !== ''): ?>
                                             <img src="<?php echo $e($item['image_path'] ?? ''); ?>"
@@ -260,53 +345,97 @@
                                         <div class="shopItemCard__body">
                                             <div class="shopItemCard__top">
                                                 <div>
-                                                    <span class="shopItemCard__eyebrow">Sélection prête à retirer</span>
                                                     <h4 class="shopItemCard__title">
                                                         <?php echo $e($item['name'] ?? ''); ?></h4>
                                                 </div>
-                                                <span
-                                                    class="shopItemCard__price"><?php echo $e($formatPrice($item)); ?></span>
+                                                <span class="shopItemCard__price"><?php echo $e($cardPriceDisplay); ?></span>
                                             </div>
 
-                                            <?php if (($item['description'] ?? '') !== ''): ?>
-                                            <p class="shopItemCard__desc"><?php echo $e($item['description'] ?? ''); ?>
-                                            </p>
-                                            <?php endif; ?>
-
-                                            <div class="shopItemCard__meta">
-                                                <span
-                                                    class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
-                                                    data-shop-stock
-                                                    data-item-id="<?php echo $itemId; ?>"><?php echo $e($statusLabel); ?></span>
+                                            <div class="shopItemCard__content">
+                                                <?php if (($item['description'] ?? '') !== ''): ?>
+                                                <p class="shopItemCard__desc"><?php echo $e($item['description'] ?? ''); ?>
+                                                </p>
+                                                <?php endif; ?>
                                             </div>
 
-                                            <div class="shopItemCard__footer">
-                                                <div class="shopItemCard__actions">
-                                                    <button type="button" class="btn btn--ghost shopItemCard__add"
-                                                        data-shop-add data-item-id="<?php echo $itemId; ?>"
-                                                        <?php echo $isSoldOut ? 'disabled' : ''; ?>>Ajouter au
-                                                        panier</button>
+                                            <div class="shopItemCard__purchase">
+                                                <div class="shopItemCard__purchaseHead">
+                                                    <span
+                                                        class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
+                                                        data-shop-stock
+                                                        data-item-id="<?php echo $itemId; ?>"><?php echo $e($statusLabel); ?></span>
+                                                    <p class="shopItemCard__purchaseHint"><?php echo $options !== [] ? 'Chaque format ci-dessous peut être ajouté séparément. Vous pouvez cumuler plusieurs lots pour un même produit.' : 'Ajout direct au panier.'; ?></p>
+                                                </div>
 
-                                                    <div class="shopQtyControls" data-shop-controls
-                                                        data-item-id="<?php echo $itemId; ?>" hidden>
-                                                        <button type="button" class="shopQtyControls__btn"
-                                                            data-shop-decrease data-item-id="<?php echo $itemId; ?>"
-                                                            aria-label="Retirer une unité">−</button>
-                                                        <label class="shopQty">
-                                                            <span class="shopQty__label">Quantité</span>
-                                                            <input class="shopQty__input" type="number"
-                                                                name="shop_quantity[<?php echo $itemId; ?>]" min="0"
-                                                                max="<?php echo $allowed; ?>" value="0"
-                                                                <?php echo $isSoldOut ? 'disabled' : ''; ?>
-                                                                data-shop-qty data-item-id="<?php echo $itemId; ?>">
-                                                        </label>
-                                                        <button type="button" class="shopQtyControls__btn"
-                                                            data-shop-increase data-item-id="<?php echo $itemId; ?>"
-                                                            aria-label="Ajouter une unité">+</button>
-                                                        <button type="button" class="shopQtyControls__remove"
-                                                            data-shop-remove
-                                                            data-item-id="<?php echo $itemId; ?>">Retirer</button>
+                                                <div class="shopPurchaseOptions">
+                                                    <?php if ($options !== []): ?>
+                                                    <p class="shopPurchaseOptions__intro">Formats disponibles : ajoutez une quantité sur chaque ligne voulue.</p>
+                                                    <?php endif; ?>
+                                                    <?php foreach ($purchaseLines as $purchaseLine): ?>
+                                                    <?php
+                                                        $lineKey        = (string) ($purchaseLine['line_key'] ?? '');
+                                                        $lineOptionId   = (int) ($purchaseLine['option_id'] ?? 0);
+                                                        $lineLabel      = trim((string) ($purchaseLine['option_label'] ?? ''));
+                                                        $lineUnits      = max(1, (int) ($purchaseLine['option_units'] ?? 1));
+                                                        $linePrice      = (string) ($purchaseLine['price_display'] ?? '');
+                                                        $linePriceCents = (int) ($purchaseLine['price_cents'] ?? 0);
+                                                        $lineAllowed    = max(0, (int) ($purchaseLine['allowed'] ?? 0));
+                                                        $lineHint       = trim((string) ($purchaseLine['hint'] ?? ''));
+                                                        $lineSoldOut    = $stockQuantity <= 0 || $lineAllowed <= 0;
+                                                        $lineTitle      = $lineLabel !== '' ? $lineLabel : 'Format standard';
+                                                    ?>
+                                                    <div class="shopPurchaseOption<?php echo $lineSoldOut ? ' is-sold-out' : ''; ?>"
+                                                        data-shop-order-line
+                                                        data-line-key="<?php echo $e($lineKey); ?>"
+                                                        data-item-id="<?php echo $itemId; ?>"
+                                                        data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
+                                                        data-item-stock="<?php echo $stockQuantity; ?>"
+                                                        data-item-price="<?php echo $e($linePrice); ?>"
+                                                        data-item-price-cents="<?php echo $linePriceCents; ?>"
+                                                        data-option-id="<?php echo $lineOptionId; ?>"
+                                                        data-option-label="<?php echo $e($lineLabel); ?>"
+                                                        data-option-units="<?php echo $lineUnits; ?>">
+                                                        <div class="shopPurchaseOption__head">
+                                                            <div class="shopPurchaseOption__copy">
+                                                                <strong class="shopPurchaseOption__title"><?php echo $e($lineTitle); ?></strong>
+                                                                <p class="shopPurchaseOption__hint" data-default-text="<?php echo $e($lineHint); ?>"><?php echo $e($lineHint); ?></p>
+                                                            </div>
+                                                            <span class="shopPurchaseOption__price"><?php echo $e($linePrice); ?></span>
+                                                        </div>
+
+                                                        <input type="hidden" name="shop_item[<?php echo $e($lineKey); ?>]" value="<?php echo $itemId; ?>">
+                                                        <input type="hidden" name="shop_option[<?php echo $e($lineKey); ?>]" value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
+                                                        <input type="hidden" name="shop_option_label[<?php echo $e($lineKey); ?>]" value="<?php echo $e($lineLabel); ?>">
+                                                        <input type="hidden" name="shop_option_units[<?php echo $e($lineKey); ?>]" value="<?php echo $lineUnits; ?>">
+
+                                                        <div class="shopItemCard__actions">
+                                                            <button type="button" class="btn btn--ghost shopItemCard__add"
+                                                                data-shop-add data-line-key="<?php echo $e($lineKey); ?>"
+                                                                <?php echo $lineSoldOut ? 'disabled' : ''; ?>>Ajouter</button>
+
+                                                            <div class="shopQtyControls" data-shop-controls
+                                                                data-line-key="<?php echo $e($lineKey); ?>" hidden>
+                                                                <button type="button" class="shopQtyControls__btn"
+                                                                    data-shop-decrease data-line-key="<?php echo $e($lineKey); ?>"
+                                                                    aria-label="Retirer une unité">−</button>
+                                                                <label class="shopQty">
+                                                                    <span class="shopQty__label">Quantité</span>
+                                                                    <input class="shopQty__input" type="number"
+                                                                        name="shop_quantity[<?php echo $e($lineKey); ?>]" min="0"
+                                                                        max="<?php echo $lineAllowed; ?>" value="0"
+                                                                        <?php echo $lineSoldOut ? 'disabled' : ''; ?>
+                                                                        data-shop-qty data-line-key="<?php echo $e($lineKey); ?>">
+                                                                </label>
+                                                                <button type="button" class="shopQtyControls__btn"
+                                                                    data-shop-increase data-line-key="<?php echo $e($lineKey); ?>"
+                                                                    aria-label="Ajouter une unité">+</button>
+                                                                <button type="button" class="shopQtyControls__remove"
+                                                                    data-shop-remove
+                                                                    data-line-key="<?php echo $e($lineKey); ?>">Retirer</button>
+                                                            </div>
+                                                        </div>
                                                     </div>
+                                                    <?php endforeach; ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -327,29 +456,31 @@
                                     <div>
                                         <span class="shopStep">Finaliser</span>
                                         <h3 class="shopSectionHead__title">Finaliser sans paiement</h3>
-                                        <p class="shopSectionHead__hint">Nous enregistrons simplement la demande et le
-                                            stock correspondant. La confirmation se fait ensuite directement avec vous.
+                                        <p class="shopSectionHead__hint">Deux étapes suffisent pour envoyer la demande. Nous confirmons ensuite avec vous le retrait ou la livraison.
                                         </p>
                                     </div>
                                 </div>
 
-                                <div class="shopCheckoutIntro">
-                                    <span class="shopCheckoutIntro__eyebrow">Après validation</span>
-                                    <ul class="shopCheckoutIntro__list">
-                                        <li>Le stock choisi est réservé à l’enregistrement.</li>
-                                        <li>Nous revenons vers vous pour confirmer le retrait ou proposer la livraison
-                                            si elle est possible.</li>
-                                        <li>La livraison peut être proposée dans un rayon de 20 km dès 15 € de commande.
-                                        </li>
-                                        <li>Aucun paiement n’est demandé à cette étape.</li>
-                                    </ul>
+                                <div class="shopCheckoutGuide" aria-label="Repères avant envoi">
+                                    <div class="shopCheckoutGuide__item">
+                                        <strong>Stock réservé</strong>
+                                        <span>Les quantités choisies sont bloquées à l’enregistrement.</span>
+                                    </div>
+                                    <div class="shopCheckoutGuide__item">
+                                        <strong>Créneau confirmé</strong>
+                                        <span>Retrait validé avec vous, ou livraison si elle est possible.</span>
+                                    </div>
+                                    <div class="shopCheckoutGuide__item">
+                                        <strong>Sans paiement</strong>
+                                        <span>Cette étape sert uniquement à envoyer la demande.</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="shopCheckoutLayout">
                                 <div class="shopCheckoutPanel">
                                     <div class="shopCheckoutPanel__head">
-                                        <h4>Vos coordonnées</h4>
+                                        <h4>1. Vos coordonnées</h4>
                                         <p>Le minimum utile pour vous recontacter rapidement.</p>
                                     </div>
 
@@ -371,10 +502,8 @@
 
                                 <div class="shopCheckoutPanel">
                                     <div class="shopCheckoutPanel__head">
-                                        <h4>Retrait ou livraison</h4>
-                                        <p>Dites-nous quand vous souhaitez récupérer la commande. Si votre adresse le
-                                            permet, nous pouvons aussi vous proposer une livraison dans un rayon de 20
-                                            km dès 15 €.</p>
+                                        <h4>2. Retrait ou livraison</h4>
+                                        <p>Choisissez un créneau souhaité. La livraison reste proposée selon votre adresse.</p>
                                     </div>
 
                                     <div class="shopFieldGrid">

@@ -24,6 +24,24 @@ function formatPrice(cents) {
     }).format((Number.parseInt(cents, 10) || 0) / 100);
 }
 
+function getSelectedOptionData(select) {
+    if (!(select instanceof HTMLSelectElement) || select.selectedOptions.length === 0) {
+        return null;
+    }
+
+    const option = select.selectedOptions[0];
+    return {
+        id: Number.parseInt(option.getAttribute("data-option-id") || option.value || "0", 10) || 0,
+        label: option.getAttribute("data-option-label") || option.textContent || "",
+        price: option.getAttribute("data-option-price") || "",
+        priceCents: Number.parseInt(option.getAttribute("data-option-price-cents") || "0", 10) || 0,
+        quantityUnits: Math.max(
+            1,
+            Number.parseInt(option.getAttribute("data-option-quantity") || "1", 10) || 1,
+        ),
+    };
+}
+
 function normalizePromoCode(value) {
     return String(value || "")
         .trim()
@@ -102,7 +120,8 @@ export function initShopPage() {
     const fulfillmentInputs = Array.from(form.querySelectorAll("[data-shop-fulfillment]"));
     const deliveryPanel = form.querySelector("[data-shop-delivery-panel]");
     const deliveryFields = Array.from(form.querySelectorAll("[data-shop-delivery-field]"));
-    const itemNodes = Array.from(form.querySelectorAll("[data-shop-item]"));
+    const lineNodes = Array.from(form.querySelectorAll("[data-shop-order-line]"));
+    const stockBadges = Array.from(form.querySelectorAll("[data-shop-stock]"));
     const inputs = Array.from(form.querySelectorAll("[data-shop-qty]"));
     const addButtons = Array.from(form.querySelectorAll("[data-shop-add]"));
     const increaseButtons = Array.from(form.querySelectorAll("[data-shop-increase]"));
@@ -120,7 +139,9 @@ export function initShopPage() {
     let touchCurrentY = 0;
     let isDraggingSummary = false;
     const desktopToastMedia = window.matchMedia("(min-width: 1320px)");
+    const desktopQuickAddMedia = window.matchMedia("(min-width: 981px)");
     let unbindDesktopToastMedia = () => {};
+    let unbindDesktopQuickAddMedia = () => {};
     const promoEndsAt = form.getAttribute("data-promo-ends-at") || "";
     const promoEndsAtDate = promoEndsAt ? new Date(promoEndsAt) : null;
     const promoConfig = {
@@ -132,6 +153,7 @@ export function initShopPage() {
     };
 
     const isDesktopToast = () => desktopToastMedia.matches;
+    const isDesktopQuickAdd = () => desktopQuickAddMedia.matches;
 
     const isPromoAvailable = () => {
         if (!promoConfig.active || !promoConfig.code || promoConfig.percent <= 0) {
@@ -314,14 +336,10 @@ export function initShopPage() {
             return;
         }
 
-        if (isDesktopToast()) {
-            isSummaryPinned = false;
-            setSummaryOpen(true);
-            clearSummaryPromptTimeout();
-            if (summaryDock) {
-                summaryDock.classList.remove("is-prompt");
+        if (isSummaryOpen) {
+            if (isDesktopToast() && !isSummaryPinned) {
+                scheduleSummaryHide();
             }
-            scheduleSummaryHide();
             return;
         }
 
@@ -349,40 +367,166 @@ export function initShopPage() {
         summaryDock.style.right = `${Math.max(12, Math.round(window.innerWidth - bounds.right))}px`;
     };
 
-    const items = new Map();
-    itemNodes.forEach((node) => {
-        const itemId = Number.parseInt(node.getAttribute("data-item-id") || "0", 10);
+    const stockBadgesByItem = new Map();
+    stockBadges.forEach((badge) => {
+        const itemId = Number.parseInt(badge.getAttribute("data-item-id") || "0", 10);
         if (!itemId) {
             return;
         }
 
-        const input = form.querySelector(`[data-shop-qty][data-item-id="${itemId}"]`);
-        const stockBadge = form.querySelector(`[data-shop-stock][data-item-id="${itemId}"]`);
-        const addButton = form.querySelector(`[data-shop-add][data-item-id="${itemId}"]`);
-        const controls = form.querySelector(`[data-shop-controls][data-item-id="${itemId}"]`);
+        const badges = stockBadgesByItem.get(itemId) || [];
+        badges.push(badge);
+        stockBadgesByItem.set(itemId, badges);
+    });
+
+    const items = new Map();
+    lineNodes.forEach((node) => {
+        const lineKey = String(node.getAttribute("data-line-key") || "").trim();
+        const itemId = Number.parseInt(node.getAttribute("data-item-id") || "0", 10);
+        if (!lineKey || !itemId) {
+            return;
+        }
+
+        const input = form.querySelector(`[data-shop-qty][data-line-key="${lineKey}"]`);
+        const addButton = form.querySelector(`[data-shop-add][data-line-key="${lineKey}"]`);
+        const controls = form.querySelector(`[data-shop-controls][data-line-key="${lineKey}"]`);
+        const purchaseHint = node.querySelector(".shopPurchaseOption__hint");
         const stockQuantity = Number.parseInt(node.getAttribute("data-item-stock") || "0", 10);
         const priceCents = Number.parseInt(node.getAttribute("data-item-price-cents") || "0", 10);
+        const optionUnits = Math.max(
+            1,
+            Number.parseInt(node.getAttribute("data-option-units") || "1", 10) || 1,
+        );
 
-        items.set(itemId, {
+        if (addButton instanceof HTMLButtonElement && !addButton.dataset.baseLabel) {
+            addButton.dataset.baseLabel = (addButton.textContent || "Ajouter").trim();
+        }
+
+        if (purchaseHint instanceof HTMLElement && !purchaseHint.dataset.defaultText) {
+            purchaseHint.dataset.defaultText = purchaseHint.textContent || "";
+        }
+
+        items.set(lineKey, {
+            lineKey,
             id: itemId,
             name: node.getAttribute("data-item-name") || "Produit",
-            price: node.getAttribute("data-item-price") || "",
-            priceCents,
+            basePrice: node.getAttribute("data-item-price") || "",
+            basePriceCents: priceCents,
+            optionId: Number.parseInt(node.getAttribute("data-option-id") || "0", 10) || 0,
+            optionLabel: node.getAttribute("data-option-label") || "",
+            optionUnits,
             node,
             input,
-            stockBadge,
+            stockBadges: stockBadgesByItem.get(itemId) || [],
             addButton,
             controls,
+            purchaseHint,
             stockQuantity,
         });
     });
+
+    const getUnitMultiplier = (item) => Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
+
+    const getEffectivePriceCents = (item) => {
+        return item.basePriceCents;
+    };
+
+    const getEffectivePriceLabel = (item) => {
+        return item.basePrice;
+    };
+
+    const getRawQuantity = (item) => {
+        if (!item || !item.input) {
+            return 0;
+        }
+
+        return Math.max(0, Number.parseInt(item.input.value, 10) || 0);
+    };
 
     const getQuantity = (item) => {
         if (!item || !item.input) {
             return 0;
         }
 
-        return clampQuantity(item.input.value, Number.parseInt(item.input.max || "0", 10));
+        return clampQuantity(item.input.value, getAvailableOrderQuantity(item));
+    };
+
+    const getReservedUnitsForItem = (itemId, excludedLineKey = null) => {
+        let reservedUnits = 0;
+
+        items.forEach((item) => {
+            if (item.id !== itemId || item.lineKey === excludedLineKey) {
+                return;
+            }
+
+            reservedUnits += getRawQuantity(item) * getUnitMultiplier(item);
+        });
+
+        return reservedUnits;
+    };
+
+    const getRemainingStockUnits = (itemId) => {
+        const itemLine = Array.from(items.values()).find((item) => item.id === itemId);
+        if (!itemLine) {
+            return 0;
+        }
+
+        return Math.max(0, itemLine.stockQuantity - getReservedUnitsForItem(itemId));
+    };
+
+    const getAvailableOrderQuantity = (item) => {
+        if (!item || !item.input) {
+            return 0;
+        }
+
+        const availableUnits = Math.max(0, item.stockQuantity - getReservedUnitsForItem(item.id, item.lineKey));
+        return Math.max(0, Math.floor(availableUnits / getUnitMultiplier(item)));
+    };
+
+    const syncStockBadges = (itemId) => {
+        const badges = stockBadgesByItem.get(itemId) || [];
+        const itemLine = Array.from(items.values()).find((item) => item.id === itemId);
+        if (!itemLine) {
+            return;
+        }
+
+        const remainingUnits = getRemainingStockUnits(itemId);
+        const soldOut = remainingUnits <= 0;
+        const lowStock = !soldOut && remainingUnits <= 5;
+
+        badges.forEach((badge) => {
+            let label = `${remainingUnits} unité(s)`;
+            let tone = "";
+
+            if (soldOut) {
+                label = "Rupture";
+                tone = " is-sold-out";
+            } else if (lowStock) {
+                label = `Plus que ${remainingUnits} unité(s)`;
+                tone = " is-low";
+            }
+
+            badge.textContent = label;
+            badge.className = `shopStockBadge${tone}`;
+        });
+    };
+
+    const syncItemPresentation = (item) => {
+        if (!item) {
+            return;
+        }
+
+        const allowed = getAvailableOrderQuantity(item);
+        const quantity = getQuantity(item);
+        const soldOut = allowed <= 0 && quantity <= 0;
+
+        if (item.input) {
+            item.input.max = String(allowed);
+            item.input.value = String(clampQuantity(item.input.value, allowed));
+            item.input.disabled = soldOut;
+        }
+
+        item.node.classList.toggle("is-sold-out", soldOut);
     };
 
     const syncItemState = (item) => {
@@ -390,19 +534,37 @@ export function initShopPage() {
             return;
         }
 
+        syncItemPresentation(item);
+
         const quantity = getQuantity(item);
         const soldOut = item.input.disabled;
 
         if (item.addButton) {
-            item.addButton.hidden = quantity > 0;
             item.addButton.disabled = soldOut;
+
+            const baseLabel = item.addButton.dataset.baseLabel || "Ajouter";
+            if (isDesktopQuickAdd()) {
+                item.addButton.hidden = false;
+                item.addButton.textContent = quantity > 0 ? `${baseLabel} +1` : baseLabel;
+                item.addButton.classList.toggle("is-active", quantity > 0);
+            } else {
+                item.addButton.hidden = quantity > 0;
+                item.addButton.textContent = baseLabel;
+                item.addButton.classList.remove("is-active");
+            }
         }
 
         if (item.controls) {
             item.controls.hidden = quantity <= 0;
         }
 
+        if (item.purchaseHint instanceof HTMLElement) {
+            const defaultText = item.purchaseHint.dataset.defaultText || "";
+            item.purchaseHint.textContent = quantity > 0 ? `${quantity} dans le panier` : defaultText;
+        }
+
         item.node.classList.toggle("is-in-cart", quantity > 0);
+        syncStockBadges(item.id);
     };
 
     const setQuantity = (item, quantity) => {
@@ -441,7 +603,7 @@ export function initShopPage() {
     const syncFulfillmentState = () => {
         const wantsDelivery = fulfillmentInputs.some(
             (input) =>
-                input instanceof HTMLInputElement && input.checked && input.value === "delivery",
+            input instanceof HTMLInputElement && input.checked && input.value === "delivery",
         );
 
         if (deliveryPanel instanceof HTMLElement) {
@@ -484,7 +646,7 @@ export function initShopPage() {
 
             totalItems += 1;
             totalCount += quantity;
-            subtotalCents += quantity * item.priceCents;
+            subtotalCents += quantity * getEffectivePriceCents(item);
 
             if (summaryLines) {
                 const line = document.createElement("div");
@@ -494,10 +656,10 @@ export function initShopPage() {
                 left.className = "shopSummary__lineMain";
 
                 const label = document.createElement("span");
-                label.textContent = item.name;
+                label.textContent = item.optionLabel ? `${item.name} — ${item.optionLabel}` : item.name;
 
                 const meta = document.createElement("small");
-                meta.textContent = `${quantity} × ${item.price}`;
+                meta.textContent = `${quantity} × ${getEffectivePriceLabel(item)}`;
 
                 left.append(label, meta);
 
@@ -505,15 +667,50 @@ export function initShopPage() {
                 right.className = "shopSummary__lineAside";
 
                 const amount = document.createElement("strong");
-                amount.textContent = formatPrice(quantity * item.priceCents);
+                amount.textContent = formatPrice(quantity * getEffectivePriceCents(item));
+
+                const controls = document.createElement("div");
+                controls.className = "shopSummary__lineControls";
+
+                const decrease = document.createElement("button");
+                decrease.type = "button";
+                decrease.className = "shopSummary__step";
+                decrease.textContent = "−";
+                decrease.disabled = quantity <= 1;
+                decrease.setAttribute("aria-label", `Retirer une unité de ${item.name}`);
+                decrease.addEventListener("click", () => setQuantity(item, quantity - 1));
+
+                const count = document.createElement("span");
+                count.className = "shopSummary__stepCount";
+                count.textContent = String(quantity);
+
+                const increase = document.createElement("button");
+                increase.type = "button";
+                increase.className = "shopSummary__step";
+                increase.textContent = "+";
+                increase.disabled = quantity >= getAvailableOrderQuantity(item);
+                increase.setAttribute("aria-label", `Ajouter une unité à ${item.name}`);
+                increase.addEventListener("click", () => setQuantity(item, quantity + 1));
+
+                controls.append(decrease, count, increase);
 
                 const remove = document.createElement("button");
                 remove.type = "button";
                 remove.className = "shopSummary__remove";
-                remove.textContent = "Retirer";
+                remove.innerHTML = `
+                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M6 2.5h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2" />
+                        <path d="M3.5 4h9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2" />
+                        <path d="M5 4.8v6.2c0 .7.5 1.2 1.2 1.2h3.6c.7 0 1.2-.5 1.2-1.2V4.8" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.2" />
+                        <path d="M6.8 6.2v4.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2" />
+                        <path d="M9.2 6.2v4.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2" />
+                    </svg>
+                `;
+                remove.setAttribute("aria-label", `Retirer ${item.name} du panier`);
+                remove.title = "Retirer";
                 remove.addEventListener("click", () => setQuantity(item, 0));
 
-                right.append(amount, remove);
+                right.append(amount, controls, remove);
                 line.append(left, right);
                 summaryLines.appendChild(line);
             }
@@ -551,9 +748,9 @@ export function initShopPage() {
         if (summaryDiscount) {
             summaryDiscount.hidden = promoEvaluation.discountCents <= 0;
             summaryDiscount.textContent =
-                promoEvaluation.discountCents > 0
-                    ? `Remise -${formatPrice(promoEvaluation.discountCents)}`
-                    : "";
+                promoEvaluation.discountCents > 0 ?
+                `Remise -${formatPrice(promoEvaluation.discountCents)}` :
+                "";
         }
 
         if (summaryTotal) {
@@ -572,9 +769,9 @@ export function initShopPage() {
         }
 
         if (summary) {
-            summary.hidden = isDesktopToast()
-                ? totalCount === 0 && !isSummaryOpen
-                : totalCount === 0;
+            summary.hidden = isDesktopToast() ?
+                totalCount === 0 && !isSummaryOpen :
+                totalCount === 0;
         }
 
         if (summaryOverlay) {
@@ -606,9 +803,9 @@ export function initShopPage() {
         if (goCheckoutButton) {
             goCheckoutButton.disabled = totalCount === 0;
             goCheckoutButton.textContent =
-                totalCount === 0
-                    ? "Continuer vers les informations"
-                    : `Continuer avec ${totalItems} ${totalItems === 1 ? "produit" : "produits"}`;
+                totalCount === 0 ?
+                "Continuer vers les informations" :
+                `Continuer avec ${totalItems} ${totalItems === 1 ? "produit" : "produits"}`;
         }
 
         if (summaryLines && totalCount === 0) {
@@ -625,42 +822,26 @@ export function initShopPage() {
         }
 
         snapshot.forEach((entry) => {
-            const item = items.get(Number.parseInt(entry.id, 10));
-            if (!item || !item.input) {
-                return;
-            }
-
             const stockQuantity = Math.max(0, Number.parseInt(entry.stock_quantity || 0, 10));
-            const allowed = stockQuantity;
 
-            item.stockQuantity = stockQuantity;
-            item.input.max = String(allowed);
-            item.input.value = String(clampQuantity(item.input.value, allowed));
-            item.input.disabled = allowed <= 0 || entry.is_active === false;
-            syncItemState(item);
-
-            item.node.classList.toggle("is-sold-out", allowed <= 0 || entry.is_active === false);
-            if (item.stockBadge) {
-                let label = `${stockQuantity} disponible(s)`;
-                let tone = "";
-
-                if (entry.is_active === false || allowed <= 0) {
-                    label = "Rupture";
-                    tone = " is-sold-out";
-                } else if (stockQuantity <= 5) {
-                    label = `Plus que ${stockQuantity} disponible(s)`;
-                    tone = " is-low";
+            items.forEach((item) => {
+                if (item.id !== (Number.parseInt(entry.id, 10) || 0) || !item.input) {
+                    return;
                 }
 
-                item.stockBadge.textContent = label;
-                item.stockBadge.className = `shopStockBadge${tone}`;
-            }
+                item.stockQuantity = stockQuantity;
+                const allowed = getAvailableOrderQuantity(item);
+                item.input.max = String(allowed);
+                item.input.value = String(clampQuantity(item.input.value, allowed));
+                item.input.disabled = (allowed <= 0 && getQuantity(item) <= 0) || entry.is_active === false;
+                syncItemState(item);
+            });
         });
 
         renderSummary();
     };
 
-    const refreshStock = async ({ silent = false } = {}) => {
+    const refreshStock = async({ silent = false } = {}) => {
         try {
             const response = await fetch(stockEndpoint, {
                 headers: {
@@ -689,7 +870,7 @@ export function initShopPage() {
 
     inputs.forEach((input) => {
         input.addEventListener("input", () => {
-            const item = items.get(Number.parseInt(input.getAttribute("data-item-id") || "0", 10));
+            const item = items.get(String(input.getAttribute("data-line-key") || "").trim());
             setQuantity(item, input.value);
         });
     });
@@ -702,28 +883,28 @@ export function initShopPage() {
 
     addButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            const item = items.get(Number.parseInt(button.getAttribute("data-item-id") || "0", 10));
-            setQuantity(item, 1);
+            const item = items.get(String(button.getAttribute("data-line-key") || "").trim());
+            setQuantity(item, getQuantity(item) + 1);
         });
     });
 
     increaseButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            const item = items.get(Number.parseInt(button.getAttribute("data-item-id") || "0", 10));
+            const item = items.get(String(button.getAttribute("data-line-key") || "").trim());
             setQuantity(item, getQuantity(item) + 1);
         });
     });
 
     decreaseButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            const item = items.get(Number.parseInt(button.getAttribute("data-item-id") || "0", 10));
+            const item = items.get(String(button.getAttribute("data-line-key") || "").trim());
             setQuantity(item, getQuantity(item) - 1);
         });
     });
 
     removeButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            const item = items.get(Number.parseInt(button.getAttribute("data-item-id") || "0", 10));
+            const item = items.get(String(button.getAttribute("data-line-key") || "").trim());
             setQuantity(item, 0);
         });
     });
@@ -842,8 +1023,7 @@ export function initShopPage() {
 
                 summary.scrollTop = Math.max(0, Math.min(maxScrollTop, nextScrollTop));
                 event.preventDefault();
-            },
-            { passive: false },
+            }, { passive: false },
         );
     }
 
@@ -861,8 +1041,7 @@ export function initShopPage() {
                 clearSummaryHideTimeout();
                 clearSummaryDragResetTimeout();
                 summary.style.willChange = "transform";
-            },
-            { passive: true },
+            }, { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -881,8 +1060,7 @@ export function initShopPage() {
                 }
 
                 applySummaryDrag(deltaY);
-            },
-            { passive: true },
+            }, { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -905,8 +1083,7 @@ export function initShopPage() {
                 summary.style.transition = "transform 220ms ease";
                 summary.style.transform = "translateY(0)";
                 scheduleSummaryDragReset();
-            },
-            { passive: true },
+            }, { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -921,8 +1098,7 @@ export function initShopPage() {
                 summary.style.transition = "transform 220ms ease";
                 summary.style.transform = "translateY(0)";
                 scheduleSummaryDragReset();
-            },
-            { passive: true },
+            }, { passive: true },
         );
     }
 
@@ -938,13 +1114,18 @@ export function initShopPage() {
         renderSummary();
     });
 
+    unbindDesktopQuickAddMedia = bindMediaQueryChange(desktopQuickAddMedia, () => {
+        renderSummary();
+    });
+
     window.addEventListener("beforeunload", () => {
         unbindDesktopToastMedia();
+        unbindDesktopQuickAddMedia();
     });
 
     window.addEventListener("resize", syncSummaryDockBounds);
 
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", async(event) => {
         event.preventDefault();
         setFeedback("");
 
@@ -959,7 +1140,7 @@ export function initShopPage() {
 
         const promoEvaluation = getPromoEvaluation(
             Array.from(items.values()).reduce(
-                (sum, item) => sum + getQuantity(item) * item.priceCents,
+                (sum, item) => sum + getQuantity(item) * getEffectivePriceCents(item),
                 0,
             ),
         );
@@ -985,22 +1166,22 @@ export function initShopPage() {
             const payload = await parseResponse(response);
 
             if (!response.ok) {
-                const conflictNames = Array.isArray(payload.conflicts)
-                    ? payload.conflicts
-                          .map((conflict) => {
-                              const name = conflict && conflict.name ? conflict.name : "Produit";
-                              const available =
-                                  Number.parseInt(conflict && conflict.available, 10) || 0;
-                              return `${name} (${available} dispo)`;
-                          })
-                          .join(", ")
-                    : "";
+                const conflictNames = Array.isArray(payload.conflicts) ?
+                    payload.conflicts
+                    .map((conflict) => {
+                        const name = conflict && conflict.name ? conflict.name : "Produit";
+                        const available =
+                            Number.parseInt(conflict && conflict.available, 10) || 0;
+                        return `${name} (${available} dispo)`;
+                    })
+                    .join(", ") :
+                    "";
 
                 setFeedback(
                     payload.error ||
-                        (conflictNames
-                            ? `Stock mis à jour: ${conflictNames}`
-                            : "Commande impossible pour le moment."),
+                    (conflictNames ?
+                        `Stock mis à jour: ${conflictNames}` :
+                        "Commande impossible pour le moment."),
                     "error",
                 );
 
@@ -1011,6 +1192,9 @@ export function initShopPage() {
             }
 
             form.reset();
+            syncFulfillmentState();
+            isSummaryPinned = false;
+            setSummaryOpen(false);
             if (Array.isArray(payload.stock)) {
                 applyStockSnapshot(payload.stock);
             } else {
@@ -1019,7 +1203,16 @@ export function initShopPage() {
             if (promoInput instanceof HTMLInputElement) {
                 promoInput.value = "";
             }
-            setFeedback(payload.message || "Votre commande a bien été enregistrée.", "success");
+            const successParts = [payload.message || "Votre commande a bien été enregistrée."];
+            if (payload.id) {
+                successParts.push(`Référence #${payload.id}.`);
+            }
+            if (payload.client_ack_sent === true) {
+                successParts.push("Un email de confirmation vient de vous être envoyé.");
+            } else if (payload.email_notifications === false) {
+                successParts.push("La confirmation affichée ici fait foi même sans email automatique immédiat.");
+            }
+            setFeedback(successParts.join(" "), "success");
         } catch {
             setFeedback("Une erreur réseau empêche l’envoi de la commande.", "error");
         } finally {

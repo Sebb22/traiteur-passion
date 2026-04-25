@@ -1,9 +1,11 @@
-export function initMenuTabs() {
-    const nav = document.querySelector("[data-menu-tabs]");
-    const panel = document.querySelector(".menuPanel--menu");
-    const shortcut = document.querySelector("[data-menu-tabs-shortcut]");
+function initMenuTabsInstance(nav) {
+    if (!(nav instanceof HTMLElement)) return;
 
-    if (!nav || !panel) return;
+    const panel = nav.closest(".menuPanel") || document.querySelector(".menuPanel--menu");
+    if (!(panel instanceof HTMLElement)) return;
+
+    const wheelRoot = nav.closest("[data-wheel-redirect]");
+    const shortcut = panel.querySelector("[data-menu-tabs-shortcut]");
 
     const isMobileViewport = () => window.matchMedia("(max-width: 1279px)").matches;
 
@@ -25,11 +27,34 @@ export function initMenuTabs() {
         return panel.querySelector(`[id="${id.replace(/"/g, '\\"')}"]`);
     };
 
-    const isPanelScrollable = () => {
-        const style = window.getComputedStyle(panel);
-        const overflowY = style.overflowY;
-        const allowsScroll = overflowY === "auto" || overflowY === "scroll";
-        return allowsScroll && panel.scrollHeight > panel.clientHeight + 2;
+    const hasScrollableRange = (element) => {
+        if (!(element instanceof HTMLElement)) return false;
+
+        return element.scrollHeight > element.clientHeight + 2;
+    };
+
+    const resolveWheelTarget = () => {
+        if (!(wheelRoot instanceof HTMLElement)) return null;
+
+        const targetSelector = wheelRoot.getAttribute("data-wheel-target");
+        if (!targetSelector) return null;
+
+        let target = wheelRoot.querySelector(targetSelector);
+        if (!target) target = document.querySelector(targetSelector);
+
+        return target instanceof HTMLElement ? target : null;
+    };
+
+    const resolveScrollContainer = () => {
+        const wheelTarget = resolveWheelTarget();
+        if (hasScrollableRange(wheelTarget)) return wheelTarget;
+
+        const rightColumn = nav.closest(".menuSplit__right");
+        if (hasScrollableRange(rightColumn)) return rightColumn;
+
+        if (hasScrollableRange(panel)) return panel;
+
+        return null;
     };
 
     const getScrollOffset = () => {
@@ -53,15 +78,22 @@ export function initMenuTabs() {
         window.scrollTo({ top: targetTop, behavior: "smooth" });
     };
 
+    const scrollContainerToElement = (container, element) => {
+        if (!(container instanceof HTMLElement) || !element) return;
+
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        const delta = elementRect.top - containerRect.top;
+        const targetTop = Math.max(0, container.scrollTop + delta - 8);
+        container.scrollTo({ top: targetTop, behavior: "smooth" });
+    };
+
     const scrollToSection = (section) => {
         if (!section) return;
 
-        if (isPanelScrollable()) {
-            const panelRect = panel.getBoundingClientRect();
-            const sectionRect = section.getBoundingClientRect();
-            const delta = sectionRect.top - panelRect.top;
-            const targetTop = Math.max(0, panel.scrollTop + delta - 8);
-            panel.scrollTo({ top: targetTop, behavior: "smooth" });
+        const scrollContainer = resolveScrollContainer();
+        if (scrollContainer) {
+            scrollContainerToElement(scrollContainer, section);
             return;
         }
 
@@ -85,7 +117,6 @@ export function initMenuTabs() {
         if (!isMobile) {
             nav.style.removeProperty("--menu-tabs-sticky-top");
             panel.style.removeProperty("--menu-section-scroll-margin");
-            if (shortcut) shortcut.classList.remove("is-visible");
             return;
         }
 
@@ -123,6 +154,12 @@ export function initMenuTabs() {
     };
 
     const scrollToTabs = () => {
+        const scrollContainer = resolveScrollContainer();
+        if (scrollContainer) {
+            scrollContainerToElement(scrollContainer, nav);
+            return;
+        }
+
         scrollWindowToElement(nav);
     };
 
@@ -173,9 +210,9 @@ export function initMenuTabs() {
         let nextIndex = currentIndex;
 
         if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % links.length;
-        else if (event.key === "ArrowLeft")
+        else if (event.key === "ArrowLeft") {
             nextIndex = (currentIndex - 1 + links.length) % links.length;
-        else if (event.key === "Home") nextIndex = 0;
+        } else if (event.key === "Home") nextIndex = 0;
         else if (event.key === "End") nextIndex = links.length - 1;
         else return;
 
@@ -200,8 +237,9 @@ export function initMenuTabs() {
             if (!isMobileViewport()) {
                 scrollActiveTabIntoView(active.link);
             }
-        }, {
-            root: isPanelScrollable() ? panel : null,
+        },
+        {
+            root: resolveScrollContainer(),
             rootMargin: "-18% 0px -60% 0px",
             threshold: [0.15, 0.35, 0.6],
         },
@@ -210,21 +248,20 @@ export function initMenuTabs() {
     sections.forEach(({ section }) => observer.observe(section));
 
     if (shortcut) {
+        const shortcutScrollContainer = resolveScrollContainer();
+
         shortcut.addEventListener("click", () => {
             scrollToTabs();
         });
 
         const toggleShortcut = () => {
-            if (!isMobileViewport()) {
-                shortcut.classList.remove("is-visible");
-                return;
-            }
-
             const navRect = nav.getBoundingClientRect();
             const header =
                 document.querySelector(".header__container") || document.querySelector(".header");
-            const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
-            const isPastTabs = navRect.bottom < headerBottom;
+            const mobileBoundary = header ? header.getBoundingClientRect().bottom : 0;
+            const desktopBoundary = 24;
+            const topBoundary = isMobileViewport() ? mobileBoundary : desktopBoundary;
+            const isPastTabs = navRect.bottom < topBoundary;
             shortcut.classList.toggle("is-visible", isPastTabs);
         };
 
@@ -234,5 +271,15 @@ export function initMenuTabs() {
         window.addEventListener("orientationchange", toggleShortcut, {
             passive: true,
         });
+        if (shortcutScrollContainer instanceof HTMLElement) {
+            shortcutScrollContainer.addEventListener("scroll", toggleShortcut, { passive: true });
+        }
     }
+}
+
+export function initMenuTabs() {
+    const navs = Array.from(document.querySelectorAll("[data-menu-tabs]"));
+    if (!navs.length) return;
+
+    navs.forEach((nav) => initMenuTabsInstance(nav));
 }

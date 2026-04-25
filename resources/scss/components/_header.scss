@@ -64,7 +64,6 @@
     }
 }
 
-
 /* ✅ IMPORTANT : nav desktop se masque sous 850 */
 
 .header__nav--desktop {
@@ -72,7 +71,6 @@
         display: none;
     }
 }
-
 
 /* ✅ sr-only accessible */
 
@@ -87,7 +85,6 @@
     white-space: nowrap;
     border: 0;
 }
-
 
 /* =========================
    MENU OVERLAY (QITCHEN)
@@ -113,7 +110,9 @@
         inset: 24px;
         border-radius: 28px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        background: radial-gradient(1200px 600px at 50% 0%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0)), #0b0b0b;
+        background:
+            radial-gradient(1200px 600px at 50% 0%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0)),
+            #0b0b0b;
         box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
         display: grid;
         grid-template-rows: auto 1fr;
@@ -192,7 +191,12 @@
         position: relative;
         height: 1px;
         width: min(50px, 100%);
-        background: linear-gradient( to right, rgba(239, 231, 210, 0), rgba(239, 231, 210, 0.16), rgba(239, 231, 210, 0));
+        background: linear-gradient(
+            to right,
+            rgba(239, 231, 210, 0),
+            rgba(239, 231, 210, 0.16),
+            rgba(239, 231, 210, 0)
+        );
         opacity: 0.9;
     }
     /* losanges “creux” */
@@ -250,7 +254,11 @@
         font-weight: 500;
         opacity: 0.92;
         transform: translateY(0);
-        transition: transform 240ms ease, opacity 240ms ease, filter 240ms ease, text-shadow 240ms ease;
+        transition:
+            transform 240ms ease,
+            opacity 240ms ease,
+            filter 240ms ease,
+            text-shadow 240ms ease;
         @media (max-width: 849px) {
             font-size: clamp(22px, 4vw, 50px);
         }
@@ -268,7 +276,9 @@
         color: rgba(239, 231, 210, 0.72);
         opacity: 0;
         transform: translateY(6px);
-        transition: transform 220ms ease, opacity 220ms ease;
+        transition:
+            transform 220ms ease,
+            opacity 220ms ease;
         @media (max-width: 849px) {
             display: none;
         }
@@ -300,7 +310,6 @@
     }
 }
 
-
 /* animation déco (tu peux garder la tienne) */
 
 @keyframes decoFade {
@@ -324,7 +333,6 @@
         transform: none;
     }
 }
-
 
 /* =========================================================
    TOGGLE (Qitchen) — force le rendu + animation
@@ -350,7 +358,10 @@
     color: inherit;
     line-height: 1;
     outline: none;
-    transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
     &:hover {
         background: rgba(255, 255, 255, 0.07);
         border-color: rgba(255, 255, 255, 0.18);
@@ -369,7 +380,6 @@
         border-radius: 14px;
     }
 }
-
 
 /* l’icône burger */
 
@@ -391,7 +401,10 @@
         height: 2px;
         border-radius: 2px;
         background: rgba(255, 255, 255, 0.9);
-        transition: transform 220ms ease, top 220ms ease, opacity 220ms ease;
+        transition:
+            transform 220ms ease,
+            top 220ms ease,
+            opacity 220ms ease;
     }
     &::before {
         top: -6px;
@@ -400,7 +413,6 @@
         top: 6px;
     }
 }
-
 
 /* hover “fusion” comme Qitchen */
 
@@ -411,7 +423,6 @@
 .header__toggle:hover .header__burger::after {
     transform: translateY(-6px);
 }
-
 
 /* ouvert -> croix */
 
@@ -428,7 +439,6 @@
     top: 0;
     transform: rotate(-45deg);
 }
-
 
 /* =========================
    HEADER — Qitchen-like pill
@@ -480,7 +490,6 @@
     }
 }
 
-
 /* Logo (image) — plus petit, comme Qitchen */
 
 .header__logo {
@@ -502,7 +511,6 @@
     }
 }
 
-
 /* NAV desktop centrée */
 
 .header__nav--desktop {
@@ -514,7 +522,6 @@
         display: none;
     }
 }
-
 
 /* Liens façon Qitchen */
 
@@ -530,7 +537,10 @@
     padding: 8px 10px;
     border-radius: 10px;
     text-align: center;
-    transition: color 180ms ease, background 180ms ease, opacity 180ms ease;
+    transition:
+        color 180ms ease,
+        background 180ms ease,
+        opacity 180ms ease;
     &:hover {
         color: rgba(239, 231, 210, 0.92);
         background: rgba(255, 255, 255, 0.04);
@@ -590,26 +600,34 @@
 }
 
 .sitePromoSticky {
-    position: sticky;
-    top: 8px;
-    z-index: 55;
-    padding: 0 0 0 0;
-    animation: promoBannerIn 0.7s cubic-bezier(.6, .2, .2, 1) both;
+    position: fixed;
+    top: 14px;
+    right: 20px;
+    left: auto;
+    transform: none;
+    z-index: 70;
+    width: min(360px, calc(100vw - 40px));
+    padding: 0;
+    pointer-events: none;
 }
 
 .sitePromoSticky__inner {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 14px 28px 14px 18px;
+    display: grid;
+    gap: 8px;
+    max-width: none;
+    margin: 0;
+    padding: 10px;
     border-radius: 22px;
-    border: 1.5px solid rgba(255, 220, 120, 0.22);
-    background: linear-gradient(90deg, #ffd36e 0%, #ffefc1 60%, #fff8e6 100%);
-    box-shadow: 0 8px 32px rgba(180, 120, 30, 0.10), 0 2px 8px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(255, 220, 120, 0.18);
+    background: linear-gradient(135deg, rgba(255, 243, 210, 0.9), rgba(255, 231, 178, 0.92));
+    box-shadow:
+        0 14px 32px rgba(180, 120, 30, 0.14),
+        0 2px 8px rgba(0, 0, 0, 0.08);
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(12px);
+    pointer-events: auto;
+    animation: promoBannerIn 0.7s cubic-bezier(0.6, 0.2, 0.2, 1) both;
 }
 
 // Petit pictogramme cadeau à gauche
@@ -622,7 +640,7 @@
     height: 38px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ffe7b2 60%, #ffd36e 100%);
-    box-shadow: 0 2px 8px rgba(180, 120, 30, 0.10);
+    box-shadow: 0 2px 8px rgba(180, 120, 30, 0.1);
     margin-right: 6px;
     font-size: 20px;
     color: #b88a2a;
@@ -631,11 +649,43 @@
 .sitePromoSticky__content {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.sitePromoSticky__desktopToggle {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    padding: 4px 6px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sitePromoSticky__summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.sitePromoSticky__code {
+    color: #a96e12;
+    font:
+        700 14px/1.1 "Inter",
+        system-ui,
+        sans-serif;
 }
 
 .sitePromoSticky__eyebrow {
-    font: 700 11px/1 "Inter", system-ui, sans-serif;
+    font:
+        700 10px/1 "Inter",
+        system-ui,
+        sans-serif;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: #b88a2a;
@@ -645,13 +695,49 @@
 .sitePromoSticky__text {
     margin: 0;
     color: #7a4c00;
-    font: 500 15px/1.6 "Inter", system-ui, sans-serif;
+    font:
+        500 13px/1.5 "Inter",
+        system-ui,
+        sans-serif;
     letter-spacing: 0.01em;
 }
 
 .sitePromoSticky__text strong {
     color: #b88a2a;
     font-weight: 700;
+}
+
+.sitePromoSticky__countdown {
+    color: #8a6414;
+    white-space: nowrap;
+    font:
+        600 12px/1.2 "Inter",
+        system-ui,
+        sans-serif;
+}
+
+.sitePromoSticky__details {
+    display: grid;
+    gap: 10px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 6px;
+    transform: translateY(-4px);
+    transition:
+        max-height 220ms ease,
+        opacity 180ms ease,
+        transform 180ms ease,
+        padding-top 180ms ease;
+}
+
+.sitePromoSticky:hover .sitePromoSticky__details,
+.sitePromoSticky.is-expanded .sitePromoSticky__details,
+.sitePromoSticky:focus-within .sitePromoSticky__details {
+    max-height: 140px;
+    opacity: 1;
+    padding-top: 4px;
+    transform: translateY(0);
 }
 
 .sitePromoSticky__tab {
@@ -666,7 +752,7 @@
     color: #b88a2a;
     border: 1.5px solid #ffe7b2;
     border-radius: 12px 0 0 12px;
-    box-shadow: 0 2px 8px rgba(180, 120, 30, 0.10);
+    box-shadow: 0 2px 8px rgba(180, 120, 30, 0.1);
     font-size: 15px;
     font-weight: 700;
     height: 44px;
@@ -676,7 +762,9 @@
     pointer-events: none;
     cursor: pointer;
     transform: translateX(110%);
-    transition: opacity 0.35s cubic-bezier(.7, .2, .2, 1), transform 0.35s cubic-bezier(.7, .2, .2, 1);
+    transition:
+        opacity 0.35s cubic-bezier(0.7, 0.2, 0.2, 1),
+        transform 0.35s cubic-bezier(0.7, 0.2, 0.2, 1);
     writing-mode: vertical-rl;
     text-orientation: mixed;
     letter-spacing: 0.12em;
@@ -690,17 +778,21 @@
 }
 
 .sitePromoSticky__link {
-    display: inline-block;
+    display: inline-flex;
+    width: fit-content;
     background: linear-gradient(90deg, #ffe7b2 0%, #f8bb2c 100%);
     color: #b88a2a;
     font-weight: 600;
-    border-radius: 8px;
-    padding: 7px 18px;
-    font-size: 15px;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
     letter-spacing: 0.04em;
     box-shadow: 0 2px 8px rgba(180, 120, 30, 0.07);
     border: none;
-    transition: background 0.22s, color 0.22s, box-shadow 0.22s;
+    transition:
+        background 0.22s,
+        color 0.22s,
+        box-shadow 0.22s;
     text-decoration: none;
     margin-left: 10px;
 }
@@ -714,11 +806,20 @@
 @keyframes promoBannerIn {
     from {
         opacity: 0;
-        transform: translateY(-18px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
-        transform: none;
+        transform: translateY(0);
+    }
+}
+
+@media (min-width: 850px) {
+    .sitePromoSticky__handle {
+        display: none;
+    }
+    .sitePromoSticky__tab {
+        display: none !important;
     }
 }
 
@@ -742,9 +843,13 @@
         position: fixed !important;
         top: 0;
         left: 0;
+        right: auto;
+        transform: none;
         width: 100vw;
         max-width: 100vw;
-        transition: transform 0.35s cubic-bezier(.7, .2, .2, 1), opacity 0.25s;
+        transition:
+            transform 0.35s cubic-bezier(0.7, 0.2, 0.2, 1),
+            opacity 0.25s;
         will-change: transform, opacity;
         z-index: 120 !important;
         padding-top: 10px;
@@ -769,6 +874,24 @@
         top: 0;
         z-index: 2;
     }
+    .sitePromoSticky__desktopToggle {
+        padding: 0;
+        cursor: default;
+    }
+    .sitePromoSticky__summary {
+        gap: 6px;
+    }
+    .sitePromoSticky__code {
+        font-size: 13px;
+    }
+    .sitePromoSticky__details {
+        display: contents;
+        max-height: none;
+        opacity: 1;
+        overflow: visible;
+        padding: 0;
+        transform: none;
+    }
     .sitePromoSticky__handle::before {
         content: "";
         display: block;
@@ -778,7 +901,7 @@
         background: #d1b16a;
         opacity: 0.7;
         margin: 0 auto;
-        box-shadow: 0 1px 4px rgba(180, 120, 30, 0.10);
+        box-shadow: 0 1px 4px rgba(180, 120, 30, 0.1);
     }
     .sitePromoSticky.is-hidden {
         transform: translateY(-80%) scale(0.98);
@@ -797,7 +920,7 @@
         color: #b88a2a;
         border: 1.5px solid #ffe7b2;
         border-radius: 12px 0 0 12px;
-        box-shadow: 0 2px 8px rgba(180, 120, 30, 0.10);
+        box-shadow: 0 2px 8px rgba(180, 120, 30, 0.1);
         font-size: 15px;
         font-weight: 700;
         height: 95px;
@@ -805,7 +928,9 @@
         padding: 0 10px;
         opacity: 0.92;
         cursor: pointer;
-        transition: opacity 0.18s, right 0.3s;
+        transition:
+            opacity 0.18s,
+            right 0.3s;
         writing-mode: vertical-rl;
         text-orientation: mixed;
         letter-spacing: 0.12em;
@@ -819,7 +944,9 @@
         transform: translateY(-120%) scale(0.98) !important;
         opacity: 0 !important;
         pointer-events: none !important;
-        transition: transform 0.45s cubic-bezier(.7,.2,.2,1), opacity 0.32s !important;
+        transition:
+            transform 0.45s cubic-bezier(0.7, 0.2, 0.2, 1),
+            opacity 0.32s !important;
     }
 }
 
@@ -846,7 +973,6 @@
     }
 }
 
-
 /* CTA “Book a table” style */
 
 .header__cta {
@@ -864,7 +990,10 @@
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
     &:hover {
         background: rgba(255, 255, 255, 0.06);
         border-color: rgba(239, 231, 210, 0.24);
@@ -882,7 +1011,6 @@
     background: rgba(255, 255, 255, 0.09);
     border-color: rgba(239, 231, 210, 0.34);
 }
-
 
 /* Toggle: déjà bon chez toi — on harmonise juste la taille */
 

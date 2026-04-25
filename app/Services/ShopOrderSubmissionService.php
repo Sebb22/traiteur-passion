@@ -9,7 +9,7 @@ final class ShopOrderSubmissionService
     private const FULFILLMENT_DELIVERY = 'delivery';
 
     /**
-     * @return array{success:bool,status:int,error?:string,customerData?:array<string,mixed>,quantities?:array<int,int>}
+     * @return array{success:bool,status:int,error?:string,customerData?:array<string,mixed>,selections?:list<array{item_id:int,quantity:int,option_id:int|null,option_label:string|null,option_units:int|null}>}
      */
     public function parse(array $post, string $method): array
     {
@@ -89,17 +89,30 @@ final class ShopOrderSubmissionService
             }
         }
 
-        $quantities = [];
-        $raw        = is_array($post['shop_quantity'] ?? null) ? $post['shop_quantity'] : [];
-        foreach ($raw as $itemId => $quantity) {
-            $itemId   = (int) $itemId;
+        $selections      = [];
+        $raw             = is_array($post['shop_quantity'] ?? null) ? $post['shop_quantity'] : [];
+        $rawItems        = is_array($post['shop_item'] ?? null) ? $post['shop_item'] : [];
+        $rawOptions      = is_array($post['shop_option'] ?? null) ? $post['shop_option'] : [];
+        $rawOptionLabels = is_array($post['shop_option_label'] ?? null) ? $post['shop_option_label'] : [];
+        $rawOptionUnits  = is_array($post['shop_option_units'] ?? null) ? $post['shop_option_units'] : [];
+        foreach ($raw as $lineKey => $quantity) {
+            $itemId   = (int) ($rawItems[$lineKey] ?? 0);
             $quantity = (int) $quantity;
             if ($itemId > 0 && $quantity > 0) {
-                $quantities[$itemId] = min(999, $quantity);
+                $optionId     = (int) ($rawOptions[$lineKey] ?? 0);
+                $optionLabel  = trim((string) ($rawOptionLabels[$lineKey] ?? ''));
+                $optionUnits  = (int) ($rawOptionUnits[$lineKey] ?? 0);
+                $selections[] = [
+                    'item_id'      => $itemId,
+                    'quantity'     => min(999, $quantity),
+                    'option_id'    => $optionId > 0 ? $optionId : null,
+                    'option_label' => $optionLabel !== '' ? $optionLabel : null,
+                    'option_units' => $optionUnits > 0 ? $optionUnits : null,
+                ];
             }
         }
 
-        if ($quantities === []) {
+        if ($selections === []) {
             return [
                 'success' => false,
                 'status'  => 400,
@@ -123,7 +136,7 @@ final class ShopOrderSubmissionService
                 'message'              => $this->nullableTrim($post['message'] ?? null),
                 'promo_code'           => $this->nullableTrim($post['promo_code'] ?? null),
             ],
-            'quantities'   => $quantities,
+            'selections'   => $selections,
         ];
     }
 

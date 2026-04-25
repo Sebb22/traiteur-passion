@@ -6,7 +6,6 @@ export function initAdminCatalog() {
     const sectionOrderForm = document.getElementById("catalogSectionOrderForm");
 
     if (sectionList && sectionOrderInput && sectionOrderForm) {
-        let draggedSection = null;
         const sections = Array.from(sectionList.querySelectorAll("[data-section-id]"));
 
         sections.forEach((section) => {
@@ -23,46 +22,13 @@ export function initAdminCatalog() {
             });
         });
 
-        const syncSectionOrder = () => {
-            const ids = Array.from(sectionList.querySelectorAll("[data-section-id]")).map((node) =>
-                node.getAttribute("data-section-id"),
-            );
-            sectionOrderInput.value = ids.join(",");
-        };
-
-        syncSectionOrder();
-
-        sections.forEach((section) => {
-            section.addEventListener("dragstart", () => {
-                draggedSection = section;
-                section.classList.add("is-dragging");
-            });
-
-            section.addEventListener("dragend", () => {
-                section.classList.remove("is-dragging");
-                draggedSection = null;
-            });
-
-            section.addEventListener("dragover", (event) => {
-                event.preventDefault();
-                if (!draggedSection || draggedSection === section) {
-                    return;
-                }
-
-                const rect = section.getBoundingClientRect();
-                const before = event.clientY < rect.top + rect.height / 2;
-                if (before) {
-                    sectionList.insertBefore(draggedSection, section);
-                } else {
-                    sectionList.insertBefore(draggedSection, section.nextSibling);
-                }
-            });
-
-            section.addEventListener("drop", (event) => {
-                event.preventDefault();
-                syncSectionOrder();
-                sectionOrderForm.submit();
-            });
+        initReorderableList({
+            list: sectionList,
+            nodeSelector: "[data-section-id]",
+            idAttribute: "data-section-id",
+            input: sectionOrderInput,
+            form: sectionOrderForm,
+            scope: "sections",
         });
     }
 
@@ -71,56 +37,267 @@ export function initAdminCatalog() {
         const input = document.getElementById(`catalogItemOrderInput-${sectionId}`);
         const form = document.getElementById(`catalogItemOrderForm-${sectionId}`);
 
-        if (!input || !form) {
+        if (!input || !form || !sectionId) {
             return;
         }
 
-        let draggedItem = null;
-
-        const syncItemOrder = () => {
-            const ids = Array.from(itemList.querySelectorAll("[data-item-id]")).map((node) =>
-                node.getAttribute("data-item-id"),
-            );
-            input.value = ids.join(",");
-        };
-
-        syncItemOrder();
-
-        itemList.querySelectorAll("[data-item-id]").forEach((item) => {
-            item.addEventListener("dragstart", () => {
-                draggedItem = item;
-                item.classList.add("is-dragging");
-            });
-
-            item.addEventListener("dragend", () => {
-                item.classList.remove("is-dragging");
-                draggedItem = null;
-            });
-
-            item.addEventListener("dragover", (event) => {
-                event.preventDefault();
-                if (!draggedItem || draggedItem === item) {
-                    return;
-                }
-
-                const rect = item.getBoundingClientRect();
-                const before = event.clientY < rect.top + rect.height / 2;
-                if (before) {
-                    itemList.insertBefore(draggedItem, item);
-                } else {
-                    itemList.insertBefore(draggedItem, item.nextSibling);
-                }
-            });
-
-            item.addEventListener("drop", (event) => {
-                event.preventDefault();
-                syncItemOrder();
-                form.submit();
-            });
+        initReorderableList({
+            list: itemList,
+            nodeSelector: "[data-item-id]",
+            idAttribute: "data-item-id",
+            input,
+            form,
+            scope: `items-${sectionId}`,
         });
     });
 
     initCatalogImageUploadUX();
+}
+
+function initReorderableList({ list, nodeSelector, idAttribute, input, form, scope }) {
+    if (!(list instanceof HTMLElement) || !(input instanceof HTMLInputElement) || !(form instanceof HTMLFormElement)) {
+        return;
+    }
+
+    const toggleButton = document.querySelector(`[data-reorder-toggle="${scope}"]`);
+    const saveButton = document.querySelector(`[data-reorder-save="${scope}"]`);
+    const cancelButton = document.querySelector(`[data-reorder-cancel="${scope}"]`);
+    const manualMode =
+        toggleButton instanceof HTMLButtonElement &&
+        saveButton instanceof HTMLButtonElement &&
+        cancelButton instanceof HTMLButtonElement;
+    const allowDrag = list.getAttribute("data-reorder-method") !== "buttons";
+
+    let active = !manualMode;
+    let draggedNode = null;
+    let armedNode = null;
+    let originalOrder = [];
+
+    const getNodes = () => Array.from(list.querySelectorAll(nodeSelector));
+    const getNodeId = (node) => String(node.getAttribute(idAttribute) || "").trim();
+    const getOrder = () => getNodes().map((node) => getNodeId(node)).filter(Boolean);
+    const isDirty = () => getOrder().join(",") !== originalOrder.join(",");
+
+    const syncOrder = () => {
+        input.value = getOrder().join(",");
+    };
+
+    const applyOrder = (orderedIds) => {
+        const nodeMap = new Map(getNodes().map((node) => [getNodeId(node), node]));
+        orderedIds.forEach((id) => {
+            const node = nodeMap.get(id);
+            if (node) {
+                list.appendChild(node);
+            }
+        });
+        syncOrder();
+    };
+
+    const renderState = () => {
+        list.classList.toggle("is-reorder-active", manualMode && active);
+        list.classList.toggle("is-reorder-dirty", manualMode && isDirty());
+
+        getNodes().forEach((node) => {
+            node.draggable = active && allowDrag;
+            node.classList.toggle("is-reorder-mode", manualMode && active);
+        });
+
+        if (manualMode) {
+            toggleButton.textContent = active ? "Quitter le mode tri" : "Réordonner";
+            saveButton.hidden = !active;
+            cancelButton.hidden = !active;
+            saveButton.disabled = !isDirty();
+            cancelButton.disabled = !isDirty();
+        }
+    };
+
+    const resetArmedDrag = () => {
+        armedNode = null;
+    };
+
+    const saveOrder = () => {
+        syncOrder();
+        form.submit();
+    };
+
+    syncOrder();
+    originalOrder = getOrder();
+    renderState();
+
+    if (manualMode) {
+        toggleButton.addEventListener("click", () => {
+            if (active) {
+                if (isDirty()) {
+                    const shouldDiscard = window.confirm("Annuler le nouvel ordre non enregistré ?");
+                    if (!shouldDiscard) {
+                        return;
+                    }
+                    applyOrder(originalOrder);
+                }
+
+                active = false;
+                draggedNode = null;
+                resetArmedDrag();
+                renderState();
+                return;
+            }
+
+            originalOrder = getOrder();
+            active = true;
+            renderState();
+        });
+
+        saveButton.addEventListener("click", () => {
+            if (!isDirty()) {
+                return;
+            }
+
+            saveOrder();
+        });
+
+        cancelButton.addEventListener("click", () => {
+            applyOrder(originalOrder);
+            renderState();
+        });
+    }
+
+    getNodes().forEach((node) => {
+        const handles = Array.from(node.querySelectorAll("[data-drag-handle]"));
+        const moveButtons = Array.from(node.querySelectorAll("[data-reorder-move]"));
+        const summary = node.querySelector("summary");
+
+        if (summary instanceof HTMLElement) {
+            summary.addEventListener("click", (event) => {
+                if (!active) {
+                    return;
+                }
+
+                event.preventDefault();
+            });
+        }
+
+        handles.forEach((handle) => {
+            const armDrag = (event) => {
+                if (!active || !allowDrag) {
+                    return;
+                }
+
+                armedNode = node;
+
+                if (event.type === "click") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            };
+
+            handle.addEventListener("pointerdown", armDrag);
+            handle.addEventListener("mousedown", armDrag);
+            handle.addEventListener("click", armDrag);
+        });
+
+        moveButtons.forEach((button) => {
+            button.addEventListener("click", (event) => {
+                if (!active) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const direction = button.getAttribute("data-reorder-move");
+                const nodes = getNodes();
+                const index = nodes.indexOf(node);
+
+                if (direction === "up" && index > 0) {
+                    list.insertBefore(node, nodes[index - 1]);
+                }
+
+                if (direction === "down" && index >= 0 && index < nodes.length - 1) {
+                    list.insertBefore(nodes[index + 1], node);
+                }
+
+                syncOrder();
+                renderState();
+            });
+        });
+
+        node.addEventListener("dragstart", (event) => {
+            if (!allowDrag || !active || (handles.length > 0 && armedNode !== node)) {
+                event.preventDefault();
+                return;
+            }
+
+            draggedNode = node;
+            node.classList.add("is-dragging");
+
+            if (event.dataTransfer) {
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", getNodeId(node));
+            }
+        });
+
+        node.addEventListener("dragend", () => {
+            node.classList.remove("is-dragging");
+            draggedNode = null;
+            resetArmedDrag();
+            syncOrder();
+            renderState();
+        });
+    });
+
+    list.addEventListener("dragover", (event) => {
+        if (!allowDrag || !active || !draggedNode) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const nextNode = getDragAfterElement(list, nodeSelector, draggedNode, event.clientY);
+        if (!nextNode) {
+            list.appendChild(draggedNode);
+        } else {
+            list.insertBefore(draggedNode, nextNode);
+        }
+
+        syncOrder();
+        renderState();
+    });
+
+    list.addEventListener("drop", (event) => {
+        if (!allowDrag || !active || !draggedNode) {
+            return;
+        }
+
+        event.preventDefault();
+        syncOrder();
+
+        if (!manualMode) {
+            saveOrder();
+            return;
+        }
+
+        renderState();
+    });
+}
+
+function getDragAfterElement(list, nodeSelector, draggedNode, clientY) {
+    const sortableNodes = Array.from(list.querySelectorAll(nodeSelector)).filter((node) => node !== draggedNode);
+
+    let closest = {
+        offset: Number.NEGATIVE_INFINITY,
+        node: null,
+    };
+
+    sortableNodes.forEach((node) => {
+        const rect = node.getBoundingClientRect();
+        const offset = clientY - rect.top - rect.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+            closest = { offset, node };
+        }
+    });
+
+    return closest.node;
 }
 
 function initCatalogWorkspaceTools() {

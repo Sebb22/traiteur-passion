@@ -84,7 +84,7 @@
             <div class="adminPanelHead__row">
                 <div>
                     <h2 class="adminTitle">Editer la carte</h2>
-                    <p class="adminSubtitle">Organisez vos rubriques, mettez à jour vos produits et gérez leurs images depuis une interface plus directe.</p>
+                    <p class="adminSubtitle">Organisez vos sections, mettez à jour vos produits et gérez leurs images depuis une interface plus directe.</p>
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
@@ -120,7 +120,7 @@
                 <div class="statCard__value"><?php echo $activeSections; ?></div>
             </div>
             <div class="statCard">
-                <div class="statCard__label">Items visibles</div>
+                <div class="statCard__label">Produits visibles</div>
                 <div class="statCard__value"><?php echo $activeItems; ?></div>
             </div>
             <div class="statCard">
@@ -132,9 +132,9 @@
         <section class="adminCatalogUtilityGrid" aria-label="Outils carte">
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Retrouver rapidement une rubrique</div>
+                    <div class="adminCard__title">Retrouver rapidement un produit</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint">Cherchez une section ou un produit sans recharger la page</span>
+                        <span class="adminHint">Cherchez une section ou un produit sans quitter l'écran</span>
                     </div>
                 </div>
 
@@ -168,7 +168,7 @@
                 <div class="adminCard__head">
                     <div class="adminCard__title">Repères d'édition</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint">Ce qui est masqué n'est pas supprimé, seulement retiré de l'affichage public</span>
+                        <span class="adminHint">La carte se pilote par visibilité des contenus et qualité de présentation</span>
                     </div>
                 </div>
 
@@ -178,11 +178,11 @@
                         <div class="adminStatusPill__value"><?php echo $inactiveSections; ?></div>
                     </div>
                     <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Items masques</div>
+                        <div class="adminStatusPill__label">Produits masqués</div>
                         <div class="adminStatusPill__value"><?php echo $inactiveItems; ?></div>
                     </div>
                     <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Options masquees</div>
+                        <div class="adminStatusPill__label">Options masquées</div>
                         <div class="adminStatusPill__value"><?php echo $inactiveOptions; ?></div>
                     </div>
                     <div class="adminStatusPill">
@@ -193,38 +193,11 @@
             </article>
         </section>
 
-        <section class="adminCard adminCard--padded adminCatalogGuideCard">
-            <div class="adminCard__head">
-                <div class="adminCard__title">Mode d'emploi</div>
-                <div class="adminCard__meta">
-                    <span class="adminHint">Trois réflexes simples pour garder la carte claire et à jour</span>
-                </div>
-            </div>
-
-            <div class="adminCatalogGuideGrid">
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">1. Structurer</div>
-                    <div class="adminQuickLinkCard__title">Section puis produit</div>
-                    <div class="adminQuickLinkCard__meta">Créez d'abord une section, puis ajoutez vos produits et leurs options à l'intérieur.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">2. Image</div>
-                    <div class="adminQuickLinkCard__title">Prévisualiser puis enregistrer</div>
-                    <div class="adminQuickLinkCard__meta">Ajoutez un fichier, lancez l'aperçu si besoin, puis utilisez le bouton d'enregistrement de l'image.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">3. Publication</div>
-                    <div class="adminQuickLinkCard__title">Masquer sans supprimer</div>
-                    <div class="adminQuickLinkCard__meta">Décochez “Visible” pour retirer un contenu du site tout en le conservant pour plus tard.</div>
-                </div>
-            </div>
-        </section>
-
         <section class="adminCard adminCatalogCreateSection">
             <div class="adminCard__head">
                 <div class="adminCard__title">Ajouter une section</div>
                 <div class="adminCard__meta">
-                    <span class="adminHint">Le slug est auto-généré si tu le laisses vide.</span>
+                    <span class="adminHint">Le slug est auto-généré si vous le laissez vide.</span>
                 </div>
             </div>
             <div class="adminCatalogBody">
@@ -258,7 +231,20 @@
             <input type="hidden" name="section_ids" id="catalogSectionOrderInput" value="">
         </form>
 
-        <div class="adminCatalogList" data-section-sortable>
+        <div class="adminCatalogItemsHead adminCatalogItemsHead--reorder">
+            <div>
+                <div class="adminCatalogOptions__title">Organisation des sections</div>
+                <span class="adminHint">Activez le mode tri, glissez avec la poignée puis enregistrez l'ordre.</span>
+            </div>
+            <div class="adminInlineActions adminInlineActions--reorder">
+                <button type="button" class="adminBtn" data-reorder-toggle="sections">Réordonner</button>
+                <button type="button" class="adminBtn adminBtn--primary" data-reorder-save="sections" hidden
+                    disabled>Enregistrer l'ordre</button>
+                <button type="button" class="adminBtn" data-reorder-cancel="sections" hidden>Annuler</button>
+            </div>
+        </div>
+
+        <div class="adminCatalogList" data-section-sortable data-reorder-scope="sections">
             <?php foreach ($sections as $section): ?>
             <?php
                 $sectionName   = (string) ($section['name'] ?? 'Section');
@@ -267,7 +253,7 @@
                 $sectionState  = ! empty($section['is_active']) ? 'Visible' : 'Masquee';
             ?>
             <details class="adminCard adminCatalogSection" id="section-<?php echo (int) $section['id']; ?>"
-                data-section-id="<?php echo (int) $section['id']; ?>" draggable="true"
+                data-section-id="<?php echo (int) $section['id']; ?>" draggable="false"
                 data-catalog-section data-catalog-search-text="<?php echo $e($sectionSearch); ?>">
                 <summary class="adminCard__head adminCatalogSection__summary">
                     <div>
@@ -281,7 +267,7 @@
                     </div>
                     <div class="adminCatalogSection__headActions" aria-hidden="true">
                         <span class="adminCatalogSection__chevron">▾</span>
-                        <span class="adminDragHandle">↕</span>
+                        <span class="adminDragHandle" data-drag-handle>↕</span>
                     </div>
                 </summary>
 
@@ -310,7 +296,7 @@
                                             <?php echo ! empty($section['is_active']) ? 'checked' : ''; ?>>
                                     </label>
                                 </div>
-                                <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la liste.</span>
+                                <span class="adminHint">Le slug reste stable et l'ordre se gère depuis le tri de la liste.</span>
 
                                 <label class="adminField">
                                     <span class="adminField__label">Description</span>
@@ -342,7 +328,7 @@
                                 method="post" enctype="multipart/form-data" class="adminForm adminForm--create">
                                 <div class="adminCatalogEditorGrid">
                                     <section class="adminEditorBlock adminEditorBlock--nested">
-                                        <div class="adminCatalogSubsection">Identité produit</div>
+                                        <div class="adminCatalogSubsection">Identité du produit</div>
                                         <div class="adminFieldGrid">
                                             <label class="adminField">
                                                 <span class="adminField__label">Nom</span>
@@ -358,7 +344,7 @@
                                                 <input class="adminCheckbox" type="checkbox" name="is_active" value="1" checked>
                                             </label>
                                         </div>
-                                        <span class="adminHint">Le slug et l'ordre d'affichage sont geres automatiquement.</span>
+                                        <span class="adminHint">Le slug et l'ordre d'affichage sont gérés automatiquement.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
@@ -417,11 +403,24 @@
                     </form>
 
                     <div class="adminCatalogItemsHead">
-                        <div class="adminCatalogOptions__title">Produits de la section</div>
-                        <span class="adminHint">Ouvrez un produit pour modifier ses informations, son image et ses options.</span>
+                        <div>
+                            <div class="adminCatalogOptions__title">Produits de la section</div>
+                            <span class="adminHint">Ouvrez un produit pour modifier ses informations, son image et ses options.</span>
+                        </div>
+                        <div class="adminInlineActions adminInlineActions--reorder">
+                            <button type="button" class="adminBtn"
+                                data-reorder-toggle="items-<?php echo (int) $section['id']; ?>">Réordonner</button>
+                            <button type="button" class="adminBtn adminBtn--primary"
+                                data-reorder-save="items-<?php echo (int) $section['id']; ?>" hidden
+                                disabled>Enregistrer l'ordre</button>
+                            <button type="button" class="adminBtn"
+                                data-reorder-cancel="items-<?php echo (int) $section['id']; ?>" hidden>Annuler</button>
+                        </div>
                     </div>
                     <div class="adminCatalogItems" data-item-sortable
-                        data-section-id="<?php echo (int) $section['id']; ?>">
+                        data-section-id="<?php echo (int) $section['id']; ?>"
+                        data-reorder-scope="items-<?php echo (int) $section['id']; ?>"
+                        data-reorder-method="buttons">
                         <?php foreach (($section['items'] ?? []) as $item): ?>
                         <?php
                             $itemSearch = strtolower(trim(
@@ -438,7 +437,7 @@
                             $itemDescriptionPreview = trim((string) ($item['short_description'] ?? ''));
                         ?>
                         <details class="adminCatalogItem" id="item-<?php echo (int) $item['id']; ?>"
-                            data-item-id="<?php echo (int) $item['id']; ?>" draggable="true"
+                            data-item-id="<?php echo (int) $item['id']; ?>" draggable="false"
                             data-catalog-item data-catalog-search-text="<?php echo $e($itemSearch); ?>">
                             <summary class="adminCatalogItem__summary">
                                 <div class="adminCatalogItem__summaryMain">
@@ -455,7 +454,12 @@
                                     <p class="adminCatalogItem__summaryText"><?php echo $e($itemDescriptionPreview); ?></p>
                                     <?php endif; ?>
                                 </div>
-                                <span class="adminCatalogItem__drag" aria-hidden="true">↕</span>
+                                <div class="adminCatalogItem__reorderTools">
+                                    <button type="button" class="adminOrderStep" data-reorder-move="up"
+                                        aria-label="Monter ce produit">↑</button>
+                                    <button type="button" class="adminOrderStep" data-reorder-move="down"
+                                        aria-label="Descendre ce produit">↓</button>
+                                </div>
                             </summary>
 
                             <div class="adminCatalogItem__body">
@@ -481,7 +485,7 @@
                                                         <?php echo ! empty($item['is_active']) ? 'checked' : ''; ?>>
                                                 </label>
                                             </div>
-                                            <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la section.</span>
+                                            <span class="adminHint">Le slug reste stable et l'ordre se gère depuis le tri de la section.</span>
                                         </section>
 
                                         <section class="adminEditorBlock adminEditorBlock--nested">

@@ -791,6 +791,10 @@
     gap: 16px;
 }
 
+.adminCatalogEditorGrid--stacked {
+    gap: 12px;
+}
+
 .adminEditorBlock {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.07);
@@ -919,6 +923,18 @@
     background: rgba(255, 255, 255, 0.025);
 }
 
+.adminCatalogItemsHead--reorder {
+    margin: 0 12px 16px;
+}
+
+.adminCatalogItemsHead--item {
+    align-items: center;
+    padding: 10px 12px;
+    background:
+        linear-gradient(180deg, rgba(239, 231, 210, 0.035), rgba(255, 255, 255, 0.018)),
+        rgba(255, 255, 255, 0.02);
+}
+
 .adminDragHandle {
     display: inline-flex;
     align-items: center;
@@ -931,9 +947,22 @@
     height: 42px;
     cursor: grab;
     font-size: 18px;
+    opacity: 0.42;
+    transition:
+        opacity 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
     &:active {
         cursor: grabbing;
     }
+}
+
+.adminInlineActions--reorder {
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 0;
+    border-top: 0;
 }
 
 .adminForm {
@@ -972,6 +1001,10 @@
 
 .adminField--sm {
     grid-column: span 2;
+}
+
+.adminField--full {
+    grid-column: 1 / -1;
 }
 
 .adminField--checkbox {
@@ -1119,6 +1152,40 @@
     gap: 14px;
 }
 
+.adminCatalogList.is-reorder-active,
+.adminCatalogItems.is-reorder-active {
+    position: relative;
+}
+
+.adminCatalogList.is-reorder-active::before,
+.adminCatalogItems.is-reorder-active::before {
+    content: "Mode tri actif";
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(239, 231, 210, 0.16);
+    background: rgba(239, 231, 210, 0.06);
+    color: rgba(239, 231, 210, 0.82);
+    font:
+        700 10px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.adminCatalogList.is-reorder-dirty::before,
+.adminCatalogItems.is-reorder-dirty::before {
+    content: "Nouvel ordre à enregistrer";
+    border-color: rgba(216, 177, 72, 0.28);
+    background: rgba(216, 177, 72, 0.12);
+    color: rgba(255, 231, 164, 0.9);
+}
+
 .adminCatalogItem {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.07);
@@ -1161,7 +1228,7 @@
     background: rgba(255, 255, 255, 0.018);
     transition: background 0.2s ease;
     strong {
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1.3;
     }
     span {
@@ -1192,20 +1259,76 @@
     font-size: 13px;
     line-height: 1.6;
     color: rgba(229, 229, 229, 0.76);
+    line-clamp: 2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .adminCatalogItem__drag {
     margin-left: auto;
-    font-size: 18px !important;
-    opacity: 0.8 !important;
+    font-size: 16px !important;
+    opacity: 0.58 !important;
     cursor: grab;
 }
 
+.adminCatalogItem__reorderTools {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.adminOrderStep {
+    display: none;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    border: 1px solid rgba(239, 231, 210, 0.14);
+    background: rgba(255, 255, 255, 0.035);
+    color: rgba(239, 231, 210, 0.84);
+    font:
+        700 13px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    cursor: pointer;
+}
+
+.adminCatalogItems.is-reorder-active .adminOrderStep {
+    display: inline-flex;
+}
+
+.adminOrderStep:hover {
+    background: rgba(239, 231, 210, 0.08);
+    border-color: rgba(239, 231, 210, 0.22);
+}
+
+.is-reorder-active .adminDragHandle,
+.is-reorder-active .adminCatalogItem__drag,
+.adminCatalogSection.is-reorder-mode .adminDragHandle,
+.adminCatalogItem.is-reorder-mode .adminCatalogItem__drag {
+    opacity: 0.92 !important;
+}
+
+.adminCatalogSection.is-reorder-mode,
+.adminCatalogItem.is-reorder-mode {
+    box-shadow: inset 0 0 0 1px rgba(239, 231, 210, 0.08);
+}
+
+.adminCatalogSection.is-reorder-mode .adminCatalogSection__summary,
+.adminCatalogItem.is-reorder-mode .adminCatalogItem__summary {
+    user-select: none;
+}
+
 .adminCatalogItem__body {
-    padding: 14px 16px 16px;
+    padding: 12px 14px 14px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -1214,6 +1337,15 @@
     flex-direction: column;
     gap: 12px;
     padding-top: 2px;
+}
+
+.adminCatalogOptions__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .adminImagePreview {

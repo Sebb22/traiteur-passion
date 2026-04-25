@@ -16,6 +16,53 @@ use App\Services\ShopPromoService;
 
 final class AdminController
 {
+
+    // Gestion des options d'achat (lots) pour la boutique
+    public function createShopItemOption(string $itemId): void
+    {
+        AdminAuth::requireAuth();
+        $itemIdInt = (int) $itemId;
+        try {
+            $shopModel = new Shop();
+            $newId     = $shopModel->createItemOption($itemIdInt, $_POST);
+            $this->pushFlash('success', 'Option d\'achat créée.');
+            $this->redirectShop('#item-' . $itemIdInt);
+        } catch (\Throwable $e) {
+            error_log('Shop item option create error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de créer l\'option d\'achat.');
+            $this->redirectShop('#item-' . $itemIdInt);
+        }
+    }
+
+    public function updateShopItemOption(string $optionId): void
+    {
+        AdminAuth::requireAuth();
+        $optionIdInt = (int) $optionId;
+        try {
+            $shopModel = new Shop();
+            $shopModel->updateItemOption($optionIdInt, $_POST);
+            $this->pushFlash('success', 'Option d\'achat mise à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop item option update error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de mettre à jour l\'option d\'achat.');
+        }
+        $this->redirectShop('#option-' . $optionIdInt);
+    }
+
+    public function deleteShopItemOption(string $optionId): void
+    {
+        AdminAuth::requireAuth();
+        $optionIdInt = (int) $optionId;
+        try {
+            $shopModel = new Shop();
+            $shopModel->deleteItemOption($optionIdInt);
+            $this->pushFlash('success', 'Option d\'achat supprimée.');
+        } catch (\Throwable $e) {
+            error_log('Shop item option delete error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de supprimer l\'option d\'achat.');
+        }
+        $this->redirectShop();
+    }
     public function dashboard(): void
     {
         AdminAuth::requireAuth();

@@ -31,17 +31,24 @@ final class ShopOrder
 
     /**
      * @param array<string,mixed> $customerData
-     * @param array<int,int> $quantitiesByItemId
+     * @param list<array{item_id:int,quantity:int,option_id:int|null,option_label:string|null,option_units:int|null}> $selections
      * @return array{success:bool,status:int,order_id?:int,error?:string,conflicts?:array<int,array<string,mixed>>}
      */
-    public function createOrder(array $customerData, array $quantitiesByItemId): array
+    public function createOrder(array $customerData, array $selections): array
     {
         $requested = [];
-        foreach ($quantitiesByItemId as $itemId => $quantity) {
-            $itemId   = (int) $itemId;
-            $quantity = (int) $quantity;
+        foreach ($selections as $selection) {
+            $itemId   = (int) ($selection['item_id'] ?? 0);
+            $quantity = (int) ($selection['quantity'] ?? 0);
+            $optionId = isset($selection['option_id']) ? (int) $selection['option_id'] : 0;
             if ($itemId > 0 && $quantity > 0) {
-                $requested[$itemId] = $quantity;
+                $requested[] = [
+                    'item_id'      => $itemId,
+                    'quantity'     => $quantity,
+                    'option_id'    => $optionId > 0 ? $optionId : null,
+                    'option_label' => isset($selection['option_label']) ? trim((string) $selection['option_label']) : null,
+                    'option_units' => isset($selection['option_units']) ? max(1, (int) $selection['option_units']) : null,
+                ];
             }
         }
 
@@ -53,7 +60,11 @@ final class ShopOrder
             ];
         }
 
-        $placeholders = implode(',', array_fill(0, count($requested), '?'));
+        $itemIds = array_values(array_unique(array_map(
+            static fn(array $selection): int => (int) ($selection['item_id'] ?? 0),
+            $requested,
+        )));
+        $placeholders = implode(',', array_fill(0, count($itemIds), '?'));
 
         try {
             $this->db->beginTransaction();
@@ -66,7 +77,7 @@ final class ShopOrder
                  WHERE bi.id IN ({$placeholders})
                  FOR UPDATE",
             );
-            $stmt->execute(array_keys($requested));
+            $stmt->execute($itemIds);
             $rows = $stmt->fetchAll();
 
             $itemsById = [];
@@ -74,9 +85,18 @@ final class ShopOrder
                 $itemsById[(int) $row['id']] = $row;
             }
 
-            $conflicts = [];
-            foreach ($requested as $itemId => $quantity) {
-                $row = $itemsById[$itemId] ?? null;
+            $selectedOptionIds = array_values(array_unique(array_filter(array_map(
+                static fn(array $selection): int => (int) ($selection['option_id'] ?? 0),
+                $requested,
+            ))));
+            $optionsById = $this->getItemOptionsByIds($selectedOptionIds);
+
+            $conflicts            = [];
+            $requestedUnitsByItem = [];
+            foreach ($requested as $selection) {
+                $itemId   = (int) ($selection['item_id'] ?? 0);
+                $row      = $itemsById[$itemId] ?? null;
+                $quantity = (int) ($selection['quantity'] ?? 0);
                 if (! is_array($row)) {
                     $conflicts[] = [
                         'item_id'   => $itemId,
@@ -87,16 +107,45 @@ final class ShopOrder
                     continue;
                 }
 
-                $available   = max(0, (int) ($row['stock_quantity'] ?? 0));
-                $isAvailable = ! empty($row['is_active']) && ! empty($row['section_active']);
-                $allowed     = $available;
-
-                if (! $isAvailable || $quantity > $allowed) {
+                $optionId    = isset($selection['option_id']) ? (int) $selection['option_id'] : 0;
+                $optionLabel = trim((string) ($selection['option_label'] ?? ''));
+                $option      = $optionId > 0 ? ($optionsById[$optionId] ?? null) : null;
+                if (! is_array($option) && $optionLabel !== '') {
+                    $option = $this->getItemOptionByLabel($itemId, $optionLabel);
+                }
+                if ($optionId > 0 && (! is_array($option) || (int) ($option['item_id'] ?? 0) !== $itemId || empty($option['is_active']))) {
                     $conflicts[] = [
                         'item_id'   => $itemId,
                         'name'      => (string) ($row['name'] ?? 'Produit indisponible'),
                         'requested' => $quantity,
-                        'available' => $allowed,
+                        'available' => 0,
+                    ];
+                    continue;
+                }
+
+                if ($optionLabel !== '' && ! is_array($option)) {
+                    $conflicts[] = [
+                        'item_id'   => $itemId,
+                        'name'      => (string) ($row['name'] ?? 'Produit indisponible'),
+                        'requested' => $quantity,
+                        'available' => 0,
+                    ];
+                    continue;
+                }
+
+                $available   = max(0, (int) ($row['stock_quantity'] ?? 0));
+                $isAvailable = ! empty($row['is_active']) && ! empty($row['section_active']);
+                $bundleUnits = is_array($option)
+                    ? $this->resolveBundleUnitsFromOption($option)
+                    : max(1, (int) ($selection['option_units'] ?? 1));
+                $requestedUnitsByItem[$itemId] = ($requestedUnitsByItem[$itemId] ?? 0) + ($quantity * $bundleUnits);
+
+                if (! $isAvailable || $requestedUnitsByItem[$itemId] > $available) {
+                    $conflicts[] = [
+                        'item_id'   => $itemId,
+                        'name'      => (string) ($row['name'] ?? 'Produit indisponible'),
+                        'requested' => $quantity,
+                        'available' => $bundleUnits > 0 ? (int) floor($available / $bundleUnits) : 0,
                     ];
                 }
             }
@@ -112,9 +161,17 @@ final class ShopOrder
             }
 
             $orderTotalCents = 0;
-            foreach ($requested as $itemId => $quantity) {
-                $item             = $itemsById[$itemId];
-                $unitPriceCents   = max(0, (int) ($item['price_cents'] ?? 0));
+            foreach ($requested as $selection) {
+                $itemId      = (int) ($selection['item_id'] ?? 0);
+                $item        = $itemsById[$itemId];
+                $quantity    = (int) ($selection['quantity'] ?? 0);
+                $optionId    = isset($selection['option_id']) ? (int) $selection['option_id'] : 0;
+                $optionLabel = trim((string) ($selection['option_label'] ?? ''));
+                $option      = $optionId > 0 ? ($optionsById[$optionId] ?? null) : null;
+                if (! is_array($option) && $optionLabel !== '') {
+                    $option = $this->getItemOptionByLabel($itemId, $optionLabel);
+                }
+                $unitPriceCents   = max(0, (int) (($option['price_cents'] ?? null) ?? ($item['price_cents'] ?? 0)));
                 $orderTotalCents += $unitPriceCents * $quantity;
             }
 
@@ -192,24 +249,38 @@ final class ShopOrder
                  WHERE id = :id',
             );
 
-            foreach ($requested as $itemId => $quantity) {
-                $item           = $itemsById[$itemId];
-                $unitPriceCents = max(0, (int) ($item['price_cents'] ?? 0));
+            foreach ($requested as $selection) {
+                $itemId                   = (int) ($selection['item_id'] ?? 0);
+                $item                     = $itemsById[$itemId];
+                $quantity                 = (int) ($selection['quantity'] ?? 0);
+                $optionId                 = isset($selection['option_id']) ? (int) $selection['option_id'] : 0;
+                $optionLabelFromSelection = trim((string) ($selection['option_label'] ?? ''));
+                $option                   = $optionId > 0 ? ($optionsById[$optionId] ?? null) : null;
+                if (! is_array($option) && $optionLabelFromSelection !== '') {
+                    $option = $this->getItemOptionByLabel($itemId, $optionLabelFromSelection);
+                }
+                $bundleUnits = is_array($option)
+                    ? $this->resolveBundleUnitsFromOption($option)
+                    : max(1, (int) ($selection['option_units'] ?? 1));
+                $unitPriceCents = max(0, (int) (($option['price_cents'] ?? null) ?? ($item['price_cents'] ?? 0)));
+                $optionLabel    = is_array($option)
+                    ? trim((string) ($option['label'] ?? ''))
+                    : $optionLabelFromSelection;
 
                 $lineStmt->execute([
                     'order_id'              => $orderId,
                     'item_id'               => $itemId,
-                    'item_name_snapshot'    => (string) ($item['name'] ?? ''),
+                    'item_name_snapshot'    => $this->buildItemNameSnapshot((string) ($item['name'] ?? ''), $optionLabel),
                     'section_name_snapshot' => (string) ($item['section_name'] ?? ''),
                     'unit_price_cents'      => $unitPriceCents,
-                    'unit_price_label'      => (string) ($item['price_label'] ?? ''),
+                    'unit_price_label'      => $this->resolveUnitPriceLabel($unitPriceCents, $option['price_label'] ?? ($item['price_label'] ?? null)),
                     'quantity'              => $quantity,
                     'line_total_cents'      => $unitPriceCents * $quantity,
                 ]);
 
                 $stockStmt->execute([
                     'id'       => $itemId,
-                    'quantity' => $quantity,
+                    'quantity' => $quantity * $bundleUnits,
                 ]);
             }
 
@@ -351,7 +422,7 @@ final class ShopOrder
 
             if ($status === 'cancelled' && $stockRestoredAt === null) {
                 $itemStmt = $this->db->prepare(
-                    'SELECT item_id, quantity
+                    'SELECT item_id, quantity, item_name_snapshot
                      FROM boutique_order_items
                      WHERE order_id = :order_id',
                 );
@@ -367,7 +438,11 @@ final class ShopOrder
                 foreach ($items as $item) {
                     $restoreStmt->execute([
                         'id'       => (int) ($item['item_id'] ?? 0),
-                        'quantity' => max(0, (int) ($item['quantity'] ?? 0)),
+                        'quantity' => $this->resolveRestoreQuantity(
+                            (int) ($item['item_id'] ?? 0),
+                            max(0, (int) ($item['quantity'] ?? 0)),
+                            (string) ($item['item_name_snapshot'] ?? ''),
+                        ),
                     ]);
                 }
 
@@ -412,6 +487,128 @@ final class ShopOrder
     {
         $value = trim((string) ($value ?? ''));
         return $value === '' ? null : $value;
+    }
+
+    /**
+     * @param list<int> $optionIds
+     * @return array<int,array<string,mixed>>
+     */
+    private function getItemOptionsByIds(array $optionIds): array
+    {
+        if ($optionIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($optionIds), '?'));
+        $stmt         = $this->db->prepare(
+            "SELECT id, item_id, label, quantity, price_cents, price_label, is_active
+             FROM boutique_item_options
+             WHERE id IN ({$placeholders})",
+        );
+        $stmt->execute($optionIds);
+
+        $options = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $options[(int) ($row['id'] ?? 0)] = $row;
+        }
+
+        return $options;
+    }
+
+    private function getItemOptionByLabel(int $itemId, string $label): ?array
+    {
+        $label = trim($label);
+        if ($itemId <= 0 || $label === '') {
+            return null;
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active
+             FROM boutique_item_options
+             WHERE item_id = :item_id AND label = :label
+             LIMIT 1',
+        );
+        $stmt->execute([
+            'item_id' => $itemId,
+            'label'   => $label,
+        ]);
+
+        $row = $stmt->fetch();
+        return is_array($row) ? $row : null;
+    }
+
+    private function buildItemNameSnapshot(string $itemName, string $optionLabel): string
+    {
+        $itemName    = trim($itemName);
+        $optionLabel = trim($optionLabel);
+
+        return $optionLabel === '' ? $itemName : $itemName . ' — ' . $optionLabel;
+    }
+
+    private function resolveUnitPriceLabel(int $unitPriceCents, $priceLabel): string
+    {
+        $label = trim((string) ($priceLabel ?? ''));
+        if ($label !== '') {
+            return $label;
+        }
+
+        return number_format($unitPriceCents / 100, 2, ',', ' ') . ' €';
+    }
+
+    private function resolveRestoreQuantity(int $itemId, int $orderedQuantity, string $itemNameSnapshot): int
+    {
+        $orderedQuantity = max(0, $orderedQuantity);
+        $optionLabel     = $this->extractOptionLabelFromSnapshot($itemNameSnapshot);
+        if ($optionLabel === null) {
+            return $orderedQuantity;
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT quantity
+             FROM boutique_item_options
+             WHERE item_id = :item_id AND label = :label
+             LIMIT 1',
+        );
+        $stmt->execute([
+            'item_id' => $itemId,
+            'label'   => $optionLabel,
+        ]);
+
+        $bundleUnits = (int) $stmt->fetchColumn();
+        if ($bundleUnits <= 1 && preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $optionLabel, $matches) === 1) {
+            $bundleUnits = max(1, (int) ($matches[1] ?? 1));
+        }
+
+        return $orderedQuantity * max(1, $bundleUnits);
+    }
+
+    private function extractOptionLabelFromSnapshot(string $itemNameSnapshot): ?string
+    {
+        $separatorPosition = strrpos($itemNameSnapshot, ' — ');
+        if ($separatorPosition === false) {
+            return null;
+        }
+
+        $label = trim(substr($itemNameSnapshot, $separatorPosition + 5));
+        return $label === '' ? null : $label;
+    }
+
+    /**
+     * @param array<string,mixed> $option
+     */
+    private function resolveBundleUnitsFromOption(array $option): int
+    {
+        $quantity = max(1, (int) ($option['quantity'] ?? 1));
+        if ($quantity > 1) {
+            return $quantity;
+        }
+
+        $label = trim((string) ($option['label'] ?? ''));
+        if ($label !== '' && preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $label, $matches) === 1) {
+            return max(1, (int) ($matches[1] ?? 1));
+        }
+
+        return $quantity;
     }
 
     private function normalizeFulfillmentMethod($value): string

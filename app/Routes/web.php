@@ -62,3 +62,6 @@ $router->get('/admin/contacts/export', 'AdminController@exportContacts');
 $router->get('/admin/contacts', 'AdminController@contacts');
 $router->post('/admin/contacts/{id}/status', 'AdminController@updateContactStatus');
 $router->get('/admin/contacts/{id}', 'AdminController@contactDetail');
+$router->post('/admin/boutique/items/{id}/options/create', 'AdminController@createShopItemOption');
+$router->post('/admin/boutique/options/{id}', 'AdminController@updateShopItemOption');
+$router->post('/admin/boutique/options/{id}/delete', 'AdminController@deleteShopItemOption');

@@ -64,9 +64,9 @@
         <header class="adminPanelHead">
             <div class="adminPanelHead__row">
                 <div>
-                    <h2 class="adminTitle">Editer la boutique</h2>
-                    <p class="adminSubtitle">Le flux boutique reste distinct de la carte : ici vous gerez les sections,
-                        les produits et le stock reel.</p>
+                    <h2 class="adminTitle">Éditer la boutique</h2>
+                    <p class="adminSubtitle">Le flux boutique reste distinct de la carte : ici vous gérez les sections,
+                        les produits et le stock réel.</p>
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
@@ -79,7 +79,7 @@
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <form action="/admin/logout" method="post">
-                            <button type="submit" class="adminBtn adminBtn--danger">Deconnexion</button>
+                            <button type="submit" class="adminBtn adminBtn--danger">Déconnexion</button>
                         </form>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
 
         <?php if ($flash !== null): ?>
         <div class="adminFlash adminFlash--<?php echo $e($flash['type'] ?? 'success'); ?>">
-            <?php echo $e($flash['message'] ?? 'Modification enregistree.'); ?>
+            <?php echo $e($flash['message'] ?? 'Modification enregistrée.'); ?>
         </div>
         <?php endif; ?>
 
@@ -123,7 +123,7 @@
                 <div class="adminCard__head">
                     <div class="adminCard__title">Retrouver rapidement un produit</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint">Cherchez une section ou un produit sans quitter l'ecran</span>
+                        <span class="adminHint">Cherchez une section ou un produit sans quitter l'écran</span>
                     </div>
                 </div>
 
@@ -135,7 +135,7 @@
                     </label>
 
                     <label class="adminField adminField--filter">
-                        <span class="adminField__label">Acceder a une section</span>
+                        <span class="adminField__label">Accéder à une section</span>
                         <select class="adminSelect" data-catalog-jump>
                             <option value="">Choisir une section</option>
                             <?php foreach ($sections as $section): ?>
@@ -155,19 +155,20 @@
 
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Repere stock</div>
+                    <div class="adminCard__title">Repères stock</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint">La boutique se pilote par disponibilite immediate et visibilite des produits</span>
+                        <span class="adminHint">La boutique se pilote par disponibilité immédiate et visibilité des
+                            produits</span>
                     </div>
                 </div>
 
                 <div class="adminDashboardStatus adminDashboardStatus--compact">
                     <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Sections masquees</div>
+                        <div class="adminStatusPill__label">Sections masquées</div>
                         <div class="adminStatusPill__value"><?php echo $inactiveSections; ?></div>
                     </div>
                     <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Produits masques</div>
+                        <div class="adminStatusPill__label">Produits masqués</div>
                         <div class="adminStatusPill__value"><?php echo $inactiveItems; ?></div>
                     </div>
                     <div class="adminStatusPill">
@@ -182,41 +183,11 @@
             </article>
         </section>
 
-        <section class="adminCard adminCard--padded adminCatalogGuideCard">
-            <div class="adminCard__head">
-                <div class="adminCard__title">Mode d'emploi</div>
-                <div class="adminCard__meta">
-                    <span class="adminHint">Trois reflexes simples pour garder une boutique nette et exploitable</span>
-                </div>
-            </div>
-
-            <div class="adminCatalogGuideGrid">
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">1. Structurer</div>
-                    <div class="adminQuickLinkCard__title">Section puis produit</div>
-                    <div class="adminQuickLinkCard__meta">Classez les references par famille avant d'ajouter les details
-                        de vente.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">2. Stock</div>
-                    <div class="adminQuickLinkCard__title">Verifier la quantite reelle</div>
-                    <div class="adminQuickLinkCard__meta">Le stock et la quantite maximale par commande doivent rester
-                        coherents pour eviter la survente.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">3. Publication</div>
-                    <div class="adminQuickLinkCard__title">Masquer sans supprimer</div>
-                    <div class="adminQuickLinkCard__meta">Desactivez un produit pour le retirer de la vente tout en
-                        conservant sa fiche.</div>
-                </div>
-            </div>
-        </section>
-
         <section class="adminCard adminCatalogCreateSection">
             <div class="adminCard__head">
                 <div class="adminCard__title">Ajouter une section</div>
                 <div class="adminCard__meta">
-                    <span class="adminHint">Le slug est auto-genere si vous le laissez vide.</span>
+                    <span class="adminHint">Le slug est auto-généré si vous le laissez vide.</span>
                 </div>
             </div>
             <div class="adminCatalogBody">
@@ -231,7 +202,7 @@
                             <input class="adminCheckbox" type="checkbox" name="is_active" value="1" checked>
                         </label>
                     </div>
-                    <span class="adminHint">Le slug et l'ordre d'affichage sont geres automatiquement.</span>
+                    <span class="adminHint">Le slug et l'ordre d'affichage sont gérés automatiquement.</span>
 
                     <label class="adminField">
                         <span class="adminField__label">Description</span>
@@ -239,7 +210,7 @@
                     </label>
 
                     <div class="adminInlineActions">
-                        <button type="submit" class="adminBtn adminBtn--primary">Creer la section</button>
+                        <button type="submit" class="adminBtn adminBtn--primary">Créer la section</button>
                     </div>
                 </form>
             </div>
@@ -250,7 +221,20 @@
             <input type="hidden" name="section_ids" id="catalogSectionOrderInput" value="">
         </form>
 
-        <div class="adminCatalogList" data-section-sortable>
+        <div class="adminCatalogItemsHead adminCatalogItemsHead--reorder">
+            <div>
+                <div class="adminCatalogOptions__title">Organisation des sections</div>
+                <span class="adminHint">Activez le mode tri, glissez avec la poignée puis enregistrez l'ordre.</span>
+            </div>
+            <div class="adminInlineActions adminInlineActions--reorder">
+                <button type="button" class="adminBtn" data-reorder-toggle="sections">Réordonner</button>
+                <button type="button" class="adminBtn adminBtn--primary" data-reorder-save="sections" hidden
+                    disabled>Enregistrer l'ordre</button>
+                <button type="button" class="adminBtn" data-reorder-cancel="sections" hidden>Annuler</button>
+            </div>
+        </div>
+
+        <div class="adminCatalogList" data-section-sortable data-reorder-scope="sections">
             <?php foreach ($sections as $section): ?>
             <?php
                 $sectionName      = (string) ($section['name'] ?? 'Section');
@@ -264,7 +248,7 @@
                 }
             ?>
             <details class="adminCard adminCatalogSection" id="section-<?php echo (int) ($section['id'] ?? 0); ?>"
-                data-section-id="<?php echo (int) ($section['id'] ?? 0); ?>" draggable="true" data-catalog-section
+                data-section-id="<?php echo (int) ($section['id'] ?? 0); ?>" draggable="false" data-catalog-section
                 data-catalog-search-text="<?php echo $e($sectionSearch); ?>">
                 <summary class="adminCard__head adminCatalogSection__summary">
                     <div>
@@ -272,13 +256,13 @@
                         <div class="adminCatalogMeta">
                             <span>Slug : <?php echo $e($sectionSlug); ?></span>
                             <span><?php echo $sectionItemCount; ?> produit(s)</span>
-                            <span><?php echo $sectionStock; ?> unite(s) en stock</span>
+                            <span><?php echo $sectionStock; ?> unité(s) en stock</span>
                             <span><?php echo $sectionState; ?></span>
                         </div>
                     </div>
                     <div class="adminCatalogSection__headActions" aria-hidden="true">
                         <span class="adminCatalogSection__chevron">▾</span>
-                        <span class="adminDragHandle">↕</span>
+                        <span class="adminDragHandle" data-drag-handle>↕</span>
                     </div>
                 </summary>
 
@@ -287,8 +271,8 @@
                         <details class="adminEditorBlock adminEditorBlock--collapsible">
                             <summary class="adminEditorBlock__summary">
                                 <div class="adminEditorBlock__head adminEditorBlock__head--summary">
-                                    <div class="adminEditorBlock__title">Reglages de la section</div>
-                                    <p class="adminEditorBlock__text">Nom, ordre d'affichage et visibilite de la famille
+                                    <div class="adminEditorBlock__title">Réglages de la section</div>
+                                    <p class="adminEditorBlock__text">Nom, ordre d'affichage et visibilité de la famille
                                         de produits.</p>
                                 </div>
                                 <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
@@ -308,7 +292,8 @@
                                             <?php echo ! empty($section['is_active']) ? 'checked' : ''; ?>>
                                     </label>
                                 </div>
-                                <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la liste.</span>
+                                <span class="adminHint">Le slug reste stable et l'ordre se gère depuis le tri de la
+                                    liste.</span>
 
                                 <label class="adminField">
                                     <span class="adminField__label">Description</span>
@@ -332,7 +317,7 @@
                             <summary class="adminEditorBlock__summary">
                                 <div class="adminEditorBlock__head adminEditorBlock__head--summary">
                                     <div class="adminEditorBlock__title">Ajouter un produit</div>
-                                    <p class="adminEditorBlock__text">Creez une nouvelle reference avec son prix, son
+                                    <p class="adminEditorBlock__text">Créez une nouvelle référence avec son prix, son
                                         stock et sa limite par commande.</p>
                                 </div>
                                 <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
@@ -343,14 +328,14 @@
                                 method="post" enctype="multipart/form-data" class="adminForm adminForm--create">
                                 <div class="adminCatalogEditorGrid">
                                     <section class="adminEditorBlock adminEditorBlock--nested">
-                                        <div class="adminCatalogSubsection">Identite produit</div>
+                                        <div class="adminCatalogSubsection">Identité du produit</div>
                                         <div class="adminFieldGrid">
                                             <label class="adminField">
                                                 <span class="adminField__label">Nom</span>
                                                 <input class="adminInput" type="text" name="name" required>
                                             </label>
                                             <label class="adminField">
-                                                <span class="adminField__label">Libelle prix</span>
+                                                <span class="adminField__label">Libellé prix</span>
                                                 <input class="adminInput" type="text" name="price_label"
                                                     placeholder="Ex: 12 EUR piece">
                                             </label>
@@ -365,7 +350,8 @@
                                                     checked>
                                             </label>
                                         </div>
-                                        <span class="adminHint">Le prix est saisi en euros, puis le slug et l'ordre d'affichage sont geres automatiquement.</span>
+                                        <span class="adminHint">Le prix est saisi en euros, puis le slug et l'ordre
+                                            d'affichage sont gérés automatiquement.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
@@ -382,11 +368,12 @@
                                                     name="low_stock_threshold" value="5">
                                             </label>
                                         </div>
-                                        <span class="adminHint">Le stock saisi ici correspond directement a la quantite commandable.</span>
+                                        <span class="adminHint">Le stock saisi ici correspond directement à la quantité
+                                            commandable.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
-                                        <div class="adminCatalogSubsection">Visuel</div>
+                                        <div class="adminCatalogSubsection">Image du produit</div>
                                         <div class="adminFieldGrid adminFieldGrid--two">
                                             <label class="adminField">
                                                 <span class="adminField__label">Image</span>
@@ -403,7 +390,7 @@
                                             <input class="adminInput" type="file" name="image_file"
                                                 accept="image/png,image/jpeg,image/webp">
                                             <span class="adminHint">Le fichier est converti automatiquement dans les
-                                                formats utiles a la boutique.</span>
+                                                formats utiles à la boutique.</span>
                                         </label>
                                         <div class="adminFieldGrid adminFieldGrid--two">
                                             <label class="adminField adminField--checkbox">
@@ -413,11 +400,11 @@
                                             </label>
                                         </div>
                                         <input type="hidden" name="background_fuzz" value="6">
-                                        <span class="adminHint">Vous pouvez generer un apercu avant enregistrement,
-                                            comme sur la carte evenementielle.</span>
+                                        <span class="adminHint">Vous pouvez générer un aperçu avant enregistrement,
+                                            comme sur la carte événementielle.</span>
                                         <div class="adminInlineActions adminInlineActions--image">
                                             <button type="submit" class="adminBtn adminBtn--primary"
-                                                data-image-save-button disabled>Creer et enregistrer l'image</button>
+                                                data-image-save-button disabled>Créer et enregistrer l'image</button>
                                         </div>
                                     </section>
 
@@ -446,13 +433,27 @@
                     </form>
 
                     <div class="adminCatalogItemsHead">
-                        <div class="adminCatalogOptions__title">Produits de la section</div>
-                        <span class="adminHint">Ouvrez un produit pour modifier ses informations commerciales et son
-                            stock.</span>
+                        <div>
+                            <div class="adminCatalogOptions__title">Produits de la section</div>
+                            <span class="adminHint">Ouvrez un produit pour modifier ses informations, son image et son
+                                stock.</span>
+                        </div>
+                        <div class="adminInlineActions adminInlineActions--reorder">
+                            <button type="button" class="adminBtn"
+                                data-reorder-toggle="items-<?php echo (int) ($section['id'] ?? 0); ?>">Réordonner</button>
+                            <button type="button" class="adminBtn adminBtn--primary"
+                                data-reorder-save="items-<?php echo (int) ($section['id'] ?? 0); ?>" hidden
+                                disabled>Enregistrer l'ordre</button>
+                            <button type="button" class="adminBtn"
+                                data-reorder-cancel="items-<?php echo (int) ($section['id'] ?? 0); ?>"
+                                hidden>Annuler</button>
+                        </div>
                     </div>
 
                     <div class="adminCatalogItems" data-item-sortable
-                        data-section-id="<?php echo (int) ($section['id'] ?? 0); ?>">
+                        data-section-id="<?php echo (int) ($section['id'] ?? 0); ?>"
+                        data-reorder-scope="items-<?php echo (int) ($section['id'] ?? 0); ?>"
+                        data-reorder-method="buttons">
                         <?php foreach (($section['items'] ?? []) as $item): ?>
                         <?php
                             $itemSearch = strtolower(trim(
@@ -461,35 +462,69 @@
                                 (string) ($item['short_description'] ?? '') . ' ' .
                                 (string) ($item['price_label'] ?? '')
                             ));
-                            $itemVisibilityLabel = ! empty($item['is_active']) ? 'Visible' : 'Masque';
-                            $itemDescription     = trim((string) ($item['short_description'] ?? ''));
-                            $itemStock           = max(0, (int) ($item['stock_quantity'] ?? 0));
+                            $itemVisibilityLabel   = ! empty($item['is_active']) ? 'Visible' : 'Masque';
+                            $itemDescription       = trim((string) ($item['short_description'] ?? ''));
+                            $itemStock             = max(0, (int) ($item['stock_quantity'] ?? 0));
+                            $itemLowStockThreshold = max(0, (int) ($item['low_stock_threshold'] ?? 0));
+                            $itemOptionsCount      = count($item['options'] ?? []);
+                            $itemStockState        = $itemStock <= 0
+                                ? 'Rupture'
+                                : ($itemLowStockThreshold > 0 && $itemStock <= $itemLowStockThreshold ? 'Stock bas' : 'Disponible');
                         ?>
                         <details class="adminCatalogItem" id="item-<?php echo (int) ($item['id'] ?? 0); ?>"
-                            data-item-id="<?php echo (int) ($item['id'] ?? 0); ?>" draggable="true" data-catalog-item
+                            data-item-id="<?php echo (int) ($item['id'] ?? 0); ?>" draggable="false" data-catalog-item
                             data-catalog-search-text="<?php echo $e($itemSearch); ?>">
                             <summary class="adminCatalogItem__summary">
                                 <div class="adminCatalogItem__summaryMain">
                                     <strong><?php echo $e($item['name'] ?? 'Produit'); ?></strong>
                                     <div class="adminCatalogMeta adminCatalogMeta--inline">
-                                        <span><?php echo $e($item['slug'] ?? ''); ?></span>
                                         <span><?php echo $e($formatItemPrice($item)); ?></span>
                                         <span>Stock : <?php echo $itemStock; ?></span>
+                                        <span><?php echo $itemStockState; ?></span>
+                                        <span><?php echo $itemOptionsCount; ?> option(s)</span>
                                         <span><?php echo $itemVisibilityLabel; ?></span>
                                     </div>
                                     <?php if ($itemDescription !== ''): ?>
                                     <p class="adminCatalogItem__summaryText"><?php echo $e($itemDescription); ?></p>
                                     <?php endif; ?>
                                 </div>
-                                <span class="adminCatalogItem__drag" aria-hidden="true">↕</span>
+                                <div class="adminCatalogItem__reorderTools">
+                                    <button type="button" class="adminOrderStep" data-reorder-move="up"
+                                        aria-label="Monter ce produit">↑</button>
+                                    <button type="button" class="adminOrderStep" data-reorder-move="down"
+                                        aria-label="Descendre ce produit">↓</button>
+                                </div>
                             </summary>
 
                             <div class="adminCatalogItem__body">
+                                <div class="adminCatalogItemsHead adminCatalogItemsHead--item">
+                                    <div>
+                                        <div class="adminCatalogOptions__title">Édition du produit</div>
+                                        <div class="adminCatalogMeta adminCatalogMeta--inline">
+                                            <span>Slug : <?php echo $e($item['slug'] ?? ''); ?></span>
+                                            <span>Seuil bas : <?php echo $itemLowStockThreshold; ?></span>
+                                            <span>Section : <?php echo $e($section['name'] ?? ''); ?></span>
+                                        </div>
+                                    </div>
+                                    <span class="adminHint">Ouvrez uniquement le bloc à modifier : contenu, stock,
+                                        image ou lots.</span>
+                                </div>
+
                                 <form action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>"
                                     method="post" enctype="multipart/form-data" class="adminForm">
-                                    <div class="adminCatalogEditorGrid">
-                                        <section class="adminEditorBlock adminEditorBlock--nested">
-                                            <div class="adminCatalogSubsection">Informations produit</div>
+                                    <div class="adminCatalogEditorGrid adminCatalogEditorGrid--stacked">
+                                        <details
+                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible"
+                                            open>
+                                            <summary class="adminEditorBlock__summary">
+                                                <div class="adminEditorBlock__head adminEditorBlock__head--summary">
+                                                    <div class="adminEditorBlock__title">Informations du produit</div>
+                                                    <p class="adminEditorBlock__text">Nom, prix public et visibilité de
+                                                        la fiche.</p>
+                                                </div>
+                                                <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
+                                            </summary>
+
                                             <div class="adminFieldGrid">
                                                 <label class="adminField">
                                                     <span class="adminField__label">Nom</span>
@@ -497,7 +532,7 @@
                                                         value="<?php echo $e($item['name'] ?? ''); ?>" required>
                                                 </label>
                                                 <label class="adminField">
-                                                    <span class="adminField__label">Libelle prix</span>
+                                                    <span class="adminField__label">Libellé prix</span>
                                                     <input class="adminInput" type="text" name="price_label"
                                                         value="<?php echo $e($item['price_label'] ?? ''); ?>">
                                                 </label>
@@ -515,11 +550,21 @@
                                                         <?php echo ! empty($item['is_active']) ? 'checked' : ''; ?>>
                                                 </label>
                                             </div>
-                                            <span class="adminHint">Le slug reste stable et l'ordre se gere depuis le tri de la section.</span>
-                                        </section>
+                                            <span class="adminHint">Le slug reste stable et l'ordre se gère depuis le
+                                                tri de la section.</span>
+                                        </details>
 
-                                        <section class="adminEditorBlock adminEditorBlock--nested">
-                                            <div class="adminCatalogSubsection">Stock & limites</div>
+                                        <details
+                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible">
+                                            <summary class="adminEditorBlock__summary">
+                                                <div class="adminEditorBlock__head adminEditorBlock__head--summary">
+                                                    <div class="adminEditorBlock__title">Stock & limites</div>
+                                                    <p class="adminEditorBlock__text">Quantité réelle disponible et
+                                                        seuil d'alerte.</p>
+                                                </div>
+                                                <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
+                                            </summary>
+
                                             <div class="adminFieldGrid">
                                                 <label class="adminField adminField--sm">
                                                     <span class="adminField__label">Stock</span>
@@ -531,18 +576,28 @@
                                                     <span class="adminField__label">Seuil bas</span>
                                                     <input class="adminInput" type="number" min="0"
                                                         name="low_stock_threshold"
-                                                        value="<?php echo (int) ($item['low_stock_threshold'] ?? 0); ?>">
+                                                        value="<?php echo $itemLowStockThreshold; ?>">
                                                 </label>
                                             </div>
-                                            <span class="adminHint">Le prix saisi ici est converti automatiquement en cents au moment de l'enregistrement.</span>
                                             <div class="adminCatalogMeta adminCatalogMeta--inline">
+                                                <span>Etat : <?php echo $itemStockState; ?></span>
                                                 <span>Prix public : <?php echo $e($formatItemPrice($item)); ?></span>
-                                                <span><?php echo $itemStock <= 0 ? 'Rupture' : 'Disponible'; ?></span>
                                             </div>
-                                        </section>
+                                            <span class="adminHint">Le prix saisi ici est converti automatiquement en
+                                                cents au moment de l'enregistrement.</span>
+                                        </details>
 
-                                        <section class="adminEditorBlock adminEditorBlock--nested">
-                                            <div class="adminCatalogSubsection">Visuel</div>
+                                        <details
+                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible">
+                                            <summary class="adminEditorBlock__summary">
+                                                <div class="adminEditorBlock__head adminEditorBlock__head--summary">
+                                                    <div class="adminEditorBlock__title">Image du produit</div>
+                                                    <p class="adminEditorBlock__text">Image, alt et traitement de fond
+                                                        du produit.</p>
+                                                </div>
+                                                <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
+                                            </summary>
+
                                             <div class="adminFieldGrid adminFieldGrid--two">
                                                 <label class="adminField">
                                                     <span class="adminField__label">Image</span>
@@ -550,7 +605,7 @@
                                                         value="<?php echo $e($item['image_path'] ?? ''); ?>">
                                                 </label>
                                                 <label class="adminField">
-                                                    <span class="adminField__label">Alt image</span>
+                                                    <span class="adminField__label">Texte alternatif</span>
                                                     <input class="adminInput" type="text" name="image_alt"
                                                         value="<?php echo $e($item['image_alt'] ?? ''); ?>">
                                                 </label>
@@ -559,7 +614,7 @@
                                                 <span class="adminField__label">Upload image (PNG/JPG/WEBP)</span>
                                                 <input class="adminInput" type="file" name="image_file"
                                                     accept="image/png,image/jpeg,image/webp">
-                                                <span class="adminHint">Si un fichier est envoye, il remplace l'image
+                                                <span class="adminHint">Si un fichier est envoyé, il remplace l'image
                                                     actuelle du produit.</span>
                                             </label>
                                             <div class="adminFieldGrid adminFieldGrid--two">
@@ -570,17 +625,21 @@
                                                         value="1" checked>
                                                 </label>
                                                 <label class="adminField adminField--sm">
-                                                    <span class="adminField__label">Tolerance fond (%)</span>
+                                                    <span class="adminField__label">Tolérance fond (%)</span>
                                                     <input class="adminInput" type="number" name="background_fuzz"
                                                         value="6" min="0" max="40">
                                                 </label>
                                             </div>
-                                            <span class="adminHint">L'aperçu permet de verifier le rendu avant
-                                                d'enregistrer definitivement l'image.</span>
+                                            <span class="adminHint">L'aperçu permet de vérifier le rendu avant
+                                                d'enregistrer définitivement l'image.</span>
+
                                             <div class="adminInlineActions adminInlineActions--image">
                                                 <button type="submit" class="adminBtn adminBtn--primary"
-                                                    data-image-save-button disabled>Enregistrer l'image</button>
+                                                    data-image-save-button disabled>
+                                                    Enregistrer l'image
+                                                </button>
                                             </div>
+
                                             <?php if (($item['image_path'] ?? '') !== ''): ?>
                                             <div class="adminImagePreview">
                                                 <div class="adminImagePreview__thumbWrap">
@@ -595,17 +654,25 @@
                                                 </div>
                                             </div>
                                             <?php endif; ?>
-                                        </section>
+                                        </details>
 
-                                        <section
-                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--full">
-                                            <div class="adminCatalogSubsection">Texte public</div>
-                                            <label class="adminField">
+                                        <details
+                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible adminEditorBlock--full">
+                                            <summary class="adminEditorBlock__summary">
+                                                <div class="adminEditorBlock__head adminEditorBlock__head--summary">
+                                                    <div class="adminEditorBlock__title">Texte public</div>
+                                                    <p class="adminEditorBlock__text">Description courte affichée sur la
+                                                        boutique.</p>
+                                                </div>
+                                                <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
+                                            </summary>
+
+                                            <label class="adminField adminField--full">
                                                 <span class="adminField__label">Description</span>
                                                 <textarea class="adminTextarea" name="short_description"
                                                     rows="4"><?php echo $e($item['short_description'] ?? ''); ?></textarea>
                                             </label>
-                                        </section>
+                                        </details>
                                     </div>
 
                                     <input type="hidden" name="section_id"
@@ -617,10 +684,114 @@
                                         <button type="submit" class="adminBtn adminBtn--danger"
                                             formaction="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/delete"
                                             formmethod="post"
-                                            onclick="return confirm('Supprimer ce produit boutique ?');">Supprimer le
-                                            produit</button>
+                                            onclick="return confirm('Supprimer ce produit boutique ?');">
+                                            Supprimer le produit
+                                        </button>
                                     </div>
                                 </form>
+
+                                <?php $options = $item['options'] ?? []; ?>
+                                <details
+                                    class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible adminEditorBlock--full adminCatalogOptions"
+                                    <?php echo ! empty($options) ? 'open' : ''; ?>>
+                                    <summary class="adminEditorBlock__summary">
+                                        <div class="adminEditorBlock__head adminEditorBlock__head--summary">
+                                            <div class="adminEditorBlock__title">Options d'achat</div>
+                                            <p class="adminEditorBlock__text">Unité, lots et variantes de vente pour ce
+                                                produit.</p>
+                                        </div>
+                                        <span class="adminEditorBlock__chevron" aria-hidden="true">▾</span>
+                                    </summary>
+
+                                    <div class="adminCatalogOptions__body">
+                                        <?php if (! empty($options)): ?>
+                                        <div class="adminTableWrap">
+                                            <table class="adminTable adminTable--options">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Libellé</th>
+                                                        <th>Quantité</th>
+                                                        <th>Prix</th>
+                                                        <th>Visible</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($options as $option): ?>
+                                                    <tr id="option-<?php echo (int) $option['id']; ?>">
+                                                        <td colspan="5">
+                                                            <form
+                                                                action="/admin/boutique/options/<?php echo (int) $option['id']; ?>"
+                                                                method="post" class="adminForm adminForm--inline">
+                                                                <input class="adminInput" type="text" name="label"
+                                                                    value="<?php echo $e($option['label'] ?? ''); ?>"
+                                                                    required>
+
+                                                                <input class="adminInput" type="number" name="quantity"
+                                                                    min="1"
+                                                                    value="<?php echo (int) ($option['quantity'] ?? 1); ?>"
+                                                                    required>
+
+                                                                <input class="adminInput" type="text" name="price_euros"
+                                                                    inputmode="decimal"
+                                                                    value="<?php echo isset($option['price_cents']) ? number_format(((int) $option['price_cents']) / 100, 2, ',', '') : ''; ?>">
+
+                                                                <label class="adminField adminField--checkbox">
+                                                                    <span class="adminField__label">Visible</span>
+                                                                    <input class="adminCheckbox" type="checkbox"
+                                                                        name="is_active" value="1"
+                                                                        <?php echo ! empty($option['is_active']) ? 'checked' : ''; ?>>
+                                                                </label>
+
+                                                                <button type="submit" class="adminBtn adminBtn--sm">
+                                                                    Enregistrer
+                                                                </button>
+
+                                                                <button type="submit"
+                                                                    class="adminBtn adminBtn--danger adminBtn--sm"
+                                                                    formaction="/admin/boutique/options/<?php echo (int) $option['id']; ?>/delete"
+                                                                    formmethod="post"
+                                                                    onclick="return confirm('Supprimer cette option ?');">
+                                                                    Supprimer
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <?php else: ?>
+                                        <div class="adminHint">Aucune option de lot n'est définie pour ce produit.</div>
+                                        <?php endif; ?>
+
+                                        <form
+                                            action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/options/create"
+                                            method="post" class="adminForm adminForm--inline">
+                                            <input type="text" name="label" placeholder="Libellé, ex: Lot de 4" required
+                                                class="adminInput adminInput--sm">
+
+                                            <input type="number" name="quantity" min="1" value="1" required
+                                                class="adminInput adminInput--sm">
+
+                                            <input type="text" name="price_euros" inputmode="decimal"
+                                                placeholder="Prix, ex: 12,50" class="adminInput adminInput--sm">
+
+                                            <label class="adminField adminField--checkbox">
+                                                <span class="adminField__label">Visible</span>
+                                                <input class="adminCheckbox" type="checkbox" name="is_active" value="1"
+                                                    checked>
+                                            </label>
+
+                                            <button type="submit" class="adminBtn adminBtn--primary adminBtn--sm">
+                                                Ajouter une option
+                                            </button>
+                                        </form>
+
+                                        <span class="adminHint">Ajoutez des lots : unité, lot de 4, lot de 6... Le prix
+                                            est saisi en euros.</span>
+                                    </div>
+                                </details>
                             </div>
                         </details>
                         <?php endforeach; ?>

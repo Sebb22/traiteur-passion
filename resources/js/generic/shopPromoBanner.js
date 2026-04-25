@@ -43,10 +43,11 @@ export function initShopPromoBanner() {
     // Ajout du comportement mobile slide droite
     const promoBanner = document.querySelector('.sitePromoSticky');
     const handle = promoBanner ?.querySelector('.sitePromoSticky__handle');
+    const desktopToggle = promoBanner ?.querySelector('.sitePromoSticky__desktopToggle');
     // Correction : cibler le bouton onglet globalement
     const tabBtn = document.querySelector('.sitePromoSticky__tab');
     if (!promoBanner || !handle || !tabBtn) {
-        console.log('[PromoBanner] Élément(s) manquant(s)', { promoBanner, handle, tabBtn });
+        console.log('[PromoBanner] Élément(s) manquant(s)', { promoBanner, handle, tabBtn, desktopToggle });
         return;
     }
 
@@ -56,6 +57,10 @@ export function initShopPromoBanner() {
 
     function hideBanner() {
         promoBanner.classList.add('is-hidden');
+        promoBanner.classList.remove('is-expanded');
+        if (desktopToggle) {
+            desktopToggle.setAttribute('aria-expanded', 'false');
+        }
         tabBtn.classList.add('is-visible');
         tabBtn.style.display = 'flex';
         tabBtn.style.visibility = 'visible';
@@ -70,6 +75,15 @@ export function initShopPromoBanner() {
         tabBtn.style.visibility = 'hidden';
         tabBtn.style.pointerEvents = 'none';
         console.log('[PromoBanner] Bannière affichée');
+    }
+
+    function setDesktopExpanded(expanded) {
+        if (isMobile() || !desktopToggle) {
+            return;
+        }
+
+        promoBanner.classList.toggle('is-expanded', expanded);
+        desktopToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     }
 
     handle.addEventListener('click', (e) => {
@@ -93,14 +107,41 @@ export function initShopPromoBanner() {
     tabBtn.addEventListener('click', (e) => {
         showBanner();
     });
+    if (desktopToggle) {
+        desktopToggle.addEventListener('click', () => {
+            if (isMobile()) {
+                return;
+            }
+
+            setDesktopExpanded(!promoBanner.classList.contains('is-expanded'));
+        });
+
+        promoBanner.addEventListener('mouseleave', () => {
+            if (!isMobile()) {
+                setDesktopExpanded(false);
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (isMobile() || !promoBanner.classList.contains('is-expanded')) {
+                return;
+            }
+
+            if (!promoBanner.contains(event.target)) {
+                setDesktopExpanded(false);
+            }
+        });
+    }
     window.addEventListener('resize', () => {
         if (!isMobile()) {
             showBanner();
+            setDesktopExpanded(false);
         }
     });
     // Initial state (on resize/reload)
     if (!isMobile()) {
         showBanner();
+        setDesktopExpanded(false);
     } else {
         showBanner(); // always start visible on mobile
     }
