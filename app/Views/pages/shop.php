@@ -17,18 +17,52 @@
     return number_format($cents / 100, 2, ',', ' ') . ' €';
     };
 
-    $resolveOptionUnits = static function (array $option): int {
+    $normalizeStockUnit = static function ($value): string {
+    return trim((string) $value) === 'g' ? 'g' : 'unit';
+    };
+
+    $formatStockQuantity = static function ($quantity, $unit) use ($normalizeStockUnit): string {
+    $amount    = max(0, (int) ($quantity ?? 0));
+    $stockUnit = $normalizeStockUnit($unit);
+    if ($stockUnit === 'g') {
+        if ($amount >= 1000) {
+            $kilograms = number_format($amount / 1000, 2, ',', ' ');
+            $kilograms = rtrim(rtrim($kilograms, '0'), ',');
+            return $kilograms . ' kg';
+        }
+
+        return $amount . ' g';
+    }
+
+    return $amount . ' unité(s)';
+    };
+
+    $resolveOptionUnits = static function (array $option, string $stockUnit = 'unit') use ($normalizeStockUnit): int {
     $quantity = max(1, (int) ($option['quantity'] ?? 1));
     if ($quantity > 1) {
         return $quantity;
     }
 
     $label = trim((string) ($option['label'] ?? ''));
-    if ($label !== '' && preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $label, $matches) === 1) {
+    if ($label === '') {
+        return 1;
+    }
+
+    if ($normalizeStockUnit($stockUnit) === 'g') {
+        if (preg_match('/(\d+(?:[\.,]\d+)?)\s*kg\b/i', $label, $matches) === 1) {
+            return max(1, (int) round(((float) str_replace(',', '.', (string) ($matches[1] ?? '0'))) * 1000));
+        }
+
+        if (preg_match('/(\d+(?:[\.,]\d+)?)\s*g\b/i', $label, $matches) === 1) {
+            return max(1, (int) round((float) str_replace(',', '.', (string) ($matches[1] ?? '0'))));
+        }
+    }
+
+    if (preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $label, $matches) === 1) {
         return max(1, (int) ($matches[1] ?? 1));
     }
 
-    return $quantity;
+    return 1;
     };
 
     $resolveSectionAnchor = static function (array $section): string {
@@ -277,6 +311,7 @@
                                     <?php
                                         $itemId        = (int) ($item['id'] ?? 0);
                                         $stockQuantity = max(0, (int) ($item['stock_quantity'] ?? 0));
+                                        $stockUnit     = $normalizeStockUnit($item['stock_unit'] ?? 'unit');
                                         $options       = array_values(array_filter(
                                             is_array($item['options'] ?? null) ? $item['options'] : [],
                                             static fn(array $option): bool => ! empty($option['is_active']),
@@ -285,7 +320,7 @@
                                         if ($options !== []) {
                                             foreach ($options as $option) {
                                                 $optionId        = (int) ($option['id'] ?? 0);
-                                                $optionUnits     = $resolveOptionUnits($option);
+                                                $optionUnits     = $resolveOptionUnits($option, $stockUnit);
                                                 $purchaseLines[] = [
                                                     'line_key'      => 'item-' . $itemId . '-option-' . $optionId,
                                                     'option_id'     => $optionId,
@@ -294,9 +329,9 @@
                                                     'price_cents'   => (int) ($option['price_cents'] ?? 0),
                                                     'price_display' => $formatPrice($option),
                                                     'allowed'       => (int) floor($stockQuantity / max(1, $optionUnits)),
-                                                    'hint'          => $optionUnits > 1
-                                                        ? $optionUnits . ' unité(s) par lot'
-                                                        : 'Ajout à l’unité',
+                                                    'hint'          => $stockUnit === 'g'
+                                                        ? $formatStockQuantity($optionUnits, 'g') . ' par format'
+                                                        : ($optionUnits > 1 ? $optionUnits . ' unité(s) par lot' : 'Ajout à l’unité'),
                                                 ];
                                             }
                                         } else {
@@ -311,7 +346,7 @@
                                                 'hint'          => 'Ajout direct au panier',
                                             ];
                                         }
-                                        $cardPriceDisplay  = $purchaseLines[0]['price_display'] ?? $formatPrice($item);
+                                        $cardPriceDisplay = $purchaseLines[0]['price_display'] ?? $formatPrice($item);
                                         if (count($purchaseLines) > 1) {
                                             $cardPriceDisplay = 'Dès ' . $cardPriceDisplay;
                                         }
@@ -326,7 +361,7 @@
                                         $isLowStock  = ! empty($item['is_low_stock']);
                                         $statusLabel = $isSoldOut
                                             ? 'Rupture'
-                                            : ($isLowStock ? 'Plus que ' . $stockQuantity . ' unité(s)' : $stockQuantity . ' unité(s)');
+                                            : ($isLowStock ? 'Plus que ' . $formatStockQuantity($stockQuantity, $stockUnit) : $formatStockQuantity($stockQuantity, $stockUnit));
                                     ?>
                                     <article class="shopItemCard<?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
                                         data-item-id="<?php echo $itemId; ?>">
@@ -390,6 +425,8 @@
                                                         data-item-id="<?php echo $itemId; ?>"
                                                         data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
                                                         data-item-stock="<?php echo $stockQuantity; ?>"
+                                                        data-item-stock-unit="<?php echo $e($stockUnit); ?>"
+                                                        data-item-low-stock-threshold="<?php echo max(0, (int) ($item['low_stock_threshold'] ?? 0)); ?>"
                                                         data-item-price="<?php echo $e($linePrice); ?>"
                                                         data-item-price-cents="<?php echo $linePriceCents; ?>"
                                                         data-option-id="<?php echo $lineOptionId; ?>"

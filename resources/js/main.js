@@ -14,7 +14,9 @@ import { initAdminLogin } from "./admin/login";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
 import { initShopPromoBanner } from "./generic/shopPromoBanner";
+import { initToastSystem } from "./generic/toast";
 document.addEventListener("DOMContentLoaded", () => {
+    initToastSystem();
     initReveal();
     //initHeaderScroll();
     initHeaderToggle();

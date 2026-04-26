@@ -1,3 +1,5 @@
+import { showToast } from "../generic/toast";
+
 function clampQuantity(value, max) {
     const number = Number.parseInt(value, 10) || 0;
     return Math.max(0, Math.min(max, number));
@@ -22,6 +24,32 @@ function formatPrice(cents) {
         style: "currency",
         currency: "EUR",
     }).format((Number.parseInt(cents, 10) || 0) / 100);
+}
+
+function normalizeStockUnit(value) {
+    return String(value || "").trim() === "g" ? "g" : "unit";
+}
+
+function formatStockQuantity(quantity, unit) {
+    const amount = Math.max(0, Number.parseInt(quantity, 10) || 0);
+    const stockUnit = normalizeStockUnit(unit);
+
+    if (stockUnit === "g") {
+        if (amount >= 1000) {
+            let kilograms = new Intl.NumberFormat("fr-FR", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+            }).format(amount / 1000);
+            kilograms = kilograms.replace(/(?:,0+|,\d*0+)$/, (match) =>
+                match.replace(/0+$/, "").replace(/,$/, ""),
+            );
+            return `${kilograms} kg`;
+        }
+
+        return `${amount} g`;
+    }
+
+    return `${amount} unité(s)`;
 }
 
 function getSelectedOptionData(select) {
@@ -392,6 +420,11 @@ export function initShopPage() {
         const controls = form.querySelector(`[data-shop-controls][data-line-key="${lineKey}"]`);
         const purchaseHint = node.querySelector(".shopPurchaseOption__hint");
         const stockQuantity = Number.parseInt(node.getAttribute("data-item-stock") || "0", 10);
+        const stockUnit = normalizeStockUnit(node.getAttribute("data-item-stock-unit") || "unit");
+        const lowStockThreshold = Number.parseInt(
+            node.getAttribute("data-item-low-stock-threshold") || "0",
+            10,
+        );
         const priceCents = Number.parseInt(node.getAttribute("data-item-price-cents") || "0", 10);
         const optionUnits = Math.max(
             1,
@@ -422,10 +455,13 @@ export function initShopPage() {
             controls,
             purchaseHint,
             stockQuantity,
+            stockUnit,
+            lowStockThreshold,
         });
     });
 
-    const getUnitMultiplier = (item) => Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
+    const getUnitMultiplier = (item) =>
+        Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
 
     const getEffectivePriceCents = (item) => {
         return item.basePriceCents;
@@ -479,7 +515,10 @@ export function initShopPage() {
             return 0;
         }
 
-        const availableUnits = Math.max(0, item.stockQuantity - getReservedUnitsForItem(item.id, item.lineKey));
+        const availableUnits = Math.max(
+            0,
+            item.stockQuantity - getReservedUnitsForItem(item.id, item.lineKey),
+        );
         return Math.max(0, Math.floor(availableUnits / getUnitMultiplier(item)));
     };
 
@@ -492,17 +531,19 @@ export function initShopPage() {
 
         const remainingUnits = getRemainingStockUnits(itemId);
         const soldOut = remainingUnits <= 0;
-        const lowStock = !soldOut && remainingUnits <= 5;
+        const lowStock =
+            !soldOut &&
+            remainingUnits <= Math.max(0, Number.parseInt(itemLine.lowStockThreshold || 0, 10));
 
         badges.forEach((badge) => {
-            let label = `${remainingUnits} unité(s)`;
+            let label = formatStockQuantity(remainingUnits, itemLine.stockUnit);
             let tone = "";
 
             if (soldOut) {
                 label = "Rupture";
                 tone = " is-sold-out";
             } else if (lowStock) {
-                label = `Plus que ${remainingUnits} unité(s)`;
+                label = `Plus que ${formatStockQuantity(remainingUnits, itemLine.stockUnit)}`;
                 tone = " is-low";
             }
 
@@ -560,7 +601,8 @@ export function initShopPage() {
 
         if (item.purchaseHint instanceof HTMLElement) {
             const defaultText = item.purchaseHint.dataset.defaultText || "";
-            item.purchaseHint.textContent = quantity > 0 ? `${quantity} dans le panier` : defaultText;
+            item.purchaseHint.textContent =
+                quantity > 0 ? `${quantity} dans le panier` : defaultText;
         }
 
         item.node.classList.toggle("is-in-cart", quantity > 0);
@@ -584,26 +626,27 @@ export function initShopPage() {
     };
 
     const setFeedback = (message, type = "info") => {
-        if (!feedback) {
-            return;
-        }
-
         if (!message) {
-            feedback.hidden = true;
-            feedback.textContent = "";
-            feedback.className = "shopFeedback";
+            if (feedback) {
+                feedback.hidden = true;
+                feedback.textContent = "";
+                feedback.className = "shopFeedback";
+            }
             return;
         }
 
-        feedback.hidden = false;
-        feedback.textContent = message;
-        feedback.className = `shopFeedback is-${type}`;
+        if (feedback) {
+            feedback.hidden = true;
+            feedback.textContent = message;
+            feedback.className = `shopFeedback is-${type}`;
+        }
+        showToast(message, { type });
     };
 
     const syncFulfillmentState = () => {
         const wantsDelivery = fulfillmentInputs.some(
             (input) =>
-            input instanceof HTMLInputElement && input.checked && input.value === "delivery",
+                input instanceof HTMLInputElement && input.checked && input.value === "delivery",
         );
 
         if (deliveryPanel instanceof HTMLElement) {
@@ -656,7 +699,9 @@ export function initShopPage() {
                 left.className = "shopSummary__lineMain";
 
                 const label = document.createElement("span");
-                label.textContent = item.optionLabel ? `${item.name} — ${item.optionLabel}` : item.name;
+                label.textContent = item.optionLabel
+                    ? `${item.name} — ${item.optionLabel}`
+                    : item.name;
 
                 const meta = document.createElement("small");
                 meta.textContent = `${quantity} × ${getEffectivePriceLabel(item)}`;
@@ -748,9 +793,9 @@ export function initShopPage() {
         if (summaryDiscount) {
             summaryDiscount.hidden = promoEvaluation.discountCents <= 0;
             summaryDiscount.textContent =
-                promoEvaluation.discountCents > 0 ?
-                `Remise -${formatPrice(promoEvaluation.discountCents)}` :
-                "";
+                promoEvaluation.discountCents > 0
+                    ? `Remise -${formatPrice(promoEvaluation.discountCents)}`
+                    : "";
         }
 
         if (summaryTotal) {
@@ -769,9 +814,9 @@ export function initShopPage() {
         }
 
         if (summary) {
-            summary.hidden = isDesktopToast() ?
-                totalCount === 0 && !isSummaryOpen :
-                totalCount === 0;
+            summary.hidden = isDesktopToast()
+                ? totalCount === 0 && !isSummaryOpen
+                : totalCount === 0;
         }
 
         if (summaryOverlay) {
@@ -803,9 +848,9 @@ export function initShopPage() {
         if (goCheckoutButton) {
             goCheckoutButton.disabled = totalCount === 0;
             goCheckoutButton.textContent =
-                totalCount === 0 ?
-                "Continuer vers les informations" :
-                `Continuer avec ${totalItems} ${totalItems === 1 ? "produit" : "produits"}`;
+                totalCount === 0
+                    ? "Continuer vers les informations"
+                    : `Continuer avec ${totalItems} ${totalItems === 1 ? "produit" : "produits"}`;
         }
 
         if (summaryLines && totalCount === 0) {
@@ -830,10 +875,16 @@ export function initShopPage() {
                 }
 
                 item.stockQuantity = stockQuantity;
+                item.stockUnit = normalizeStockUnit(entry.stock_unit || item.stockUnit || "unit");
+                item.lowStockThreshold = Math.max(
+                    0,
+                    Number.parseInt(entry.low_stock_threshold || item.lowStockThreshold || 0, 10),
+                );
                 const allowed = getAvailableOrderQuantity(item);
                 item.input.max = String(allowed);
                 item.input.value = String(clampQuantity(item.input.value, allowed));
-                item.input.disabled = (allowed <= 0 && getQuantity(item) <= 0) || entry.is_active === false;
+                item.input.disabled =
+                    (allowed <= 0 && getQuantity(item) <= 0) || entry.is_active === false;
                 syncItemState(item);
             });
         });
@@ -841,7 +892,7 @@ export function initShopPage() {
         renderSummary();
     };
 
-    const refreshStock = async({ silent = false } = {}) => {
+    const refreshStock = async ({ silent = false } = {}) => {
         try {
             const response = await fetch(stockEndpoint, {
                 headers: {
@@ -1023,7 +1074,8 @@ export function initShopPage() {
 
                 summary.scrollTop = Math.max(0, Math.min(maxScrollTop, nextScrollTop));
                 event.preventDefault();
-            }, { passive: false },
+            },
+            { passive: false },
         );
     }
 
@@ -1041,7 +1093,8 @@ export function initShopPage() {
                 clearSummaryHideTimeout();
                 clearSummaryDragResetTimeout();
                 summary.style.willChange = "transform";
-            }, { passive: true },
+            },
+            { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -1060,7 +1113,8 @@ export function initShopPage() {
                 }
 
                 applySummaryDrag(deltaY);
-            }, { passive: true },
+            },
+            { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -1083,7 +1137,8 @@ export function initShopPage() {
                 summary.style.transition = "transform 220ms ease";
                 summary.style.transform = "translateY(0)";
                 scheduleSummaryDragReset();
-            }, { passive: true },
+            },
+            { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -1098,7 +1153,8 @@ export function initShopPage() {
                 summary.style.transition = "transform 220ms ease";
                 summary.style.transform = "translateY(0)";
                 scheduleSummaryDragReset();
-            }, { passive: true },
+            },
+            { passive: true },
         );
     }
 
@@ -1125,7 +1181,7 @@ export function initShopPage() {
 
     window.addEventListener("resize", syncSummaryDockBounds);
 
-    form.addEventListener("submit", async(event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         setFeedback("");
 
@@ -1166,22 +1222,22 @@ export function initShopPage() {
             const payload = await parseResponse(response);
 
             if (!response.ok) {
-                const conflictNames = Array.isArray(payload.conflicts) ?
-                    payload.conflicts
-                    .map((conflict) => {
-                        const name = conflict && conflict.name ? conflict.name : "Produit";
-                        const available =
-                            Number.parseInt(conflict && conflict.available, 10) || 0;
-                        return `${name} (${available} dispo)`;
-                    })
-                    .join(", ") :
-                    "";
+                const conflictNames = Array.isArray(payload.conflicts)
+                    ? payload.conflicts
+                          .map((conflict) => {
+                              const name = conflict && conflict.name ? conflict.name : "Produit";
+                              const available =
+                                  Number.parseInt(conflict && conflict.available, 10) || 0;
+                              return `${name} (${available} dispo)`;
+                          })
+                          .join(", ")
+                    : "";
 
                 setFeedback(
                     payload.error ||
-                    (conflictNames ?
-                        `Stock mis à jour: ${conflictNames}` :
-                        "Commande impossible pour le moment."),
+                        (conflictNames
+                            ? `Stock mis à jour: ${conflictNames}`
+                            : "Commande impossible pour le moment."),
                     "error",
                 );
 
@@ -1210,7 +1266,9 @@ export function initShopPage() {
             if (payload.client_ack_sent === true) {
                 successParts.push("Un email de confirmation vient de vous être envoyé.");
             } else if (payload.email_notifications === false) {
-                successParts.push("La confirmation affichée ici fait foi même sans email automatique immédiat.");
+                successParts.push(
+                    "La confirmation affichée ici fait foi même sans email automatique immédiat.",
+                );
             }
             setFeedback(successParts.join(" "), "success");
         } catch {

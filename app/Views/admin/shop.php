@@ -43,6 +43,40 @@
     $priceLabel = trim((string) ($item['price_label'] ?? ''));
     return $priceLabel !== '' ? $priceLabel : $formatPrice($item['price_cents'] ?? 0);
     };
+
+    $normalizeStockUnit = static function ($value): string {
+    return trim((string) $value) === 'g' ? 'g' : 'unit';
+    };
+
+    $formatStockQuantity = static function ($quantity, $unit) use ($normalizeStockUnit): string {
+    $amount = max(0, (int) ($quantity ?? 0));
+    $stockUnit = $normalizeStockUnit($unit);
+    if ($stockUnit === 'g') {
+        if ($amount >= 1000) {
+            $kilograms = number_format($amount / 1000, 2, ',', ' ');
+            $kilograms = rtrim(rtrim($kilograms, '0'), ',');
+            return $kilograms . ' kg';
+        }
+
+        return $amount . ' g';
+    }
+
+    return $amount . ' unité(s)';
+    };
+
+    $resolveOptionQuantityInputValue = static function (array $option, $unit) use ($normalizeStockUnit): int {
+    $storedQuantity = max(1, (int) ($option['quantity'] ?? 1));
+    if ($normalizeStockUnit($unit) === 'g' || $storedQuantity > 1) {
+        return $storedQuantity;
+    }
+
+    $label = trim((string) ($option['label'] ?? ''));
+    if ($label !== '' && preg_match('/(?:lot\s*de|x)\s*(\d+)/iu', $label, $matches)) {
+        return max(1, (int) ($matches[1] ?? 1));
+    }
+
+    return $storedQuantity;
+    };
 ?>
 
 <div class="adminSplit adminSplit--catalog"
@@ -344,6 +378,13 @@
                                                 <input class="adminInput" type="text" name="price_euros"
                                                     inputmode="decimal" placeholder="Ex: 12,50" required>
                                             </label>
+                                            <label class="adminField adminField--sm">
+                                                <span class="adminField__label">Unité de stock</span>
+                                                <select class="adminSelect" name="stock_unit">
+                                                    <option value="unit" selected>Unités</option>
+                                                    <option value="g">Grammes (1000 = 1 kg)</option>
+                                                </select>
+                                            </label>
                                             <label class="adminField adminField--checkbox">
                                                 <span class="adminField__label">Visible</span>
                                                 <input class="adminCheckbox" type="checkbox" name="is_active" value="1"
@@ -368,8 +409,7 @@
                                                     name="low_stock_threshold" value="5">
                                             </label>
                                         </div>
-                                        <span class="adminHint">Le stock saisi ici correspond directement à la quantité
-                                            commandable.</span>
+                                        <span class="adminHint">Le stock saisi ici correspond à l'unité de stock du produit. Pour une vente au poids, utilisez les grammes : 1000 = 1 kg.</span>
                                     </section>
 
                                     <section class="adminEditorBlock adminEditorBlock--nested">
@@ -465,7 +505,10 @@
                             $itemVisibilityLabel   = ! empty($item['is_active']) ? 'Visible' : 'Masque';
                             $itemDescription       = trim((string) ($item['short_description'] ?? ''));
                             $itemStock             = max(0, (int) ($item['stock_quantity'] ?? 0));
+                            $itemStockUnit         = $normalizeStockUnit($item['stock_unit'] ?? 'unit');
+                            $itemStockDisplay      = $formatStockQuantity($itemStock, $itemStockUnit);
                             $itemLowStockThreshold = max(0, (int) ($item['low_stock_threshold'] ?? 0));
+                            $itemThresholdDisplay  = $formatStockQuantity($itemLowStockThreshold, $itemStockUnit);
                             $itemOptionsCount      = count($item['options'] ?? []);
                             $itemStockState        = $itemStock <= 0
                                 ? 'Rupture'
@@ -479,7 +522,7 @@
                                     <strong><?php echo $e($item['name'] ?? 'Produit'); ?></strong>
                                     <div class="adminCatalogMeta adminCatalogMeta--inline">
                                         <span><?php echo $e($formatItemPrice($item)); ?></span>
-                                        <span>Stock : <?php echo $itemStock; ?></span>
+                                        <span>Stock : <?php echo $e($itemStockDisplay); ?></span>
                                         <span><?php echo $itemStockState; ?></span>
                                         <span><?php echo $itemOptionsCount; ?> option(s)</span>
                                         <span><?php echo $itemVisibilityLabel; ?></span>
@@ -502,7 +545,7 @@
                                         <div class="adminCatalogOptions__title">Édition du produit</div>
                                         <div class="adminCatalogMeta adminCatalogMeta--inline">
                                             <span>Slug : <?php echo $e($item['slug'] ?? ''); ?></span>
-                                            <span>Seuil bas : <?php echo $itemLowStockThreshold; ?></span>
+                                            <span>Seuil bas : <?php echo $e($itemThresholdDisplay); ?></span>
                                             <span>Section : <?php echo $e($section['name'] ?? ''); ?></span>
                                         </div>
                                     </div>
@@ -542,6 +585,13 @@
                                                         inputmode="decimal"
                                                         value="<?php echo $e($formatPriceInput($item['price_cents'] ?? 0)); ?>"
                                                         required>
+                                                </label>
+                                                <label class="adminField adminField--sm">
+                                                    <span class="adminField__label">Unité de stock</span>
+                                                    <select class="adminSelect" name="stock_unit">
+                                                        <option value="unit" <?php echo $itemStockUnit === 'unit' ? 'selected' : ''; ?>>Unités</option>
+                                                        <option value="g" <?php echo $itemStockUnit === 'g' ? 'selected' : ''; ?>>Grammes (1000 = 1 kg)</option>
+                                                    </select>
                                                 </label>
                                                 <label class="adminField adminField--checkbox">
                                                     <span class="adminField__label">Visible</span>
@@ -583,8 +633,7 @@
                                                 <span>Etat : <?php echo $itemStockState; ?></span>
                                                 <span>Prix public : <?php echo $e($formatItemPrice($item)); ?></span>
                                             </div>
-                                            <span class="adminHint">Le prix saisi ici est converti automatiquement en
-                                                cents au moment de l'enregistrement.</span>
+                                            <span class="adminHint">Le prix saisi ici est converti automatiquement en cents au moment de l'enregistrement. En mode poids, stock et seuil bas sont saisis en grammes.</span>
                                         </details>
 
                                         <details
@@ -691,6 +740,10 @@
                                 </form>
 
                                 <?php $options = $item['options'] ?? []; ?>
+                                <?php $optionQuantityLabel = $itemStockUnit === 'g' ? 'Quantité vendue (g)' : 'Taille du lot'; ?>
+                                <?php $optionQuantityPlaceholder = $itemStockUnit === 'g' ? 'Ex: 100' : 'Ex: 4'; ?>
+                                <?php $optionCreateDefault = $itemStockUnit === 'g' ? '100' : ''; ?>
+                                <?php $optionLabelPlaceholder = $itemStockUnit === 'g' ? 'Libellé, ex: Barquette 100 g' : 'Libellé, ex: Unité, Lot de 4, Lot de 6'; ?>
                                 <details
                                     class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible adminEditorBlock--full adminCatalogOptions"
                                     <?php echo ! empty($options) ? 'open' : ''; ?>>
@@ -706,11 +759,16 @@
                                     <div class="adminCatalogOptions__body">
                                         <?php if (! empty($options)): ?>
                                         <div class="adminTableWrap">
+                                            <?php foreach ($options as $option): ?>
+                                            <form id="shop-option-form-<?php echo (int) $option['id']; ?>"
+                                                action="/admin/boutique/options/<?php echo (int) $option['id']; ?>"
+                                                method="post" class="adminOptionTableForm"></form>
+                                            <?php endforeach; ?>
                                             <table class="adminTable adminTable--options">
                                                 <thead>
                                                     <tr>
                                                         <th>Libellé</th>
-                                                        <th>Quantité</th>
+                                                        <th><?php echo $e($optionQuantityLabel); ?></th>
                                                         <th>Prix</th>
                                                         <th>Visible</th>
                                                         <th>Actions</th>
@@ -718,43 +776,52 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach ($options as $option): ?>
+                                                    <?php $optionFormId = 'shop-option-form-' . (int) $option['id']; ?>
+                                                    <?php $optionQuantityValue = $resolveOptionQuantityInputValue($option, $itemStockUnit); ?>
                                                     <tr id="option-<?php echo (int) $option['id']; ?>">
-                                                        <td colspan="5">
-                                                            <form
-                                                                action="/admin/boutique/options/<?php echo (int) $option['id']; ?>"
-                                                                method="post" class="adminForm adminForm--inline">
-                                                                <input class="adminInput" type="text" name="label"
-                                                                    value="<?php echo $e($option['label'] ?? ''); ?>"
-                                                                    required>
-
-                                                                <input class="adminInput" type="number" name="quantity"
-                                                                    min="1"
-                                                                    value="<?php echo (int) ($option['quantity'] ?? 1); ?>"
-                                                                    required>
-
-                                                                <input class="adminInput" type="text" name="price_euros"
-                                                                    inputmode="decimal"
-                                                                    value="<?php echo isset($option['price_cents']) ? number_format(((int) $option['price_cents']) / 100, 2, ',', '') : ''; ?>">
-
-                                                                <label class="adminField adminField--checkbox">
-                                                                    <span class="adminField__label">Visible</span>
-                                                                    <input class="adminCheckbox" type="checkbox"
-                                                                        name="is_active" value="1"
-                                                                        <?php echo ! empty($option['is_active']) ? 'checked' : ''; ?>>
-                                                                </label>
-
-                                                                <button type="submit" class="adminBtn adminBtn--sm">
+                                                        <td data-label="Libellé">
+                                                            <input class="adminInput" type="text" name="label"
+                                                                value="<?php echo $e($option['label'] ?? ''); ?>"
+                                                                form="<?php echo $e($optionFormId); ?>" required>
+                                                        </td>
+                                                        <td data-label="<?php echo $e($optionQuantityLabel); ?>">
+                                                            <input class="adminInput adminInput--sm" type="number"
+                                                                name="quantity" min="1"
+                                                                value="<?php echo $optionQuantityValue; ?>"
+                                                                placeholder="<?php echo $e($optionQuantityPlaceholder); ?>"
+                                                                form="<?php echo $e($optionFormId); ?>" required>
+                                                        </td>
+                                                        <td data-label="Prix">
+                                                            <input class="adminInput" type="text" name="price_euros"
+                                                                inputmode="decimal"
+                                                                value="<?php echo isset($option['price_cents']) ? number_format(((int) $option['price_cents']) / 100, 2, ',', '') : ''; ?>"
+                                                                form="<?php echo $e($optionFormId); ?>">
+                                                        </td>
+                                                        <td data-label="Visible">
+                                                            <label class="adminOptionVisibility">
+                                                                <input class="adminCheckbox" type="checkbox"
+                                                                    name="is_active" value="1"
+                                                                    form="<?php echo $e($optionFormId); ?>"
+                                                                    <?php echo ! empty($option['is_active']) ? 'checked' : ''; ?>>
+                                                                <span>Visible</span>
+                                                            </label>
+                                                        </td>
+                                                        <td data-label="Actions">
+                                                            <div class="adminOptionActions">
+                                                                <button type="submit" class="adminBtn adminBtn--sm"
+                                                                    form="<?php echo $e($optionFormId); ?>">
                                                                     Enregistrer
                                                                 </button>
 
                                                                 <button type="submit"
                                                                     class="adminBtn adminBtn--danger adminBtn--sm"
+                                                                    form="<?php echo $e($optionFormId); ?>"
                                                                     formaction="/admin/boutique/options/<?php echo (int) $option['id']; ?>/delete"
                                                                     formmethod="post"
                                                                     onclick="return confirm('Supprimer cette option ?');">
                                                                     Supprimer
                                                                 </button>
-                                                            </form>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
@@ -768,10 +835,12 @@
                                         <form
                                             action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/options/create"
                                             method="post" class="adminForm adminForm--inline">
-                                            <input type="text" name="label" placeholder="Libellé, ex: Lot de 4" required
+                                            <input type="text" name="label" placeholder="<?php echo $e($optionLabelPlaceholder); ?>" required
                                                 class="adminInput adminInput--sm">
 
-                                            <input type="number" name="quantity" min="1" value="1" required
+                                            <input type="number" name="quantity" min="1"
+                                                value="<?php echo $e($optionCreateDefault); ?>"
+                                                placeholder="<?php echo $e($optionQuantityPlaceholder); ?>" required
                                                 class="adminInput adminInput--sm">
 
                                             <input type="text" name="price_euros" inputmode="decimal"
@@ -788,8 +857,9 @@
                                             </button>
                                         </form>
 
-                                        <span class="adminHint">Ajoutez des lots : unité, lot de 4, lot de 6... Le prix
-                                            est saisi en euros.</span>
+                                        <span class="adminHint"><?php echo $itemStockUnit === 'g'
+                                                ? 'Pour une vente au poids, saisissez la quantité vendue en grammes : 100 pour 100 g, 250 pour 250 g, 1000 pour 1 kg. Le libellé sert surtout à l’affichage public.'
+                                            : 'Pour une vente à l’unité, indiquez la taille du lot : 1 pour « Unité », 4 pour « Lot de 4 », 6 pour « Lot de 6 ». Si le libellé contient déjà « Lot de 8 », gardez aussi 8 ici pour que le stock reste lisible en admin.'; ?></span>
                                     </div>
                                 </details>
                             </div>
@@ -825,6 +895,7 @@
                         </thead>
                         <tbody>
                             <?php foreach ($lowStockItems as $item): ?>
+                            <?php $lowStockUnit = $normalizeStockUnit($item['stock_unit'] ?? 'unit'); ?>
                             <tr>
                                 <td>
                                     <a href="#item-<?php echo (int) ($item['id'] ?? 0); ?>" class="adminLink">
@@ -832,8 +903,8 @@
                                     </a>
                                 </td>
                                 <td><?php echo $e($item['section_name'] ?? ''); ?></td>
-                                <td><?php echo (int) ($item['stock_quantity'] ?? 0); ?></td>
-                                <td><?php echo (int) ($item['low_stock_threshold'] ?? 0); ?></td>
+                                <td><?php echo $e($formatStockQuantity($item['stock_quantity'] ?? 0, $lowStockUnit)); ?></td>
+                                <td><?php echo $e($formatStockQuantity($item['low_stock_threshold'] ?? 0, $lowStockUnit)); ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>

@@ -24,6 +24,9 @@ final class ShopOrder
     /** @var list<string>|null */
     private ?array $orderColumns = null;
 
+    /** @var list<string>|null */
+    private ?array $itemColumns = null;
+
     public function __construct()
     {
         $this->db = Database::getInstance();
@@ -71,6 +74,7 @@ final class ShopOrder
 
             $stmt = $this->db->prepare(
                 "SELECT bi.id, bi.name, bi.price_cents, bi.price_label, bi.stock_quantity, bi.is_active,
+                    {$this->stockUnitSelectSql('bi')} AS stock_unit,
                         bs.name AS section_name, bs.is_active AS section_active
                  FROM boutique_items bi
                  INNER JOIN boutique_sections bs ON bs.id = bi.section_id
@@ -266,11 +270,16 @@ final class ShopOrder
                 $optionLabel    = is_array($option)
                     ? trim((string) ($option['label'] ?? ''))
                     : $optionLabelFromSelection;
+                $optionLabelSnapshot = $this->buildOptionLabelSnapshot(
+                    $optionLabel,
+                    $bundleUnits,
+                    (string) ($item['stock_unit'] ?? 'unit'),
+                );
 
                 $lineStmt->execute([
                     'order_id'              => $orderId,
                     'item_id'               => $itemId,
-                    'item_name_snapshot'    => $this->buildItemNameSnapshot((string) ($item['name'] ?? ''), $optionLabel),
+                    'item_name_snapshot'    => $this->buildItemNameSnapshot((string) ($item['name'] ?? ''), $optionLabelSnapshot),
                     'section_name_snapshot' => (string) ($item['section_name'] ?? ''),
                     'unit_price_cents'      => $unitPriceCents,
                     'unit_price_label'      => $this->resolveUnitPriceLabel($unitPriceCents, $option['price_label'] ?? ($item['price_label'] ?? null)),
@@ -545,6 +554,24 @@ final class ShopOrder
         return $optionLabel === '' ? $itemName : $itemName . ' — ' . $optionLabel;
     }
 
+    private function buildOptionLabelSnapshot(string $optionLabel, int $bundleUnits, string $stockUnit): string
+    {
+        $label = trim($optionLabel);
+        if ($label === '') {
+            return '';
+        }
+
+        if ($this->parseOptionUnitsFromLabel($label) > 1 || $bundleUnits <= 1) {
+            return $label;
+        }
+
+        if (trim((string) $stockUnit) === 'g') {
+            return $label . ' (' . $this->formatWeightUnits($bundleUnits) . ')';
+        }
+
+        return $label . ' (x' . $bundleUnits . ')';
+    }
+
     private function resolveUnitPriceLabel(int $unitPriceCents, $priceLabel): string
     {
         $label = trim((string) ($priceLabel ?? ''));
@@ -563,23 +590,7 @@ final class ShopOrder
             return $orderedQuantity;
         }
 
-        $stmt = $this->db->prepare(
-            'SELECT quantity
-             FROM boutique_item_options
-             WHERE item_id = :item_id AND label = :label
-             LIMIT 1',
-        );
-        $stmt->execute([
-            'item_id' => $itemId,
-            'label'   => $optionLabel,
-        ]);
-
-        $bundleUnits = (int) $stmt->fetchColumn();
-        if ($bundleUnits <= 1 && preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $optionLabel, $matches) === 1) {
-            $bundleUnits = max(1, (int) ($matches[1] ?? 1));
-        }
-
-        return $orderedQuantity * max(1, $bundleUnits);
+        return $orderedQuantity * $this->parseOptionUnitsFromLabel($optionLabel);
     }
 
     private function extractOptionLabelFromSnapshot(string $itemNameSnapshot): ?string
@@ -604,16 +615,78 @@ final class ShopOrder
         }
 
         $label = trim((string) ($option['label'] ?? ''));
-        if ($label !== '' && preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $label, $matches) === 1) {
+        return $this->parseOptionUnitsFromLabel($label);
+    }
+
+    private function parseOptionUnitsFromLabel(string $label): int
+    {
+        $label = trim($label);
+        if ($label === '') {
+            return 1;
+        }
+
+        if (preg_match('/(\d+(?:[\.,]\d+)?)\s*kg\b/i', $label, $matches) === 1) {
+            $kilograms = (float) str_replace(',', '.', (string) ($matches[1] ?? '0'));
+            return max(1, (int) round($kilograms * 1000));
+        }
+
+        if (preg_match('/(\d+(?:[\.,]\d+)?)\s*g\b/i', $label, $matches) === 1) {
+            $grams = (float) str_replace(',', '.', (string) ($matches[1] ?? '0'));
+            return max(1, (int) round($grams));
+        }
+
+        if (preg_match('/\b(?:lot|x)\s*(?:de\s*)?(\d+)\b/i', $label, $matches) === 1) {
             return max(1, (int) ($matches[1] ?? 1));
         }
 
-        return $quantity;
+        return 1;
+    }
+
+    private function formatWeightUnits(int $grams): string
+    {
+        $grams = max(1, $grams);
+        if ($grams >= 1000) {
+            $kilograms = number_format($grams / 1000, 2, ',', ' ');
+            $kilograms = rtrim(rtrim($kilograms, '0'), ',');
+            return $kilograms . ' kg';
+        }
+
+        return $grams . ' g';
     }
 
     private function normalizeFulfillmentMethod($value): string
     {
         return trim((string) $value) === 'delivery' ? 'delivery' : 'pickup';
+    }
+
+    private function stockUnitSelectSql(string $alias = 'boutique_items'): string
+    {
+        return $this->hasItemColumn('stock_unit') ? $alias . '.stock_unit' : "'unit'";
+    }
+
+    private function hasItemColumn(string $column): bool
+    {
+        return in_array($column, $this->getItemColumns(), true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getItemColumns(): array
+    {
+        if ($this->itemColumns !== null) {
+            return $this->itemColumns;
+        }
+
+        $stmt = $this->db->query('SHOW COLUMNS FROM boutique_items');
+        $rows = $stmt !== false ? $stmt->fetchAll() : [];
+
+        $this->itemColumns = array_values(array_filter(array_map(
+            static fn(array $row): string => (string) ($row['Field'] ?? ''),
+            is_array($rows) ? $rows : [],
+        )));
+
+        return $this->itemColumns;
     }
 
     private function hasOrderColumn(string $column): bool

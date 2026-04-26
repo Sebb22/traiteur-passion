@@ -1,3 +1,5 @@
+import { showToast } from "../generic/toast";
+
 function minDateIso(days) {
     const date = new Date();
     date.setDate(date.getDate() + days);
@@ -601,15 +603,13 @@ function initRequestForm(form) {
 
             const data = await response.json();
             if (response.ok && data.success) {
-                if (successMessage) {
-                    if (successText) {
-                        successText.textContent =
-                            data.message ||
-                            "Votre demande a été envoyée avec succès ! Nous vous recontacterons rapidement.";
-                    }
-                    successMessage.style.display = "block";
-                    successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+                const successCopy =
+                    data.message ||
+                    "Votre demande a été envoyée avec succès ! Nous vous recontacterons rapidement.";
+                if (successText) {
+                    successText.textContent = successCopy;
                 }
+                showToast(successCopy, { type: "success" });
 
                 form.reset();
                 resetSelectionState();
@@ -619,19 +619,20 @@ function initRequestForm(form) {
                         successMessage.style.display = "none";
                     }
                 }, 8000);
-            } else if (errorMessage && errorText) {
-                errorText.textContent =
+            } else {
+                const errorCopy =
                     data.error || "Une erreur est survenue. Veuillez réessayer.";
-                errorMessage.style.display = "block";
-                errorMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+                if (errorText) {
+                    errorText.textContent = errorCopy;
+                }
+                showToast(errorCopy, { type: "error" });
             }
         } catch (error) {
-            if (errorMessage && errorText) {
-                errorText.textContent =
-                    "Erreur de connexion. Veuillez vérifier votre connexion internet.";
-                errorMessage.style.display = "block";
-                errorMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+            const errorCopy = "Erreur de connexion. Veuillez vérifier votre connexion internet.";
+            if (errorText) {
+                errorText.textContent = errorCopy;
             }
+            showToast(errorCopy, { type: "error" });
             console.error("Request form submission error:", error);
         } finally {
             if (submitButton) {

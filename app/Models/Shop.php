@@ -8,6 +8,9 @@ use PDO;
 
 final class Shop
 {
+    /** @var list<string>|null */
+    private ?array $itemColumns = null;
+
     /**
      * Récupère les options d'achat (lots) pour un item donné
      * @param int $itemId
@@ -103,10 +106,12 @@ final class Shop
              ORDER BY sort_order ASC, id ASC",
         )->fetchAll(PDO::FETCH_ASSOC);
 
+        $stockUnitSelect = $this->stockUnitSelectSql('bi');
+
         $items = $this->db->query(
             "SELECT bi.id, bi.section_id, bi.slug, bi.name, bi.short_description, bi.image_path, bi.image_alt,
                     bi.price_cents, bi.price_label, bi.stock_quantity, bi.low_stock_threshold, bi.max_order_quantity,
-                    bi.sort_order
+                    {$stockUnitSelect} AS stock_unit, bi.sort_order
              FROM boutique_items bi
              INNER JOIN boutique_sections bs ON bs.id = bi.section_id
              WHERE bi.is_active = 1 AND bs.is_active = 1
@@ -133,6 +138,7 @@ final class Shop
                 'price_label'         => (string) ($item['price_label'] ?? ''),
                 'options'             => $options,
                 'stock_quantity'      => $stock,
+                'stock_unit'          => $this->normalizeStockUnit($item['stock_unit'] ?? null),
                 'low_stock_threshold' => max(0, (int) ($item['low_stock_threshold'] ?? 0)),
                 'is_sold_out'         => $stock <= 0,
                 'is_low_stock'        => $stock > 0 && $stock <= max(0, (int) ($item['low_stock_threshold'] ?? 0)),
@@ -156,6 +162,8 @@ final class Shop
 
     public function getCatalogForAdmin(): array
     {
+        $stockUnitSelect = $this->stockUnitSelectSql();
+
         $sections = $this->db->query(
             "SELECT id, slug, name, description, sort_order, is_active
              FROM boutique_sections
@@ -165,7 +173,7 @@ final class Shop
         $items = $this->db->query(
             "SELECT id, section_id, slug, name, short_description, image_path, image_alt,
                     price_cents, price_label, stock_quantity, low_stock_threshold, max_order_quantity,
-                    sort_order, is_active
+                    {$stockUnitSelect} AS stock_unit, sort_order, is_active
              FROM boutique_items
              ORDER BY section_id ASC, sort_order ASC, id ASC",
         )->fetchAll();
@@ -177,6 +185,7 @@ final class Shop
                 $itemsBySectionId[$sectionId] = [];
             }
             // Injection des options d'achat (lots)
+            $item['stock_unit']             = $this->normalizeStockUnit($item['stock_unit'] ?? null);
             $item['options']                = $this->getItemOptions((int) $item['id']);
             $itemsBySectionId[$sectionId][] = $item;
         }
@@ -273,19 +282,7 @@ final class Shop
         }
         $slug = $this->ensureUniqueItemSlugInSection($sectionId, $slug);
 
-        $stmt = $this->db->prepare(
-            'INSERT INTO boutique_items (
-                section_id, slug, name, short_description, image_path, image_alt,
-                price_cents, price_label, stock_quantity, low_stock_threshold,
-                max_order_quantity, sort_order, is_active
-             ) VALUES (
-                :section_id, :slug, :name, :short_description, :image_path, :image_alt,
-                :price_cents, :price_label, :stock_quantity, :low_stock_threshold,
-                :max_order_quantity, :sort_order, :is_active
-             )',
-        );
-
-        $stmt->execute([
+        $payload = [
             'section_id'          => $sectionId,
             'slug'                => $slug,
             'name'                => $name,
@@ -299,30 +296,27 @@ final class Shop
             'max_order_quantity'  => $this->resolveMaxOrderQuantityForCreate($data),
             'sort_order'          => $this->resolveSortOrderForCreate('boutique_items', $data, 'section_id', $sectionId),
             'is_active'           => $this->toBoolInt($data['is_active'] ?? null),
-        ]);
+        ];
+
+        if ($this->hasItemColumn('stock_unit')) {
+            $payload['stock_unit'] = $this->normalizeStockUnit($data['stock_unit'] ?? null);
+        }
+
+        $columns = array_keys($payload);
+        $stmt    = $this->db->prepare(sprintf(
+            'INSERT INTO boutique_items (%s) VALUES (%s)',
+            implode(', ', $columns),
+            implode(', ', array_map(static fn(string $column): string => ':' . $column, $columns)),
+        ));
+
+        $stmt->execute($payload);
 
         return (int) $this->db->lastInsertId();
     }
 
     public function updateItem(int $id, array $data): void
     {
-        $stmt = $this->db->prepare(
-            'UPDATE boutique_items
-             SET name = :name,
-                 short_description = :short_description,
-                 image_path = :image_path,
-                 image_alt = :image_alt,
-                 price_cents = :price_cents,
-                 price_label = :price_label,
-                 stock_quantity = :stock_quantity,
-                 low_stock_threshold = :low_stock_threshold,
-                 max_order_quantity = :max_order_quantity,
-                 sort_order = :sort_order,
-                 is_active = :is_active
-             WHERE id = :id',
-        );
-
-        $stmt->execute([
+        $payload = [
             'id'                  => $id,
             'name'                => trim((string) ($data['name'] ?? '')),
             'short_description'   => $this->nullableString($data['short_description'] ?? null),
@@ -335,7 +329,26 @@ final class Shop
             'max_order_quantity'  => $this->resolveMaxOrderQuantityForUpdate($id, $data),
             'sort_order'          => $this->resolveSortOrderForUpdate('boutique_items', $id, $data),
             'is_active'           => $this->toBoolInt($data['is_active'] ?? null),
-        ]);
+        ];
+
+        if ($this->hasItemColumn('stock_unit')) {
+            $payload['stock_unit'] = $this->normalizeStockUnit($data['stock_unit'] ?? null);
+        }
+
+        $setClauses = [];
+        foreach (array_keys($payload) as $column) {
+            if ($column === 'id') {
+                continue;
+            }
+
+            $setClauses[] = $column . ' = :' . $column;
+        }
+
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_items SET ' . implode(', ', $setClauses) . ' WHERE id = :id',
+        );
+
+        $stmt->execute($payload);
     }
 
     public function deleteItem(int $id): void
@@ -414,8 +427,10 @@ final class Shop
 
     public function getLowStockItems(int $limit = 8): array
     {
+        $stockUnitSelect = $this->stockUnitSelectSql('bi');
+
         $stmt = $this->db->prepare(
-            "SELECT bi.id, bi.name, bi.stock_quantity, bi.low_stock_threshold, bi.is_active,
+            "SELECT bi.id, bi.name, bi.stock_quantity, {$stockUnitSelect} AS stock_unit, bi.low_stock_threshold, bi.is_active,
                     bs.name AS section_name
              FROM boutique_items bi
              INNER JOIN boutique_sections bs ON bs.id = bi.section_id
@@ -434,8 +449,10 @@ final class Shop
      */
     public function getStockSnapshot(): array
     {
+        $stockUnitSelect = $this->stockUnitSelectSql();
+
         $rows = $this->db->query(
-            "SELECT id, name, stock_quantity, is_active
+            "SELECT id, name, stock_quantity, {$stockUnitSelect} AS stock_unit, low_stock_threshold, is_active
              FROM boutique_items
              ORDER BY id ASC",
         )->fetchAll();
@@ -444,10 +461,12 @@ final class Shop
         foreach ($rows as $row) {
             $itemId            = (int) ($row['id'] ?? 0);
             $snapshot[$itemId] = [
-                'id'             => $itemId,
-                'name'           => (string) ($row['name'] ?? ''),
-                'stock_quantity' => max(0, (int) ($row['stock_quantity'] ?? 0)),
-                'is_active'      => ! empty($row['is_active']),
+                'id'                  => $itemId,
+                'name'                => (string) ($row['name'] ?? ''),
+                'stock_quantity'      => max(0, (int) ($row['stock_quantity'] ?? 0)),
+                'stock_unit'          => $this->normalizeStockUnit($row['stock_unit'] ?? null),
+                'low_stock_threshold' => max(0, (int) ($row['low_stock_threshold'] ?? 0)),
+                'is_active'           => ! empty($row['is_active']),
             ];
         }
 
@@ -687,5 +706,40 @@ final class Shop
             $candidate = $slug . '-' . $suffix;
             $suffix++;
         }
+    }
+
+    private function normalizeStockUnit($value): string
+    {
+        return trim((string) $value) === 'g' ? 'g' : 'unit';
+    }
+
+    private function stockUnitSelectSql(string $alias = 'boutique_items'): string
+    {
+        return $this->hasItemColumn('stock_unit') ? $alias . '.stock_unit' : "'unit'";
+    }
+
+    private function hasItemColumn(string $column): bool
+    {
+        return in_array($column, $this->getItemColumns(), true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getItemColumns(): array
+    {
+        if ($this->itemColumns !== null) {
+            return $this->itemColumns;
+        }
+
+        $stmt = $this->db->query('SHOW COLUMNS FROM boutique_items');
+        $rows = $stmt !== false ? $stmt->fetchAll() : [];
+
+        $this->itemColumns = array_values(array_filter(array_map(
+            static fn(array $row): string => (string) ($row['Field'] ?? ''),
+            is_array($rows) ? $rows : [],
+        )));
+
+        return $this->itemColumns;
     }
 }

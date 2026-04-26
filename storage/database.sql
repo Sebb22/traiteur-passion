@@ -146,6 +146,7 @@ CREATE TABLE IF NOT EXISTS boutique_items (
     price_cents INT NOT NULL DEFAULT 0,
     price_label VARCHAR(80) NULL,
     stock_quantity INT NOT NULL DEFAULT 0,
+    stock_unit VARCHAR(16) NOT NULL DEFAULT 'unit' COMMENT 'unit ou g',
     low_stock_threshold INT NOT NULL DEFAULT 5,
     max_order_quantity INT NOT NULL DEFAULT 10,
     sort_order INT NOT NULL DEFAULT 0,
