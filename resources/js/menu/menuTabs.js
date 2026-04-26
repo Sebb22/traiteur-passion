@@ -237,8 +237,7 @@ function initMenuTabsInstance(nav) {
             if (!isMobileViewport()) {
                 scrollActiveTabIntoView(active.link);
             }
-        },
-        {
+        }, {
             root: resolveScrollContainer(),
             rootMargin: "-18% 0px -60% 0px",
             threshold: [0.15, 0.35, 0.6],
