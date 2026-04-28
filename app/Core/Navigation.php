@@ -13,6 +13,7 @@ final class Navigation
         '/a-propos'             => 'À propos',
         '/contact'              => 'Contact',
         '/devis'                => 'Devis',
+        '/mentions-legales'     => 'Mentions légales',
     ];
 
     private static array $descriptions = [
@@ -23,6 +24,7 @@ final class Navigation
         '/a-propos'             => 'Découvrez Traiteur Passion : notre équipe, notre méthode et nos engagements pour des réceptions mémorables.',
         '/contact'              => 'Contactez Traiteur Passion pour votre mariage, réception privée ou événement professionnel. Réponse rapide et accompagnement personnalisé.',
         '/devis'                => 'Demandez votre devis traiteur sur mesure à Compiègne. Menus adaptés, budget maîtrisé et accompagnement complet.',
+        '/mentions-legales'     => 'Mentions légales du site Traiteur Passion : éditeur du site, hébergement OVH, conception et développement, propriété intellectuelle et contact.',
     ];
 
     public static function getCurrentPath(): string
@@ -87,6 +89,7 @@ final class Navigation
             '/a-propos'             => 'page--about',
             '/contact'              => 'page--contact',
             '/devis'                => 'page--devis',
+            '/mentions-legales'     => 'page--legal',
         ];
 
         return $bodyClasses[$currentPath] ?? 'page--generic';

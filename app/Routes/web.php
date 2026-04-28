@@ -19,6 +19,7 @@ $router->post('/contact', 'ContactController@store');
 $router->get('/devis', 'QuoteController@show');
 $router->post('/devis', 'QuoteController@store');
 $router->get('/a-propos', 'HomeController@about');
+$router->get('/mentions-legales', 'HomeController@legalNotice');
 
 // Admin auth routes
 $router->get('/admin/login', 'AuthController@showLogin');

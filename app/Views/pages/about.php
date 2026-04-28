@@ -248,9 +248,7 @@
                     <a class="btn btn--primary" href="/contact">Demander un devis</a>
                 </section>
 
-                <footer class="menuFooter">
-                    <p>© <?php echo date('Y') ?> Traiteur Passion</p>
-                </footer>
+                <?php require dirname(__DIR__) . '/partials/menu-footer.php'; ?>
             </div>
         </div>
     </section>

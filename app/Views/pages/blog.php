@@ -74,6 +74,8 @@
                 </article>
                 <?php endforeach; ?>
             </section>
+
+            <?php require dirname(__DIR__) . '/partials/menu-footer.php'; ?>
         </div>
     </section>
 </main>

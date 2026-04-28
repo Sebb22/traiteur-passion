@@ -26,6 +26,15 @@ final class HomeController
         ]);
     }
 
+    public function legalNotice(): void
+    {
+        View::render('pages/legal', [
+            'title'           => 'Traiteur Passion — Mentions légales',
+            'metaDescription' => 'Consultez les mentions légales du site Traiteur Passion : éditeur, hébergement OVH, conception, propriété intellectuelle et données personnelles.',
+            'bodyClass'       => 'page--legal',
+        ]);
+    }
+
     public function blog(): void
     {
         $blogModel = new Blog();

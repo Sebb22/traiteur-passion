@@ -113,6 +113,8 @@
                     </footer>
                 </section>
             </article>
+
+            <?php require dirname(__DIR__) . '/partials/menu-footer.php'; ?>
         </div>
     </section>
 </main>

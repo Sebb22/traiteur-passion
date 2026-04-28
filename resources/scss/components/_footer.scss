@@ -20,3 +20,28 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(239, 231, 210, 0.55);
 }
+
+.menuFooter__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.menuFooter__copy {
+  margin: 0;
+}
+
+.menuFooter__link {
+  color: rgba(239, 231, 210, 0.68);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  transition: color 160ms ease, opacity 160ms ease;
+}
+
+.menuFooter__link:hover,
+.menuFooter__link:focus-visible {
+  color: rgba(239, 231, 210, 0.9);
+}

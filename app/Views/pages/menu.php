@@ -169,9 +169,7 @@
                 </section>
                 <?php endforeach; ?>
 
-                <footer class="menuFooter">
-                    <p>© <?php echo date('Y'); ?> Traiteur Passion</p>
-                </footer>
+                <?php require dirname(__DIR__) . '/partials/menu-footer.php'; ?>
 
             </div>
         </div>
