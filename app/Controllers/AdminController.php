@@ -53,15 +53,21 @@ final class AdminController
     {
         AdminAuth::requireAuth();
         $optionIdInt = (int) $optionId;
+        $anchor      = '';
+
         try {
             $shopModel = new Shop();
+            $option    = $shopModel->getItemOptionById($optionIdInt);
+            $itemId    = is_array($option) ? (int) ($option['item_id'] ?? 0) : 0;
             $shopModel->deleteItemOption($optionIdInt);
             $this->pushFlash('success', 'Option d\'achat supprimée.');
+            $anchor = $itemId > 0 ? '#item-' . $itemId : '';
         } catch (\Throwable $e) {
             error_log('Shop item option delete error: ' . $e->getMessage());
             $this->pushFlash('error', 'Impossible de supprimer l\'option d\'achat.');
         }
-        $this->redirectShop();
+
+        $this->redirectShop($anchor);
     }
     public function dashboard(): void
     {
@@ -312,8 +318,21 @@ final class AdminController
     {
         AdminAuth::requireAuth();
 
+        $sectionIdInt = (int) $id;
+        $shopModel    = new Shop();
+        $imageService = new MenuImageService(null, 'shop');
+
         try {
-            (new Shop())->deleteSection((int) $id);
+            $imagePaths = $shopModel->getSectionItemImagePaths($sectionIdInt);
+        } catch (\Throwable $e) {
+            $imagePaths = [];
+        }
+
+        try {
+            $shopModel->deleteSection($sectionIdInt);
+            foreach ($imagePaths as $imagePath) {
+                $imageService->cleanupFromDesktopPath($imagePath);
+            }
             $this->pushFlash('success', 'Section boutique supprimée.');
         } catch (\Throwable $e) {
             error_log('Shop section delete error: ' . $e->getMessage());
@@ -388,10 +407,22 @@ final class AdminController
     {
         AdminAuth::requireAuth();
 
-        $sectionId = (int) ($_POST['section_id'] ?? 0);
+        $itemId       = (int) $id;
+        $sectionId    = (int) ($_POST['section_id'] ?? 0);
+        $shopModel    = new Shop();
+        $imageService = new MenuImageService(null, 'shop');
 
         try {
-            (new Shop())->deleteItem((int) $id);
+            $existingItem = $shopModel->getItemById($itemId);
+        } catch (\Throwable $e) {
+            $existingItem = null;
+        }
+
+        try {
+            $shopModel->deleteItem($itemId);
+            if (is_array($existingItem)) {
+                $imageService->cleanupFromDesktopPath((string) ($existingItem['image_path'] ?? ''));
+            }
             $this->pushFlash('success', 'Produit boutique supprimé.');
         } catch (\Throwable $e) {
             error_log('Shop item delete error: ' . $e->getMessage());

@@ -49,7 +49,7 @@
     };
 
     $formatStockQuantity = static function ($quantity, $unit) use ($normalizeStockUnit): string {
-    $amount = max(0, (int) ($quantity ?? 0));
+    $amount    = max(0, (int) ($quantity ?? 0));
     $stockUnit = $normalizeStockUnit($unit);
     if ($stockUnit === 'g') {
         if ($amount >= 1000) {
@@ -739,11 +739,11 @@
                                     </div>
                                 </form>
 
-                                <?php $options = $item['options'] ?? []; ?>
-                                <?php $optionQuantityLabel = $itemStockUnit === 'g' ? 'Quantité vendue (g)' : 'Taille du lot'; ?>
+                                <?php $options                   = $item['options'] ?? []; ?>
+                                <?php $optionQuantityLabel       = $itemStockUnit === 'g' ? 'Quantité vendue (g)' : 'Taille du lot'; ?>
                                 <?php $optionQuantityPlaceholder = $itemStockUnit === 'g' ? 'Ex: 100' : 'Ex: 4'; ?>
-                                <?php $optionCreateDefault = $itemStockUnit === 'g' ? '100' : ''; ?>
-                                <?php $optionLabelPlaceholder = $itemStockUnit === 'g' ? 'Libellé, ex: Barquette 100 g' : 'Libellé, ex: Unité, Lot de 4, Lot de 6'; ?>
+                                <?php $optionCreateDefault       = $itemStockUnit === 'g' ? '100' : ''; ?>
+                                <?php $optionLabelPlaceholder    = $itemStockUnit === 'g' ? 'Libellé, ex: Barquette 100 g' : 'Libellé, ex: Unité, Lot de 4, Lot de 6'; ?>
                                 <details
                                     class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible adminEditorBlock--full adminCatalogOptions"
                                     <?php echo ! empty($options) ? 'open' : ''; ?>>
@@ -776,7 +776,7 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach ($options as $option): ?>
-                                                    <?php $optionFormId = 'shop-option-form-' . (int) $option['id']; ?>
+                                                    <?php $optionFormId        = 'shop-option-form-' . (int) $option['id']; ?>
                                                     <?php $optionQuantityValue = $resolveOptionQuantityInputValue($option, $itemStockUnit); ?>
                                                     <tr id="option-<?php echo (int) $option['id']; ?>">
                                                         <td data-label="Libellé">
@@ -858,8 +858,8 @@
                                         </form>
 
                                         <span class="adminHint"><?php echo $itemStockUnit === 'g'
-                                                ? 'Pour une vente au poids, saisissez la quantité vendue en grammes : 100 pour 100 g, 250 pour 250 g, 1000 pour 1 kg. Le libellé sert surtout à l’affichage public.'
-                                            : 'Pour une vente à l’unité, indiquez la taille du lot : 1 pour « Unité », 4 pour « Lot de 4 », 6 pour « Lot de 6 ». Si le libellé contient déjà « Lot de 8 », gardez aussi 8 ici pour que le stock reste lisible en admin.'; ?></span>
+                                                                    ? 'Pour une vente au poids, saisissez la quantité vendue en grammes : 100 pour 100 g, 250 pour 250 g, 1000 pour 1 kg. Le libellé sert surtout à l’affichage public.'
+                                                                    : 'Pour une vente à l’unité, indiquez la taille du lot : 1 pour « Unité », 4 pour « Lot de 4 », 6 pour « Lot de 6 ». Si le libellé contient déjà « Lot de 8 », gardez aussi 8 ici pour que le stock reste lisible en admin.'; ?></span>
                                     </div>
                                 </details>
                             </div>

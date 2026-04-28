@@ -255,6 +255,28 @@ final class Shop
         $stmt->execute(['id' => $id]);
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getSectionItemImagePaths(int $sectionId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT image_path
+             FROM boutique_items
+             WHERE section_id = :section_id
+               AND image_path IS NOT NULL
+               AND image_path != ""'
+        );
+        $stmt->execute(['section_id' => $sectionId]);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_values(array_filter(array_map(
+            static fn(array $row): string => trim((string) ($row['image_path'] ?? '')),
+            is_array($rows) ? $rows : [],
+        )));
+    }
+
     public function reorderSections(array $sectionIds): void
     {
         $stmt = $this->db->prepare('UPDATE boutique_sections SET sort_order = :sort_order WHERE id = :id');
@@ -353,8 +375,30 @@ final class Shop
 
     public function deleteItem(int $id): void
     {
-        $stmt = $this->db->prepare('DELETE FROM boutique_items WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $this->db->beginTransaction();
+
+        try {
+            $deleteOptionsStmt = $this->db->prepare('DELETE FROM boutique_item_options WHERE item_id = :id');
+            $deleteOptionsStmt->execute(['id' => $id]);
+
+            $detachOrderItemsStmt = $this->db->prepare(
+                'UPDATE boutique_order_items
+                 SET item_id = NULL
+                 WHERE item_id = :id',
+            );
+            $detachOrderItemsStmt->execute(['id' => $id]);
+
+            $deleteItemStmt = $this->db->prepare('DELETE FROM boutique_items WHERE id = :id');
+            $deleteItemStmt->execute(['id' => $id]);
+
+            $this->db->commit();
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+
+            throw $e;
+        }
     }
 
     public function getItemById(int $id): ?array
@@ -593,7 +637,7 @@ final class Shop
     /**
      * @return array<string,mixed>|null
      */
-    private function getItemOptionById(int $optionId): ?array
+    public function getItemOptionById(int $optionId): ?array
     {
         $stmt = $this->db->prepare(
             'SELECT id, item_id, price_label, sort_order

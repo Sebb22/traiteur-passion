@@ -161,6 +161,23 @@ CREATE TABLE IF NOT EXISTS boutique_items (
     INDEX idx_boutique_items_stock (stock_quantity)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS boutique_item_options (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    price_cents INT NOT NULL DEFAULT 0,
+    price_label VARCHAR(80) NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (item_id) REFERENCES boutique_items(id) ON DELETE CASCADE,
+    INDEX idx_boutique_item_options_item (item_id),
+    INDEX idx_boutique_item_options_order (item_id, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS boutique_orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_name VARCHAR(255) NOT NULL,
@@ -190,7 +207,7 @@ CREATE TABLE IF NOT EXISTS boutique_orders (
 CREATE TABLE IF NOT EXISTS boutique_order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
-    item_id INT NOT NULL,
+    item_id INT NULL,
     item_name_snapshot VARCHAR(255) NOT NULL,
     section_name_snapshot VARCHAR(120) NOT NULL,
     unit_price_cents INT NOT NULL DEFAULT 0,
@@ -200,7 +217,7 @@ CREATE TABLE IF NOT EXISTS boutique_order_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (order_id) REFERENCES boutique_orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES boutique_items(id) ON DELETE RESTRICT,
+    FOREIGN KEY (item_id) REFERENCES boutique_items(id) ON DELETE SET NULL,
     INDEX idx_boutique_order_items_order (order_id),
     INDEX idx_boutique_order_items_item (item_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
