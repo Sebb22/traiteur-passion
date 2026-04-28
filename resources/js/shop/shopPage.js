@@ -166,8 +166,11 @@ export function initShopPage() {
     let touchStartY = 0;
     let touchCurrentY = 0;
     let isDraggingSummary = false;
-    const desktopToastMedia = window.matchMedia("(min-width: 1320px)");
+    const desktopToastMedia = window.matchMedia(
+        "(min-width: 1320px) and (hover: hover) and (pointer: fine)",
+    );
     const desktopQuickAddMedia = window.matchMedia("(min-width: 981px)");
+    const summarySheetMedia = window.matchMedia("(max-width: 980px)");
     let unbindDesktopToastMedia = () => {};
     let unbindDesktopQuickAddMedia = () => {};
     const promoEndsAt = form.getAttribute("data-promo-ends-at") || "";
@@ -182,6 +185,7 @@ export function initShopPage() {
 
     const isDesktopToast = () => desktopToastMedia.matches;
     const isDesktopQuickAdd = () => desktopQuickAddMedia.matches;
+    const isSummarySheet = () => summarySheetMedia.matches;
 
     const isPromoAvailable = () => {
         if (!promoConfig.active || !promoConfig.code || promoConfig.percent <= 0) {
@@ -331,7 +335,7 @@ export function initShopPage() {
             summaryOverlay.hidden = false;
         }
 
-        document.body.classList.toggle("shop-summary-open", open && !isDesktopToast());
+        document.body.classList.toggle("shop-summary-open", open && isSummarySheet());
     };
 
     const clearSummaryHideTimeout = () => {
@@ -448,6 +452,8 @@ export function initShopPage() {
             optionId: Number.parseInt(node.getAttribute("data-option-id") || "0", 10) || 0,
             optionLabel: node.getAttribute("data-option-label") || "",
             optionUnits,
+            cartLabelSingular: node.getAttribute("data-cart-label-singular") || "article",
+            cartLabelPlural: node.getAttribute("data-cart-label-plural") || "articles",
             node,
             input,
             stockBadges: stockBadgesByItem.get(itemId) || [],
@@ -586,7 +592,7 @@ export function initShopPage() {
             const baseLabel = item.addButton.dataset.baseLabel || "Ajouter";
             if (isDesktopQuickAdd()) {
                 item.addButton.hidden = false;
-                item.addButton.textContent = quantity > 0 ? `${baseLabel} +1` : baseLabel;
+                item.addButton.textContent = baseLabel;
                 item.addButton.classList.toggle("is-active", quantity > 0);
             } else {
                 item.addButton.hidden = quantity > 0;
@@ -601,8 +607,12 @@ export function initShopPage() {
 
         if (item.purchaseHint instanceof HTMLElement) {
             const defaultText = item.purchaseHint.dataset.defaultText || "";
+            const quantityLabel =
+                quantity > 1
+                    ? item.cartLabelPlural || "articles"
+                    : item.cartLabelSingular || "article";
             item.purchaseHint.textContent =
-                quantity > 0 ? `${quantity} dans le panier` : defaultText;
+                quantity > 0 ? `${quantity} ${quantityLabel} dans le panier` : defaultText;
         }
 
         item.node.classList.toggle("is-in-cart", quantity > 0);
@@ -1083,7 +1093,7 @@ export function initShopPage() {
         summaryHandle.addEventListener(
             "touchstart",
             (event) => {
-                if (isDesktopToast() || !isSummaryOpen) {
+                if (!isSummarySheet() || isDesktopToast() || !isSummaryOpen) {
                     return;
                 }
 
@@ -1100,7 +1110,7 @@ export function initShopPage() {
         summaryHandle.addEventListener(
             "touchmove",
             (event) => {
-                if (!isDraggingSummary || isDesktopToast() || !isSummaryOpen) {
+                if (!isDraggingSummary || !isSummarySheet() || isDesktopToast() || !isSummaryOpen) {
                     return;
                 }
 
@@ -1120,7 +1130,7 @@ export function initShopPage() {
         summaryHandle.addEventListener(
             "touchend",
             () => {
-                if (!isDraggingSummary || isDesktopToast()) {
+                if (!isDraggingSummary || !isSummarySheet() || isDesktopToast()) {
                     return;
                 }
 
@@ -1144,7 +1154,7 @@ export function initShopPage() {
         summaryHandle.addEventListener(
             "touchcancel",
             () => {
-                if (!isDraggingSummary) {
+                if (!isDraggingSummary || !isSummarySheet()) {
                     return;
                 }
 

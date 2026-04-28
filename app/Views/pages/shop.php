@@ -1,7 +1,7 @@
 <?php
-    $sections  = is_array($sections ?? null) ? $sections : [];
-    $loadError = is_string($loadError ?? null) ? $loadError : null;
-    $shopPromo = is_array($shopPromo ?? null) ? $shopPromo : null;
+    $sections  = isset($sections) && is_array($sections) ? $sections : [];
+    $loadError = isset($loadError) && is_string($loadError) ? $loadError : null;
+    $shopPromo = isset($shopPromo) && is_array($shopPromo) ? $shopPromo : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -35,6 +35,10 @@
     }
 
     return $amount . ' unité(s)';
+    };
+
+    $pluralize = static function (int $count, string $singular, string $plural): string {
+    return $count > 1 ? $plural : $singular;
     };
 
     $resolveOptionUnits = static function (array $option, string $stockUnit = 'unit') use ($normalizeStockUnit): int {
@@ -74,6 +78,30 @@
     return 'section-' . (int) ($section['id'] ?? 0);
     };
 
+    $shopIcon = static function (string $name): string {
+    static $icons = null;
+
+    if ($icons === null) {
+        $icons = [
+            'artisan'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 14h12c0 3.05-2.69 5.5-6 5.5S6 17.05 6 14Z" fill="currentColor" stroke="none" opacity=".14"/><path d="M6 14h12c0 3.05-2.69 5.5-6 5.5S6 17.05 6 14Z"/><path d="M8.2 13.7v-1.1c0-1.82 1.7-3.3 3.8-3.3s3.8 1.48 3.8 3.3v1.1"/><path d="M8.1 8.6c0-1.07.84-1.95 1.88-1.95.67 0 1.16.3 1.52.77.38-.85 1.17-1.42 2.17-1.42 1.38 0 2.5 1.1 2.5 2.46 0 .2-.03.39-.08.57"/><circle cx="17.8" cy="6.4" r="1.15" fill="currentColor" stroke="none" opacity=".92"/></svg>',
+            'location'   => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19.9s4.9-3.63 4.9-8.27a4.9 4.9 0 1 0-9.8 0c0 4.64 4.9 8.27 4.9 8.27Z" fill="currentColor" stroke="none" opacity=".14"/><path d="M12 19.9s4.9-3.63 4.9-8.27a4.9 4.9 0 1 0-9.8 0c0 4.64 4.9 8.27 4.9 8.27Z"/><circle cx="12" cy="11.55" r="1.7" fill="currentColor" stroke="none" opacity=".92"/><path d="M15.9 16.4c1.7.22 2.9.8 2.9 1.48 0 .88-3.04 1.6-6.8 1.6s-6.8-.72-6.8-1.6c0-.67 1.1-1.24 2.69-1.46"/><path d="M18.1 8.7h2.2"/><path d="M19.2 7.6v2.2"/></svg>',
+            'payment'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.4" y="7.1" width="15.2" height="9.8" rx="2.7" fill="currentColor" stroke="none" opacity=".14"/><rect x="4.4" y="7.1" width="15.2" height="9.8" rx="2.7"/><path d="M4.4 10.45h15.2"/><path d="M8.1 13.8h2.9"/><circle cx="18.15" cy="7.35" r="2.45" fill="currentColor" stroke="none" opacity=".92"/><path d="m17.15 6.35 2 2" stroke="#120f0b"/><path d="m19.15 6.35-2 2" stroke="#120f0b"/></svg>',
+            'categories' => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.6" y="4.6" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".16"/><rect x="13.2" y="4.6" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".16"/><rect x="4.6" y="13.2" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".16"/><rect x="13.2" y="13.2" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".84"/><rect x="4.6" y="4.6" width="6.2" height="6.2" rx="1.6"/><rect x="13.2" y="4.6" width="6.2" height="6.2" rx="1.6"/><rect x="4.6" y="13.2" width="6.2" height="6.2" rx="1.6"/><rect x="13.2" y="13.2" width="6.2" height="6.2" rx="1.6"/></svg>',
+            'selection'  => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.5" y="5.5" width="11.5" height="13" rx="2.4" fill="currentColor" stroke="none" opacity=".12"/><rect x="4.5" y="5.5" width="11.5" height="13" rx="2.4"/><path d="m7.2 9.4 1 1 1.8-1.9"/><path d="M11.4 9.9h2.2"/><path d="m7.2 13.3 1 1 1.8-1.9"/><path d="M11.4 13.8h2.2"/><circle cx="17.9" cy="15.8" r="3.1" fill="currentColor" stroke="none" opacity=".9"/><path d="M17.9 14.2v3.2" stroke="#120f0b"/><path d="M16.3 15.8h3.2" stroke="#120f0b"/></svg>',
+            'confirm'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.2 18.2 7v4.85c0 4.05-2.53 7.46-6.2 8.95-3.67-1.49-6.2-4.9-6.2-8.95V7L12 4.2Z"/><path d="m9.35 11.95 1.75 1.75 3.55-3.75"/><circle cx="17.9" cy="8.1" r="1" fill="currentColor" stroke="none" opacity=".9"/></svg>',
+            'alert'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.5 20 19H4l8-14.5Z"/><path d="M12 9v4.5"/><circle cx="12" cy="16.5" r=".75"/></svg>',
+            'store'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 10.5 6.4 6h11.2l1.4 4.5"/><path d="M6 10.5V18h12v-7.5"/><path d="M4.75 10.5h14.5"/><path d="M9.5 18v-4h5v4"/></svg>',
+            'dish'       => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7.5 12a4.5 4.5 0 0 1 9 0"/><path d="M4.5 13h15"/><path d="M7 16.5h10"/><path d="M10 19h4"/></svg>',
+            'bag'        => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.1 9V8.1a3.9 3.9 0 0 1 7.8 0V9"/><path d="M6 9h12l-1 10H7L6 9Z" fill="currentColor" stroke="none" opacity=".14"/><path d="M6 9h12l-1 10H7L6 9Z"/><path d="M9.5 12.9h5"/><circle cx="18.1" cy="7.4" r="2.5" fill="currentColor" stroke="none" opacity=".92"/><path d="M18.1 6.15v2.5" stroke="#120f0b"/><path d="M16.85 7.4h2.5" stroke="#120f0b"/></svg>',
+            'box'        => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.5 19 8l-7 3.5L5 8l7-3.5Z"/><path d="M5 8v8l7 3.5 7-3.5V8"/><path d="M12 11.5V19.5"/></svg>',
+            'clock'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="7.5"/><path d="M12 8.5v4.2l2.8 1.8"/></svg>',
+            'layers'     => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5.5 7 3.5-7 3.5L5 9l7-3.5Z"/><path d="m7 12 5 2.5 5-2.5"/><path d="m7 15 5 2.5 5-2.5"/></svg>',
+        ];
+    }
+
+    return $icons[$name] ?? $icons['categories'];
+    };
+
     $visibleProductsCount = 0;
     foreach ($sections as $section) {
     $visibleProductsCount += count(is_array($section['items'] ?? null) ? $section['items'] : []);
@@ -106,44 +134,94 @@
                             de production et garantir la fraîcheur. Vous composez ici la demande, puis nous confirmons
                             avec vous le retrait ou la livraison possible selon votre zone.</p>
                     </div>
+                    <div class="shopIntroPills" aria-label="Repères boutique">
+                        <span class="shopIntroPill shopIntroPill--gold">
+                            <span class="shopIntroPill__icon" aria-hidden="true">
+                                <?php echo $shopIcon('artisan'); ?>
+                            </span>
+                            Fait maison
+                        </span>
+                        <span class="shopIntroPill shopIntroPill--sage">
+                            <span class="shopIntroPill__icon" aria-hidden="true">
+                                <?php echo $shopIcon('location'); ?>
+                            </span>
+                            Retrait ou livraison
+                        </span>
+                        <span class="shopIntroPill shopIntroPill--coral">
+                            <span class="shopIntroPill__icon" aria-hidden="true">
+                                <?php echo $shopIcon('payment'); ?>
+                            </span>
+                            Sans paiement en ligne
+                        </span>
+                    </div>
                     <div class="shopIntroSteps" aria-label="Parcours de commande boutique">
-                        <article class="shopIntroStep">
-                            <span class="shopIntroStep__index">01</span>
+                        <article class="shopIntroStep shopIntroStep--gold">
+                            <div class="shopIntroStep__marker">
+                                <span class="shopIntroStep__index">01</span>
+                                <span class="shopIntroStep__icon" aria-hidden="true">
+                                    <?php echo $shopIcon('categories'); ?>
+                                </span>
+                            </div>
                             <div>
                                 <strong class="shopIntroStep__title">Choisissez une catégorie</strong>
                                 <p class="shopIntroStep__copy">Repérez vite ce qui est disponible cette semaine.</p>
                             </div>
                         </article>
-                        <article class="shopIntroStep">
-                            <span class="shopIntroStep__index">02</span>
+                        <article class="shopIntroStep shopIntroStep--sage">
+                            <div class="shopIntroStep__marker">
+                                <span class="shopIntroStep__index">02</span>
+                                <span class="shopIntroStep__icon" aria-hidden="true">
+                                    <?php echo $shopIcon('selection'); ?>
+                                </span>
+                            </div>
                             <div>
                                 <strong class="shopIntroStep__title">Ajoutez les bons formats</strong>
                                 <p class="shopIntroStep__copy">À l’unité ou en lot selon le stock affiché.</p>
                             </div>
                         </article>
-                        <article class="shopIntroStep">
-                            <span class="shopIntroStep__index">03</span>
+                        <article class="shopIntroStep shopIntroStep--coral">
+                            <div class="shopIntroStep__marker">
+                                <span class="shopIntroStep__index">03</span>
+                                <span class="shopIntroStep__icon" aria-hidden="true">
+                                    <?php echo $shopIcon('confirm'); ?>
+                                </span>
+                            </div>
                             <div>
                                 <strong class="shopIntroStep__title">Confirmez sans payer</strong>
                                 <p class="shopIntroStep__copy">Nous validons ensuite avec vous le retrait ou la livraison.</p>
                             </div>
                         </article>
                     </div>
-                    <p class="shopIntro__note">Carte courte, fait maison, stock revérifié à l’enregistrement. Retrait sur créneau ou livraison locale selon votre adresse.</p>
+                    <p class="shopIntro__note">
+                        <span class="shopIntro__noteIcon" aria-hidden="true">
+                            <?php echo $shopIcon('location'); ?>
+                        </span>
+                        <span>Carte courte, fait maison, stock revérifié à l’enregistrement. Retrait sur créneau ou livraison locale selon votre adresse.</span>
+                    </p>
                 </header>
 
                 <?php if ($loadError !== null): ?>
                 <section class="shopNotice shopNotice--warning" aria-live="polite">
+                    <span class="shopNotice__icon" aria-hidden="true">
+                        <?php echo $shopIcon('alert'); ?>
+                    </span>
+                    <div>
                     <strong>Boutique temporairement indisponible.</strong>
                     <p><?php echo $e($loadError); ?></p>
+                    </div>
                 </section>
                 <?php endif; ?>
 
                 <?php if ($sections === [] && $loadError === null): ?>
                 <section class="shopNotice" aria-live="polite">
+                    <span class="shopNotice__icon" aria-hidden="true">
+                        <?php echo $shopIcon('store'); ?>
+                    </span>
+                    <div>
                     <strong>La boutique n'est pas encore configurée.</strong>
                     <p>Ajoutez d'abord des catégories et des produits depuis l'administration pour ouvrir la commande en
                         ligne.</p>
+                    </div>
                 </section>
                 <?php endif; ?>
 
@@ -162,8 +240,18 @@
                                 <p class="shopCatalogNav__title">Repérez d'abord votre catégorie, puis composez le panier sans perdre le fil de la carte.</p>
                             </div>
                             <div class="shopCatalogNav__stats" aria-label="Repères de navigation boutique">
-                                <span class="shopCatalogNav__stat"><?php echo count($sections); ?> catégorie<?php echo count($sections) > 1 ? 's' : ''; ?></span>
-                                <span class="shopCatalogNav__stat"><?php echo $visibleProductsCount; ?> produit<?php echo $visibleProductsCount > 1 ? 's' : ''; ?></span>
+                                <span class="shopCatalogNav__stat shopCatalogNav__stat--gold">
+                                    <span class="shopCatalogNav__statIcon" aria-hidden="true">
+                                        <?php echo $shopIcon('categories'); ?>
+                                    </span>
+                                    <?php echo count($sections); ?> catégorie<?php echo count($sections) > 1 ? 's' : ''; ?>
+                                </span>
+                                <span class="shopCatalogNav__stat shopCatalogNav__stat--sage">
+                                    <span class="shopCatalogNav__statIcon" aria-hidden="true">
+                                        <?php echo $shopIcon('dish'); ?>
+                                    </span>
+                                    <?php echo $visibleProductsCount; ?> produit<?php echo $visibleProductsCount > 1 ? 's' : ''; ?>
+                                </span>
                             </div>
                         </div>
 
@@ -187,14 +275,7 @@
                             <button type="button" class="shopSummaryTab" data-shop-summary-toggle aria-expanded="false"
                                 aria-controls="shopSummaryPanel" hidden>
                                 <span class="shopSummaryTab__icon" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" focusable="false">
-                                        <path
-                                            d="M7 6.5h13l-1.4 6.73a2 2 0 0 1-1.96 1.6H10.1a2 2 0 0 1-1.95-1.56L6.2 4.5H3.5"
-                                            fill="none" stroke="currentColor" stroke-linecap="round"
-                                            stroke-linejoin="round" stroke-width="1.7" />
-                                        <circle cx="10.5" cy="18.5" r="1.35" fill="currentColor" />
-                                        <circle cx="17.25" cy="18.5" r="1.35" fill="currentColor" />
-                                    </svg>
+                                    <?php echo $shopIcon('bag'); ?>
                                 </span>
                                 <span class="shopSummaryTab__main">
                                     <span class="shopSummaryTab__label">Panier</span>
@@ -319,31 +400,53 @@
                                         $purchaseLines = [];
                                         if ($options !== []) {
                                             foreach ($options as $option) {
-                                                $optionId        = (int) ($option['id'] ?? 0);
-                                                $optionUnits     = $resolveOptionUnits($option, $stockUnit);
-                                                $purchaseLines[] = [
-                                                    'line_key'      => 'item-' . $itemId . '-option-' . $optionId,
-                                                    'option_id'     => $optionId,
-                                                    'option_label'  => trim((string) ($option['label'] ?? '')),
-                                                    'option_units'  => $optionUnits,
-                                                    'price_cents'   => (int) ($option['price_cents'] ?? 0),
-                                                    'price_display' => $formatPrice($option),
-                                                    'allowed'       => (int) floor($stockQuantity / max(1, $optionUnits)),
-                                                    'hint'          => $stockUnit === 'g'
-                                                        ? $formatStockQuantity($optionUnits, 'g') . ' par format'
-                                                        : ($optionUnits > 1 ? $optionUnits . ' unité(s) par lot' : 'Ajout à l’unité'),
+                                                $optionId          = (int) ($option['id'] ?? 0);
+                                                $optionUnits       = $resolveOptionUnits($option, $stockUnit);
+                                                $selectionSingular = $stockUnit === 'g'
+                                                    ? 'format'
+                                                    : ($optionUnits > 1 ? 'lot' : 'unité');
+                                                $selectionPlural = $stockUnit === 'g'
+                                                    ? 'formats'
+                                                    : ($optionUnits > 1 ? 'lots' : 'unités');
+                                                $conversionHint = $stockUnit === 'g'
+                                                    ? '1 format = ' . $formatStockQuantity($optionUnits, 'g')
+                                                    : ($optionUnits > 1
+                                                        ? '1 lot = ' . $formatStockQuantity($optionUnits, 'unit')
+                                                        : 'Vente à l’unité');
+                                                $availableSelections = (int) floor($stockQuantity / max(1, $optionUnits));
+                                                $purchaseLines[]     = [
+                                                    'line_key'            => 'item-' . $itemId . '-option-' . $optionId,
+                                                    'option_id'           => $optionId,
+                                                    'option_label'        => trim((string) ($option['label'] ?? '')),
+                                                    'option_units'        => $optionUnits,
+                                                    'price_cents'         => (int) ($option['price_cents'] ?? 0),
+                                                    'price_display'       => $formatPrice($option),
+                                                    'allowed'             => $availableSelections,
+                                                    'hint'                => 'Jusqu’à ' . $availableSelections . ' ' . $pluralize($availableSelections, $selectionSingular, $selectionPlural),
+                                                    'meta_hint'           => $conversionHint,
+                                                    'quantity_label'      => $stockUnit === 'g'
+                                                        ? 'Nombre de formats'
+                                                        : ($optionUnits > 1 ? 'Nombre de lots' : 'Nombre d’unités'),
+                                                    'button_label'        => 'Ajouter 1 ' . $selectionSingular,
+                                                    'cart_label_singular' => $selectionSingular,
+                                                    'cart_label_plural'   => $selectionPlural,
                                                 ];
                                             }
                                         } else {
                                             $purchaseLines[] = [
-                                                'line_key'      => 'item-' . $itemId . '-default',
-                                                'option_id'     => 0,
-                                                'option_label'  => '',
-                                                'option_units'  => 1,
-                                                'price_cents'   => (int) ($item['price_cents'] ?? 0),
-                                                'price_display' => $formatPrice($item),
-                                                'allowed'       => $stockQuantity,
-                                                'hint'          => 'Ajout direct au panier',
+                                                'line_key'            => 'item-' . $itemId . '-default',
+                                                'option_id'           => 0,
+                                                'option_label'        => '',
+                                                'option_units'        => 1,
+                                                'price_cents'         => (int) ($item['price_cents'] ?? 0),
+                                                'price_display'       => $formatPrice($item),
+                                                'allowed'             => $stockQuantity,
+                                                'hint'                => 'Jusqu’à ' . $stockQuantity . ' ' . $pluralize($stockQuantity, 'unité', 'unités'),
+                                                'meta_hint'           => 'Ajout direct au panier',
+                                                'quantity_label'      => 'Nombre d’unités',
+                                                'button_label'        => 'Ajouter 1 unité',
+                                                'cart_label_singular' => 'unité',
+                                                'cart_label_plural'   => 'unités',
                                             ];
                                         }
                                         $cardPriceDisplay = $purchaseLines[0]['price_display'] ?? $formatPrice($item);
@@ -398,26 +501,40 @@
                                                     <span
                                                         class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
                                                         data-shop-stock
-                                                        data-item-id="<?php echo $itemId; ?>"><?php echo $e($statusLabel); ?></span>
-                                                    <p class="shopItemCard__purchaseHint"><?php echo $options !== [] ? 'Chaque format ci-dessous peut être ajouté séparément. Vous pouvez cumuler plusieurs lots pour un même produit.' : 'Ajout direct au panier.'; ?></p>
+                                                        data-item-id="<?php echo $itemId; ?>">
+                                                        <?php echo $shopIcon($isSoldOut ? 'alert' : ($isLowStock ? 'clock' : 'box')); ?>
+                                                        <span><?php echo $e($statusLabel); ?></span>
+                                                    </span>
+                                                    <p class="shopItemCard__purchaseHint">
+                                                        <?php echo $shopIcon($options !== [] ? 'layers' : 'bag'); ?>
+                                                        <span><?php echo $options !== [] ? 'Chaque ligne correspond à une sélection distincte. Vous pouvez combiner plusieurs formats pour un même produit.' : 'Ajout direct au panier.'; ?></span>
+                                                    </p>
                                                 </div>
 
                                                 <div class="shopPurchaseOptions">
                                                     <?php if ($options !== []): ?>
-                                                    <p class="shopPurchaseOptions__intro">Formats disponibles : ajoutez une quantité sur chaque ligne voulue.</p>
+                                                    <p class="shopPurchaseOptions__intro">
+                                                        <?php echo $shopIcon('selection'); ?>
+                                                        <span>Formats disponibles : choisissez le nombre voulu sur chaque ligne.</span>
+                                                    </p>
                                                     <?php endif; ?>
                                                     <?php foreach ($purchaseLines as $purchaseLine): ?>
                                                     <?php
-                                                        $lineKey        = (string) ($purchaseLine['line_key'] ?? '');
-                                                        $lineOptionId   = (int) ($purchaseLine['option_id'] ?? 0);
-                                                        $lineLabel      = trim((string) ($purchaseLine['option_label'] ?? ''));
-                                                        $lineUnits      = max(1, (int) ($purchaseLine['option_units'] ?? 1));
-                                                        $linePrice      = (string) ($purchaseLine['price_display'] ?? '');
-                                                        $linePriceCents = (int) ($purchaseLine['price_cents'] ?? 0);
-                                                        $lineAllowed    = max(0, (int) ($purchaseLine['allowed'] ?? 0));
-                                                        $lineHint       = trim((string) ($purchaseLine['hint'] ?? ''));
-                                                        $lineSoldOut    = $stockQuantity <= 0 || $lineAllowed <= 0;
-                                                        $lineTitle      = $lineLabel !== '' ? $lineLabel : 'Format standard';
+                                                        $lineKey               = (string) ($purchaseLine['line_key'] ?? '');
+                                                        $lineOptionId          = (int) ($purchaseLine['option_id'] ?? 0);
+                                                        $lineLabel             = trim((string) ($purchaseLine['option_label'] ?? ''));
+                                                        $lineUnits             = max(1, (int) ($purchaseLine['option_units'] ?? 1));
+                                                        $linePrice             = (string) ($purchaseLine['price_display'] ?? '');
+                                                        $linePriceCents        = (int) ($purchaseLine['price_cents'] ?? 0);
+                                                        $lineAllowed           = max(0, (int) ($purchaseLine['allowed'] ?? 0));
+                                                        $lineHint              = trim((string) ($purchaseLine['hint'] ?? ''));
+                                                        $lineMetaHint          = trim((string) ($purchaseLine['meta_hint'] ?? ''));
+                                                        $lineSoldOut           = $stockQuantity <= 0 || $lineAllowed <= 0;
+                                                        $lineTitle             = $lineLabel !== '' ? $lineLabel : 'Format standard';
+                                                        $lineQuantityLabel     = trim((string) ($purchaseLine['quantity_label'] ?? 'Quantité'));
+                                                        $lineButtonLabel       = trim((string) ($purchaseLine['button_label'] ?? 'Ajouter'));
+                                                        $lineCartLabelSingular = trim((string) ($purchaseLine['cart_label_singular'] ?? 'article'));
+                                                        $lineCartLabelPlural   = trim((string) ($purchaseLine['cart_label_plural'] ?? 'articles'));
                                                     ?>
                                                     <div class="shopPurchaseOption<?php echo $lineSoldOut ? ' is-sold-out' : ''; ?>"
                                                         data-shop-order-line
@@ -431,11 +548,18 @@
                                                         data-item-price-cents="<?php echo $linePriceCents; ?>"
                                                         data-option-id="<?php echo $lineOptionId; ?>"
                                                         data-option-label="<?php echo $e($lineLabel); ?>"
-                                                        data-option-units="<?php echo $lineUnits; ?>">
+                                                        data-option-units="<?php echo $lineUnits; ?>"
+                                                        data-cart-label-singular="<?php echo $e($lineCartLabelSingular); ?>"
+                                                        data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
                                                         <div class="shopPurchaseOption__head">
                                                             <div class="shopPurchaseOption__copy">
                                                                 <strong class="shopPurchaseOption__title"><?php echo $e($lineTitle); ?></strong>
-                                                                <p class="shopPurchaseOption__hint" data-default-text="<?php echo $e($lineHint); ?>"><?php echo $e($lineHint); ?></p>
+                                                                <p class="shopPurchaseOption__hint" data-default-text="<?php echo $e($lineHint); ?>">
+                                                                    <span><?php echo $e($lineHint); ?></span>
+                                                                </p>
+                                                                <p class="shopPurchaseOption__meta">
+                                                                    <span><?php echo $e($lineMetaHint); ?></span>
+                                                                </p>
                                                             </div>
                                                             <span class="shopPurchaseOption__price"><?php echo $e($linePrice); ?></span>
                                                         </div>
@@ -448,15 +572,15 @@
                                                         <div class="shopItemCard__actions">
                                                             <button type="button" class="btn btn--ghost shopItemCard__add"
                                                                 data-shop-add data-line-key="<?php echo $e($lineKey); ?>"
-                                                                <?php echo $lineSoldOut ? 'disabled' : ''; ?>>Ajouter</button>
+                                                                <?php echo $lineSoldOut ? 'disabled' : ''; ?>><?php echo $e($lineButtonLabel); ?></button>
 
                                                             <div class="shopQtyControls" data-shop-controls
                                                                 data-line-key="<?php echo $e($lineKey); ?>" hidden>
                                                                 <button type="button" class="shopQtyControls__btn"
                                                                     data-shop-decrease data-line-key="<?php echo $e($lineKey); ?>"
-                                                                    aria-label="Retirer une unité">−</button>
+                                                                    aria-label="Retirer une unité de cette sélection">−</button>
                                                                 <label class="shopQty">
-                                                                    <span class="shopQty__label">Quantité</span>
+                                                                    <span class="shopQty__label"><?php echo $e($lineQuantityLabel); ?></span>
                                                                     <input class="shopQty__input" type="number"
                                                                         name="shop_quantity[<?php echo $e($lineKey); ?>]" min="0"
                                                                         max="<?php echo $lineAllowed; ?>" value="0"
@@ -465,7 +589,7 @@
                                                                 </label>
                                                                 <button type="button" class="shopQtyControls__btn"
                                                                     data-shop-increase data-line-key="<?php echo $e($lineKey); ?>"
-                                                                    aria-label="Ajouter une unité">+</button>
+                                                                    aria-label="Ajouter une unité à cette sélection">+</button>
                                                                 <button type="button" class="shopQtyControls__remove"
                                                                     data-shop-remove
                                                                     data-line-key="<?php echo $e($lineKey); ?>">Retirer</button>
@@ -619,9 +743,7 @@
                     </div>
                 </form>
 
-                <footer class="menuFooter">
-                    <p>© <?php echo date('Y'); ?> Traiteur Passion</p>
-                </footer>
+                <?php require dirname(__DIR__) . '/partials/menu-footer.php'; ?>
             </div>
         </div>
     </section>
