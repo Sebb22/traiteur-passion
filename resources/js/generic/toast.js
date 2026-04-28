@@ -73,7 +73,10 @@ export function showToast(message, options = {}) {
     }
 
     const type = normalizeType(options.type || "info");
-    const duration = Math.max(2500, Number.parseInt(options.duration, 10) || (type === "error" ? 6500 : 4800));
+    const duration = Math.max(
+        2500,
+        Number.parseInt(options.duration, 10) || (type === "error" ? 6500 : 4800),
+    );
     const dedupeKey = `${type}:${text}`;
     const now = Date.now();
     const lastShownAt = recentToastTimestamps.get(dedupeKey) || 0;
@@ -87,12 +90,14 @@ export function showToast(message, options = {}) {
     toast.className = `siteToast siteToast--${type}`;
     toast.setAttribute("role", type === "error" ? "alert" : "status");
 
-    const closeLabel = typeof options.closeLabel === "string" && options.closeLabel.trim() !== ""
-        ? options.closeLabel.trim()
-        : "Fermer le message";
-    const title = typeof options.title === "string" && options.title.trim() !== ""
-        ? options.title.trim()
-        : resolveToastTitle(type);
+    const closeLabel =
+        typeof options.closeLabel === "string" && options.closeLabel.trim() !== ""
+            ? options.closeLabel.trim()
+            : "Fermer le message";
+    const title =
+        typeof options.title === "string" && options.title.trim() !== ""
+            ? options.title.trim()
+            : resolveToastTitle(type);
 
     toast.innerHTML = `
         <div class="siteToast__accent" aria-hidden="true"></div>

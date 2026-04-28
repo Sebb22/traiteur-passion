@@ -1,3 +1,3 @@
 <footer class="footer">
-    <p>© <?= date('Y') ?> Traiteur Passion</p>
+    <p>© <?php echo date('Y') ?> Traiteur Passion</p>
 </footer>

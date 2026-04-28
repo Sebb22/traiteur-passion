@@ -620,8 +620,7 @@ function initRequestForm(form) {
                     }
                 }, 8000);
             } else {
-                const errorCopy =
-                    data.error || "Une erreur est survenue. Veuillez réessayer.";
+                const errorCopy = data.error || "Une erreur est survenue. Veuillez réessayer.";
                 if (errorText) {
                     errorText.textContent = errorCopy;
                 }
