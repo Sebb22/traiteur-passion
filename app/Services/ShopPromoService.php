@@ -5,7 +5,8 @@ namespace App\Services;
 
 final class ShopPromoService
 {
-    private const STORAGE_FILE = __DIR__ . '/../../storage/cache/shop-promo.json';
+    private const STORAGE_FILE        = __DIR__ . '/../../storage/cache/shop-promo.json';
+    private const STORAGE_DATE_FORMAT = 'Y-m-d H:i:s';
 
     /**
      * @return array<string,mixed>
@@ -84,7 +85,10 @@ final class ShopPromoService
             throw new \InvalidArgumentException('La date de fin est requise pour activer le minuteur.');
         }
 
-        if ($startsAt !== null && $endsAt !== null && strtotime($startsAt) >= strtotime($endsAt)) {
+        $startsAtDate = $this->parseDateTime($startsAt);
+        $endsAtDate   = $this->parseDateTime($endsAt);
+
+        if ($startsAtDate !== null && $endsAtDate !== null && $startsAtDate >= $endsAtDate) {
             throw new \InvalidArgumentException('La date de fin doit être postérieure à la date de début.');
         }
 
@@ -97,7 +101,7 @@ final class ShopPromoService
             'discount_percent' => $discountPercent,
             'starts_at'        => $startsAt,
             'ends_at'          => $endsAt,
-            'updated_at'       => date('Y-m-d H:i:s'),
+            'updated_at'       => $this->currentDateTime()->format(self::STORAGE_DATE_FORMAT),
         ];
 
         $directory = dirname(self::STORAGE_FILE);
@@ -242,19 +246,19 @@ final class ShopPromoService
             return false;
         }
 
-        $nowTs = time();
-        $start = $promo['starts_at'] ?? null;
-        $end   = $promo['ends_at'] ?? null;
+        $now   = $this->currentDateTime();
+        $start = $this->parseDateTime($promo['starts_at'] ?? null);
+        $end   = $this->parseDateTime($promo['ends_at'] ?? null);
 
-        if (is_string($start) && $start !== '' && $nowTs < (int) strtotime($start)) {
+        if ($start instanceof \DateTimeImmutable && $now < $start) {
             return false;
         }
 
-        if (! is_string($end) || $end === '') {
+        if (! $end instanceof \DateTimeImmutable) {
             return false;
         }
 
-        return $nowTs < (int) strtotime($end);
+        return $now < $end;
     }
 
     /**
@@ -266,15 +270,15 @@ final class ShopPromoService
             return 'inactive';
         }
 
-        $nowTs = time();
-        $start = $promo['starts_at'] ?? null;
-        $end   = $promo['ends_at'] ?? null;
+        $now   = $this->currentDateTime();
+        $start = $this->parseDateTime($promo['starts_at'] ?? null);
+        $end   = $this->parseDateTime($promo['ends_at'] ?? null);
 
-        if (is_string($start) && $start !== '' && $nowTs < (int) strtotime($start)) {
+        if ($start instanceof \DateTimeImmutable && $now < $start) {
             return 'scheduled';
         }
 
-        if (is_string($end) && $end !== '' && $nowTs >= (int) strtotime($end)) {
+        if ($end instanceof \DateTimeImmutable && $now >= $end) {
             return 'expired';
         }
 
@@ -298,9 +302,9 @@ final class ShopPromoService
 
         $formats = ['Y-m-d\TH:i', 'Y-m-d H:i:s', 'Y-m-d H:i'];
         foreach ($formats as $format) {
-            $dateTime = \DateTimeImmutable::createFromFormat($format, $value);
+            $dateTime = \DateTimeImmutable::createFromFormat($format, $value, $this->getTimeZone());
             if ($dateTime instanceof \DateTimeImmutable) {
-                return $dateTime->format('Y-m-d H:i:s');
+                return $dateTime->format(self::STORAGE_DATE_FORMAT);
             }
         }
 
@@ -309,32 +313,65 @@ final class ShopPromoService
 
     private function normalizeStoredDateTime($value): ?string
     {
-        $value = trim((string) ($value ?? ''));
-        if ($value === '') {
-            return null;
-        }
-
-        $timestamp = strtotime($value);
-        return $timestamp === false ? null : date('Y-m-d H:i:s', $timestamp);
+        $dateTime = $this->parseDateTime($value);
+        return $dateTime instanceof \DateTimeImmutable ? $dateTime->format(self::STORAGE_DATE_FORMAT) : null;
     }
 
     private function formatDateTimeLocal($value): string
     {
-        $value = $this->normalizeStoredDateTime($value);
-        if ($value === null) {
+        $dateTime = $this->parseDateTime($value);
+        if (! $dateTime instanceof \DateTimeImmutable) {
             return '';
         }
 
-        return date('Y-m-d\TH:i', (int) strtotime($value));
+        return $dateTime->format('Y-m-d\TH:i');
     }
 
     private function toIso8601($value): string
     {
-        $value = $this->normalizeStoredDateTime($value);
-        if ($value === null) {
+        $dateTime = $this->parseDateTime($value);
+        if (! $dateTime instanceof \DateTimeImmutable) {
             return '';
         }
 
-        return date(DATE_ATOM, (int) strtotime($value));
+        return $dateTime->format(DATE_ATOM);
+    }
+
+    private function currentDateTime(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('now', $this->getTimeZone());
+    }
+
+    private function getTimeZone(): \DateTimeZone
+    {
+        $timezone = date_default_timezone_get();
+
+        try {
+            return new \DateTimeZone($timezone !== '' ? $timezone : 'Europe/Paris');
+        } catch (\Throwable $e) {
+            return new \DateTimeZone('Europe/Paris');
+        }
+    }
+
+    private function parseDateTime($value): ?\DateTimeImmutable
+    {
+        $normalized = trim((string) ($value ?? ''));
+        if ($normalized === '') {
+            return null;
+        }
+
+        $formats = [self::STORAGE_DATE_FORMAT, 'Y-m-d\TH:i', 'Y-m-d H:i'];
+        foreach ($formats as $format) {
+            $dateTime = \DateTimeImmutable::createFromFormat($format, $normalized, $this->getTimeZone());
+            if ($dateTime instanceof \DateTimeImmutable) {
+                return $dateTime;
+            }
+        }
+
+        try {
+            return new \DateTimeImmutable($normalized, $this->getTimeZone());
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

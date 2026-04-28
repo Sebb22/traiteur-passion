@@ -44,6 +44,11 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
  */
 $appConfig = require dirname(__DIR__) . '/config/app.php';
 
+$timezone = (string) ($appConfig['timezone'] ?? 'Europe/Paris');
+if ($timezone === '' || ! @date_default_timezone_set($timezone)) {
+    date_default_timezone_set('Europe/Paris');
+}
+
 /**
  * Error handling
  */
