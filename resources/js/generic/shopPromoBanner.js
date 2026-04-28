@@ -78,7 +78,7 @@ export function initShopPromoBanner() {
     }
 
     function setDesktopExpanded(expanded) {
-        if (isMobile() || !desktopToggle) {
+        if (!desktopToggle) {
             return;
         }
 
@@ -109,10 +109,6 @@ export function initShopPromoBanner() {
     });
     if (desktopToggle) {
         desktopToggle.addEventListener('click', () => {
-            if (isMobile()) {
-                return;
-            }
-
             setDesktopExpanded(!promoBanner.classList.contains('is-expanded'));
         });
 
@@ -144,5 +140,6 @@ export function initShopPromoBanner() {
         setDesktopExpanded(false);
     } else {
         showBanner(); // always start visible on mobile
+        setDesktopExpanded(false);
     }
 }
