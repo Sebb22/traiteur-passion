@@ -21,11 +21,6 @@
                 class="header__link<?php echo Navigation::isActivePath('/carte-évènementielle') ? ' header__link--active' : ''; ?>"
                 <?php echo Navigation::isActivePath('/carte-évènementielle') ? ' aria-current="page"' : ''; ?>><span
                     class="header__linkLabel header__linkLabel--stack">Carte<br>évènementielle</span></a>
-
-            <a href="/blog"
-                class="header__link<?php echo Navigation::isActivePath('/blog') ? ' header__link--active' : ''; ?>"
-                <?php echo Navigation::isActivePath('/blog') ? ' aria-current="page"' : ''; ?>><span
-                    class="header__linkLabel">Blog</span></a>
             <a href="/a-propos"
                 class="header__link<?php echo Navigation::isActivePath('/a-propos') ? ' header__link--active' : ''; ?>"
                 <?php echo Navigation::isActivePath('/a-propos') ? ' aria-current="page"' : ''; ?>><span
