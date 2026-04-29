@@ -14,70 +14,7 @@
         height: 100dvh;
         overflow: hidden;
         padding: 18px 18px 18px 0;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-    }
-    .shopPanel {
-        height: 100%;
         overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        scroll-behavior: smooth;
-    }
-}
-
-@media (min-width: 1280px) and (max-width: 1319px) {
-    body.page--shop {
-        height: auto;
-        overflow: auto;
-        overflow-x: hidden;
-    }
-    .siteMain {
-        height: auto;
-        min-height: 0;
-        overflow: visible;
-    }
-    .shopSplit {
-        height: auto;
-        min-height: 0;
-        grid-template-columns: 1fr;
-    }
-    .shopSplit .menuSplit__left,
-    .shopSplit .menuSplit__right {
-        min-height: 0;
-        height: auto;
-        overflow: visible;
-    }
-    .shopSplit .menuSplit__left {
-        position: relative;
-        top: auto;
-        min-height: 56vh;
-        height: 56vh;
-        overflow: hidden;
-    }
-    .shopSplit .menuSplit__right {
-        overflow-y: visible;
-        overflow-x: hidden;
-        padding: 0 18px 18px;
-    }
-    .shopPanel {
-        overflow: visible;
-    }
-}
-
-@media (max-width: 1279px) {
-    body.page--shop {
-        overflow: auto;
-        overflow-x: hidden;
-    }
-    .shopSplit {
-        height: auto;
-    }
-    .shopSplit .menuSplit__right {
-        height: auto;
-        overflow-y: visible;
-        padding: 0 18px 18px;
     }
 }
 
@@ -342,9 +279,9 @@
 }
 
 .shopIntroPill {
-    --shop-pill-accent: rgba(223, 185, 118, 0.42);
-    --shop-pill-bg: rgba(10, 8, 7, 0.28);
-    --shop-pill-border: rgba(239, 231, 210, 0.14);
+    --shop-pill-accent: rgba(188, 160, 118, 0.68);
+    --shop-pill-bg: rgba(24, 20, 17, 0.72);
+    --shop-pill-border: rgba(188, 160, 118, 0.14);
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -353,8 +290,12 @@
     border-radius: 999px;
     border: 1px solid var(--shop-pill-border);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent), var(--shop-pill-bg);
-    color: rgba(239, 231, 210, 0.86);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.005)),
+        var(--shop-pill-bg);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.025),
+        0 8px 18px rgba(0, 0, 0, 0.12);
+    color: rgba(233, 226, 210, 0.76);
     font:
         600 11px/1 "Inter",
         system-ui,
@@ -364,21 +305,21 @@
 }
 
 .shopIntroPill--gold {
-    --shop-pill-accent: rgba(223, 185, 118, 0.46);
-    --shop-pill-bg: rgba(92, 66, 23, 0.2);
-    --shop-pill-border: rgba(223, 185, 118, 0.26);
+    --shop-pill-accent: rgba(194, 160, 109, 0.74);
+    --shop-pill-bg: rgba(35, 27, 21, 0.78);
+    --shop-pill-border: rgba(194, 160, 109, 0.18);
 }
 
 .shopIntroPill--sage {
-    --shop-pill-accent: rgba(116, 183, 143, 0.48);
-    --shop-pill-bg: rgba(30, 73, 54, 0.2);
-    --shop-pill-border: rgba(116, 183, 143, 0.24);
+    --shop-pill-accent: rgba(145, 151, 156, 0.68);
+    --shop-pill-bg: rgba(24, 28, 31, 0.78);
+    --shop-pill-border: rgba(145, 151, 156, 0.16);
 }
 
 .shopIntroPill--coral {
-    --shop-pill-accent: rgba(224, 134, 110, 0.48);
-    --shop-pill-bg: rgba(100, 46, 33, 0.2);
-    --shop-pill-border: rgba(224, 134, 110, 0.24);
+    --shop-pill-accent: rgba(158, 136, 128, 0.68);
+    --shop-pill-bg: rgba(31, 24, 24, 0.8);
+    --shop-pill-border: rgba(158, 136, 128, 0.16);
 }
 
 .shopIntroPill__icon,
@@ -391,37 +332,26 @@
 }
 
 .shopIconGlyph {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 1em;
-    height: 1em;
-    line-height: 1;
-    stroke: currentColor;
+    width: 1.35rem;
+    height: 1.35rem;
+    color: #c9a96e;
     fill: none;
-    stroke-width: 2.1;
+    stroke: currentColor;
+    stroke-width: 1.65;
     stroke-linecap: round;
     stroke-linejoin: round;
+    flex: 0 0 auto;
     overflow: visible;
-    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.08));
-}
-
-.shopIconGlyph::before {
-    display: block;
-    width: 1em;
-    height: 1em;
-    line-height: 1;
 }
 
 .shopIntroPill__icon {
     width: 22px;
     height: 22px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--shop-pill-accent) 16%, rgba(255, 255, 255, 0.02));
+    background: color-mix(in srgb, var(--shop-pill-accent) 10%, rgba(255, 255, 255, 0.012));
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        0 0 0 1px color-mix(in srgb, var(--shop-pill-accent) 28%, transparent);
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 1px color-mix(in srgb, var(--shop-pill-accent) 16%, transparent);
     color: var(--shop-pill-accent);
     transform: translateY(-0.5px);
 }
@@ -429,7 +359,6 @@
 .shopIntroPill__icon .shopIconGlyph,
 .shopIntro__noteIcon .shopIconGlyph {
     font-size: 18px;
-    stroke-width: 2.25;
 }
 
 .shopIntroSteps {
@@ -439,7 +368,7 @@
 }
 
 .shopIntroStep {
-    --shop-step-accent: rgba(223, 185, 118, 0.42);
+    --shop-step-accent: rgba(184, 129, 59, 0.42);
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 10px;
@@ -454,7 +383,7 @@
 }
 
 .shopIntroStep--gold {
-    --shop-step-accent: rgba(223, 185, 118, 0.42);
+    --shop-step-accent: rgba(184, 129, 59, 0.78);
 }
 
 .shopIntroStep--sage {
@@ -505,7 +434,6 @@
 
 .shopIntroStep__icon .shopIconGlyph {
     font-size: 22px;
-    stroke-width: 2.3;
 }
 
 .shopIntro__noteIcon {
@@ -570,7 +498,7 @@
     height: 16px;
     flex: 0 0 16px;
     transform: translateY(1px);
-    color: rgba(216, 173, 110, 0.86);
+    color: rgba(184, 129, 59, 0.92);
 }
 
 .shopIntro__title,
@@ -694,17 +622,18 @@
 }
 
 .shopCatalogNav__stat {
-    --shop-stat-accent: rgba(223, 185, 118, 0.4);
+    --shop-stat-accent: rgba(188, 160, 118, 0.64);
     display: inline-flex;
     align-items: center;
     gap: 8px;
     min-height: 32px;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid rgba(239, 231, 210, 0.12);
+    border: 1px solid rgba(188, 160, 118, 0.12);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent), rgba(0, 0, 0, 0.18);
-    color: rgba(239, 231, 210, 0.82);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)),
+        rgba(14, 12, 11, 0.48);
+    color: rgba(233, 226, 210, 0.72);
     font:
         700 10px/1 "Inter",
         system-ui,
@@ -714,13 +643,13 @@
 }
 
 .shopCatalogNav__stat--gold {
-    --shop-stat-accent: rgba(241, 198, 108, 0.92);
-    border-color: rgba(223, 185, 118, 0.22);
+    --shop-stat-accent: rgba(194, 160, 109, 0.74);
+    border-color: rgba(194, 160, 109, 0.18);
 }
 
 .shopCatalogNav__stat--sage {
-    --shop-stat-accent: rgba(126, 205, 156, 0.9);
-    border-color: rgba(116, 183, 143, 0.22);
+    --shop-stat-accent: rgba(145, 151, 156, 0.68);
+    border-color: rgba(145, 151, 156, 0.16);
 }
 
 .shopCatalogNav__statIcon {
@@ -730,14 +659,13 @@
     width: 24px;
     height: 24px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--shop-stat-accent) 16%, rgba(255, 255, 255, 0.02));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    background: color-mix(in srgb, var(--shop-stat-accent) 10%, rgba(255, 255, 255, 0.012));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     color: var(--shop-stat-accent);
 }
 
 .shopCatalogNav__statIcon .shopIconGlyph {
     font-size: 16px;
-    stroke-width: 2.2;
 }
 
 .shopNotice {
@@ -756,7 +684,7 @@
     border-radius: 14px;
     background: rgba(239, 231, 210, 0.08);
     border: 1px solid rgba(239, 231, 210, 0.12);
-    color: rgba(216, 173, 110, 0.84);
+    color: rgba(184, 129, 59, 0.92);
 }
 
 .shopNotice__icon .shopIconGlyph {
@@ -867,7 +795,6 @@
 
 .shopSummaryTab__icon .shopIconGlyph {
     font-size: 24px;
-    stroke-width: 2.35;
 }
 
 .shopSummaryTab__label {
@@ -1087,9 +1014,9 @@ body.shop-summary-open {
     margin-bottom: 10px;
     padding: 6px 10px;
     border-radius: 999px;
-    background: rgba(239, 231, 210, 0.08);
-    border: 1px solid rgba(239, 231, 210, 0.14);
-    color: rgba(239, 231, 210, 0.68);
+    background: rgba(19, 17, 15, 0.84);
+    border: 1px solid rgba(188, 160, 118, 0.12);
+    color: rgba(214, 198, 171, 0.66);
 }
 
 .shopInput,

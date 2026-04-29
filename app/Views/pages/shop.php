@@ -83,19 +83,19 @@
 
     if ($icons === null) {
         $icons = [
-            'artisan'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 14h12c0 3.05-2.69 5.5-6 5.5S6 17.05 6 14Z" fill="currentColor" stroke="none" opacity=".14"/><path d="M6 14h12c0 3.05-2.69 5.5-6 5.5S6 17.05 6 14Z"/><path d="M8.2 13.7v-1.1c0-1.82 1.7-3.3 3.8-3.3s3.8 1.48 3.8 3.3v1.1"/><path d="M8.1 8.6c0-1.07.84-1.95 1.88-1.95.67 0 1.16.3 1.52.77.38-.85 1.17-1.42 2.17-1.42 1.38 0 2.5 1.1 2.5 2.46 0 .2-.03.39-.08.57"/><circle cx="17.8" cy="6.4" r="1.15" fill="currentColor" stroke="none" opacity=".92"/></svg>',
-            'location'   => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19.9s4.9-3.63 4.9-8.27a4.9 4.9 0 1 0-9.8 0c0 4.64 4.9 8.27 4.9 8.27Z" fill="currentColor" stroke="none" opacity=".14"/><path d="M12 19.9s4.9-3.63 4.9-8.27a4.9 4.9 0 1 0-9.8 0c0 4.64 4.9 8.27 4.9 8.27Z"/><circle cx="12" cy="11.55" r="1.7" fill="currentColor" stroke="none" opacity=".92"/><path d="M15.9 16.4c1.7.22 2.9.8 2.9 1.48 0 .88-3.04 1.6-6.8 1.6s-6.8-.72-6.8-1.6c0-.67 1.1-1.24 2.69-1.46"/><path d="M18.1 8.7h2.2"/><path d="M19.2 7.6v2.2"/></svg>',
-            'payment'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.4" y="7.1" width="15.2" height="9.8" rx="2.7" fill="currentColor" stroke="none" opacity=".14"/><rect x="4.4" y="7.1" width="15.2" height="9.8" rx="2.7"/><path d="M4.4 10.45h15.2"/><path d="M8.1 13.8h2.9"/><circle cx="18.15" cy="7.35" r="2.45" fill="currentColor" stroke="none" opacity=".92"/><path d="m17.15 6.35 2 2" stroke="#120f0b"/><path d="m19.15 6.35-2 2" stroke="#120f0b"/></svg>',
-            'categories' => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.6" y="4.6" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".16"/><rect x="13.2" y="4.6" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".16"/><rect x="4.6" y="13.2" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".16"/><rect x="13.2" y="13.2" width="6.2" height="6.2" rx="1.6" fill="currentColor" stroke="none" opacity=".84"/><rect x="4.6" y="4.6" width="6.2" height="6.2" rx="1.6"/><rect x="13.2" y="4.6" width="6.2" height="6.2" rx="1.6"/><rect x="4.6" y="13.2" width="6.2" height="6.2" rx="1.6"/><rect x="13.2" y="13.2" width="6.2" height="6.2" rx="1.6"/></svg>',
-            'selection'  => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.5" y="5.5" width="11.5" height="13" rx="2.4" fill="currentColor" stroke="none" opacity=".12"/><rect x="4.5" y="5.5" width="11.5" height="13" rx="2.4"/><path d="m7.2 9.4 1 1 1.8-1.9"/><path d="M11.4 9.9h2.2"/><path d="m7.2 13.3 1 1 1.8-1.9"/><path d="M11.4 13.8h2.2"/><circle cx="17.9" cy="15.8" r="3.1" fill="currentColor" stroke="none" opacity=".9"/><path d="M17.9 14.2v3.2" stroke="#120f0b"/><path d="M16.3 15.8h3.2" stroke="#120f0b"/></svg>',
-            'confirm'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.2 18.2 7v4.85c0 4.05-2.53 7.46-6.2 8.95-3.67-1.49-6.2-4.9-6.2-8.95V7L12 4.2Z"/><path d="m9.35 11.95 1.75 1.75 3.55-3.75"/><circle cx="17.9" cy="8.1" r="1" fill="currentColor" stroke="none" opacity=".9"/></svg>',
-            'alert'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.5 20 19H4l8-14.5Z"/><path d="M12 9v4.5"/><circle cx="12" cy="16.5" r=".75"/></svg>',
-            'store'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 10.5 6.4 6h11.2l1.4 4.5"/><path d="M6 10.5V18h12v-7.5"/><path d="M4.75 10.5h14.5"/><path d="M9.5 18v-4h5v4"/></svg>',
-            'dish'       => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7.5 12a4.5 4.5 0 0 1 9 0"/><path d="M4.5 13h15"/><path d="M7 16.5h10"/><path d="M10 19h4"/></svg>',
-            'bag'        => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.1 9V8.1a3.9 3.9 0 0 1 7.8 0V9"/><path d="M6 9h12l-1 10H7L6 9Z" fill="currentColor" stroke="none" opacity=".14"/><path d="M6 9h12l-1 10H7L6 9Z"/><path d="M9.5 12.9h5"/><circle cx="18.1" cy="7.4" r="2.5" fill="currentColor" stroke="none" opacity=".92"/><path d="M18.1 6.15v2.5" stroke="#120f0b"/><path d="M16.85 7.4h2.5" stroke="#120f0b"/></svg>',
-            'box'        => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.5 19 8l-7 3.5L5 8l7-3.5Z"/><path d="M5 8v8l7 3.5 7-3.5V8"/><path d="M12 11.5V19.5"/></svg>',
-            'clock'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="7.5"/><path d="M12 8.5v4.2l2.8 1.8"/></svg>',
-            'layers'     => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5.5 7 3.5-7 3.5L5 9l7-3.5Z"/><path d="m7 12 5 2.5 5-2.5"/><path d="m7 15 5 2.5 5-2.5"/></svg>',
+            'artisan'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 12h8v6.5H8z" fill="currentColor" opacity=".12"/><path d="M8 12h8v6.5H8z"/><path d="M8 12c-1.2 0-2.15-.96-2.15-2.15 0-1.1.82-2 1.88-2.13.27-1.55 1.61-2.72 3.24-2.72 1.04 0 1.99.48 2.62 1.26A2.86 2.86 0 0 1 18 8.95 3.03 3.03 0 0 1 16 12"/><path d="M10.2 15.2h3.6"/></svg>',
+            'location'   => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z" fill="currentColor" opacity=".12"/><path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>',
+            'payment'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="6.5" width="16" height="11" rx="2.5" fill="currentColor" opacity=".12"/><rect x="4" y="6.5" width="16" height="11" rx="2.5"/><path d="M4 10h16"/><path d="M7 14.5h4"/><path d="M15 14.5h2"/></svg>',
+            'categories' => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 7h14"/><path d="M5 12h14"/><path d="M5 17h14"/></svg>',
+            'selection'  => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 8.2h11l-1.2 6.6H9.4z" fill="currentColor" opacity=".12"/><path d="M4.5 5.5H6l2.1 9.3h9.7L19.4 8.2H8"/><path d="M9.1 17.2h8.2"/><circle cx="10" cy="19" r="1.15"/><circle cx="17.2" cy="19" r="1.15"/></svg>',
+            'confirm'    => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="currentColor" opacity=".12"/><circle cx="12" cy="12" r="8"/><path d="m8.5 12.2 2.2 2.2 4.9-5"/></svg>',
+            'alert'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4 21 20H3z" fill="currentColor" opacity=".12"/><path d="M12 4 21 20H3z"/><path d="M12 9v5"/><circle cx="12" cy="17" r=".7"/></svg>',
+            'store'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.4 8.8h13.2l-1.1-3.6H6.5z" fill="currentColor" opacity=".12"/><path d="M5.4 8.8h13.2l-1.1-3.6H6.5z"/><path d="M6.2 8.8v10h11.6v-10"/><path d="M10 18.8v-4.9h4v4.9"/><path d="M5.4 8.8c0 1.18.96 2.14 2.14 2.14 1.18 0 2.14-.96 2.14-2.14 0 1.18.96 2.14 2.14 2.14 1.18 0 2.14-.96 2.14-2.14 0 1.18.96 2.14 2.14 2.14 1.18 0 2.14-.96 2.14-2.14"/></svg>',
+            'dish'       => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 18h12"/><path d="M8 15a4 4 0 0 1 8 0"/><path d="M5 15h14"/><path d="M12 8v-2"/><circle cx="12" cy="6" r="1"/></svg>',
+            'bag'        => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 9h10l-1 11H8z" fill="currentColor" opacity=".12"/><path d="M7 9h10l-1 11H8z"/><path d="M9 9V7a3 3 0 0 1 6 0v2"/></svg>',
+            'box'        => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4.5 20 8.5v7L12 20l-8-4.5v-7z" fill="currentColor" opacity=".12"/><path d="M12 4.5 20 8.5v7L12 20l-8-4.5v-7z"/><path d="M4 8.5 12 13l8-4.5"/><path d="M12 13v7"/></svg>',
+            'clock'      => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="currentColor" opacity=".12"/><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/></svg>',
+            'layers'     => '<svg class="shopIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5 8 4-8 4-8-4z" fill="currentColor" opacity=".12"/><path d="m12 5 8 4-8 4-8-4z"/><path d="m6 13 6 3 6-3"/><path d="m6 16 6 3 6-3"/></svg>',
         ];
     }
 
@@ -188,7 +188,8 @@
                             </div>
                             <div>
                                 <strong class="shopIntroStep__title">Confirmez sans payer</strong>
-                                <p class="shopIntroStep__copy">Nous validons ensuite avec vous le retrait ou la livraison.</p>
+                                <p class="shopIntroStep__copy">Nous validons ensuite avec vous le retrait ou la
+                                    livraison.</p>
                             </div>
                         </article>
                     </div>
@@ -196,7 +197,8 @@
                         <span class="shopIntro__noteIcon" aria-hidden="true">
                             <?php echo $shopIcon('location'); ?>
                         </span>
-                        <span>Carte courte, fait maison, stock revérifié à l’enregistrement. Retrait sur créneau ou livraison locale selon votre adresse.</span>
+                        <span>Carte courte, fait maison, stock revérifié à l’enregistrement. Retrait sur créneau ou
+                            livraison locale selon votre adresse.</span>
                     </p>
                 </header>
 
@@ -206,8 +208,8 @@
                         <?php echo $shopIcon('alert'); ?>
                     </span>
                     <div>
-                    <strong>Boutique temporairement indisponible.</strong>
-                    <p><?php echo $e($loadError); ?></p>
+                        <strong>Boutique temporairement indisponible.</strong>
+                        <p><?php echo $e($loadError); ?></p>
                     </div>
                 </section>
                 <?php endif; ?>
@@ -218,9 +220,10 @@
                         <?php echo $shopIcon('store'); ?>
                     </span>
                     <div>
-                    <strong>La boutique n'est pas encore configurée.</strong>
-                    <p>Ajoutez d'abord des catégories et des produits depuis l'administration pour ouvrir la commande en
-                        ligne.</p>
+                        <strong>La boutique n'est pas encore configurée.</strong>
+                        <p>Ajoutez d'abord des catégories et des produits depuis l'administration pour ouvrir la
+                            commande en
+                            ligne.</p>
                     </div>
                 </section>
                 <?php endif; ?>
@@ -237,20 +240,23 @@
                         <div class="shopCatalogNav__head">
                             <div class="shopCatalogNav__copy">
                                 <span class="shopCatalogNav__eyebrow">Parcourir les catégories</span>
-                                <p class="shopCatalogNav__title">Repérez d'abord votre catégorie, puis composez le panier sans perdre le fil de la carte.</p>
+                                <p class="shopCatalogNav__title">Repérez d'abord votre catégorie, puis composez le
+                                    panier sans perdre le fil de la carte.</p>
                             </div>
                             <div class="shopCatalogNav__stats" aria-label="Repères de navigation boutique">
                                 <span class="shopCatalogNav__stat shopCatalogNav__stat--gold">
                                     <span class="shopCatalogNav__statIcon" aria-hidden="true">
                                         <?php echo $shopIcon('categories'); ?>
                                     </span>
-                                    <?php echo count($sections); ?> catégorie<?php echo count($sections) > 1 ? 's' : ''; ?>
+                                    <?php echo count($sections); ?>
+                                    catégorie<?php echo count($sections) > 1 ? 's' : ''; ?>
                                 </span>
                                 <span class="shopCatalogNav__stat shopCatalogNav__stat--sage">
                                     <span class="shopCatalogNav__statIcon" aria-hidden="true">
                                         <?php echo $shopIcon('dish'); ?>
                                     </span>
-                                    <?php echo $visibleProductsCount; ?> produit<?php echo $visibleProductsCount > 1 ? 's' : ''; ?>
+                                    <?php echo $visibleProductsCount; ?>
+                                    produit<?php echo $visibleProductsCount > 1 ? 's' : ''; ?>
                                 </span>
                             </div>
                         </div>
@@ -345,17 +351,26 @@
                                             <span class="shopStep">Promo</span>
                                             <strong><?php echo $e($shopPromo['title'] ?? 'Offre boutique'); ?></strong>
                                         </div>
-                                        <span class="shopSummary__promoCountdown" data-countdown-target="<?php echo $e($shopPromo['countdown_iso'] ?? ''); ?>">Fin dans --</span>
+                                        <span class="shopSummary__promoCountdown"
+                                            data-countdown-target="<?php echo $e($shopPromo['countdown_iso'] ?? ''); ?>">Fin
+                                            dans --</span>
                                     </div>
-                                    <p class="shopSummary__promoCopy"><?php echo $e($shopPromo['banner_text'] ?? ''); ?></p>
+                                    <p class="shopSummary__promoCopy"><?php echo $e($shopPromo['banner_text'] ?? ''); ?>
+                                    </p>
                                     <div class="shopPromoCodeRow">
                                         <label class="shopField shopField--full">
                                             <span class="shopField__label">Code promo</span>
-                                            <input class="shopInput" type="text" name="promo_code" data-shop-promo-input placeholder="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>">
+                                            <input class="shopInput" type="text" name="promo_code" data-shop-promo-input
+                                                placeholder="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>">
                                         </label>
-                                        <button type="button" class="btn btn--ghost shopPromoCodeRow__apply" data-shop-promo-apply>Appliquer</button>
+                                        <button type="button" class="btn btn--ghost shopPromoCodeRow__apply"
+                                            data-shop-promo-apply>Appliquer</button>
                                     </div>
-                                    <p class="shopSummary__promoHint">Code actif : <strong><?php echo $e($shopPromo['promo_code'] ?? ''); ?></strong> pour -<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>% sur les articles boutique.</p>
+                                    <p class="shopSummary__promoHint">Code actif :
+                                        <strong><?php echo $e($shopPromo['promo_code'] ?? ''); ?></strong> pour
+                                        -<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>% sur les articles
+                                        boutique.
+                                    </p>
                                     <p class="shopSummary__promoState" data-shop-promo-state></p>
                                 </div>
                                 <?php endif; ?>
@@ -486,12 +501,14 @@
                                                     <h4 class="shopItemCard__title">
                                                         <?php echo $e($item['name'] ?? ''); ?></h4>
                                                 </div>
-                                                <span class="shopItemCard__price"><?php echo $e($cardPriceDisplay); ?></span>
+                                                <span
+                                                    class="shopItemCard__price"><?php echo $e($cardPriceDisplay); ?></span>
                                             </div>
 
                                             <div class="shopItemCard__content">
                                                 <?php if (($item['description'] ?? '') !== ''): ?>
-                                                <p class="shopItemCard__desc"><?php echo $e($item['description'] ?? ''); ?>
+                                                <p class="shopItemCard__desc">
+                                                    <?php echo $e($item['description'] ?? ''); ?>
                                                 </p>
                                                 <?php endif; ?>
                                             </div>
@@ -500,8 +517,7 @@
                                                 <div class="shopItemCard__purchaseHead">
                                                     <span
                                                         class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
-                                                        data-shop-stock
-                                                        data-item-id="<?php echo $itemId; ?>">
+                                                        data-shop-stock data-item-id="<?php echo $itemId; ?>">
                                                         <?php echo $shopIcon($isSoldOut ? 'alert' : ($isLowStock ? 'clock' : 'box')); ?>
                                                         <span><?php echo $e($statusLabel); ?></span>
                                                     </span>
@@ -515,7 +531,8 @@
                                                     <?php if ($options !== []): ?>
                                                     <p class="shopPurchaseOptions__intro">
                                                         <?php echo $shopIcon('selection'); ?>
-                                                        <span>Formats disponibles : choisissez le nombre voulu sur chaque ligne.</span>
+                                                        <span>Formats disponibles : choisissez le nombre voulu sur
+                                                            chaque ligne.</span>
                                                     </p>
                                                     <?php endif; ?>
                                                     <?php foreach ($purchaseLines as $purchaseLine): ?>
@@ -537,8 +554,7 @@
                                                         $lineCartLabelPlural   = trim((string) ($purchaseLine['cart_label_plural'] ?? 'articles'));
                                                     ?>
                                                     <div class="shopPurchaseOption<?php echo $lineSoldOut ? ' is-sold-out' : ''; ?>"
-                                                        data-shop-order-line
-                                                        data-line-key="<?php echo $e($lineKey); ?>"
+                                                        data-shop-order-line data-line-key="<?php echo $e($lineKey); ?>"
                                                         data-item-id="<?php echo $itemId; ?>"
                                                         data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
                                                         data-item-stock="<?php echo $stockQuantity; ?>"
@@ -553,42 +569,59 @@
                                                         data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
                                                         <div class="shopPurchaseOption__head">
                                                             <div class="shopPurchaseOption__copy">
-                                                                <strong class="shopPurchaseOption__title"><?php echo $e($lineTitle); ?></strong>
-                                                                <p class="shopPurchaseOption__hint" data-default-text="<?php echo $e($lineHint); ?>">
+                                                                <strong
+                                                                    class="shopPurchaseOption__title"><?php echo $e($lineTitle); ?></strong>
+                                                                <p class="shopPurchaseOption__hint"
+                                                                    data-default-text="<?php echo $e($lineHint); ?>">
                                                                     <span><?php echo $e($lineHint); ?></span>
                                                                 </p>
                                                                 <p class="shopPurchaseOption__meta">
                                                                     <span><?php echo $e($lineMetaHint); ?></span>
                                                                 </p>
                                                             </div>
-                                                            <span class="shopPurchaseOption__price"><?php echo $e($linePrice); ?></span>
+                                                            <span
+                                                                class="shopPurchaseOption__price"><?php echo $e($linePrice); ?></span>
                                                         </div>
 
-                                                        <input type="hidden" name="shop_item[<?php echo $e($lineKey); ?>]" value="<?php echo $itemId; ?>">
-                                                        <input type="hidden" name="shop_option[<?php echo $e($lineKey); ?>]" value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
-                                                        <input type="hidden" name="shop_option_label[<?php echo $e($lineKey); ?>]" value="<?php echo $e($lineLabel); ?>">
-                                                        <input type="hidden" name="shop_option_units[<?php echo $e($lineKey); ?>]" value="<?php echo $lineUnits; ?>">
+                                                        <input type="hidden"
+                                                            name="shop_item[<?php echo $e($lineKey); ?>]"
+                                                            value="<?php echo $itemId; ?>">
+                                                        <input type="hidden"
+                                                            name="shop_option[<?php echo $e($lineKey); ?>]"
+                                                            value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
+                                                        <input type="hidden"
+                                                            name="shop_option_label[<?php echo $e($lineKey); ?>]"
+                                                            value="<?php echo $e($lineLabel); ?>">
+                                                        <input type="hidden"
+                                                            name="shop_option_units[<?php echo $e($lineKey); ?>]"
+                                                            value="<?php echo $lineUnits; ?>">
 
                                                         <div class="shopItemCard__actions">
-                                                            <button type="button" class="btn btn--ghost shopItemCard__add"
-                                                                data-shop-add data-line-key="<?php echo $e($lineKey); ?>"
+                                                            <button type="button"
+                                                                class="btn btn--ghost shopItemCard__add" data-shop-add
+                                                                data-line-key="<?php echo $e($lineKey); ?>"
                                                                 <?php echo $lineSoldOut ? 'disabled' : ''; ?>><?php echo $e($lineButtonLabel); ?></button>
 
                                                             <div class="shopQtyControls" data-shop-controls
                                                                 data-line-key="<?php echo $e($lineKey); ?>" hidden>
                                                                 <button type="button" class="shopQtyControls__btn"
-                                                                    data-shop-decrease data-line-key="<?php echo $e($lineKey); ?>"
+                                                                    data-shop-decrease
+                                                                    data-line-key="<?php echo $e($lineKey); ?>"
                                                                     aria-label="Retirer une unité de cette sélection">−</button>
                                                                 <label class="shopQty">
-                                                                    <span class="shopQty__label"><?php echo $e($lineQuantityLabel); ?></span>
+                                                                    <span
+                                                                        class="shopQty__label"><?php echo $e($lineQuantityLabel); ?></span>
                                                                     <input class="shopQty__input" type="number"
-                                                                        name="shop_quantity[<?php echo $e($lineKey); ?>]" min="0"
-                                                                        max="<?php echo $lineAllowed; ?>" value="0"
+                                                                        name="shop_quantity[<?php echo $e($lineKey); ?>]"
+                                                                        min="0" max="<?php echo $lineAllowed; ?>"
+                                                                        value="0"
                                                                         <?php echo $lineSoldOut ? 'disabled' : ''; ?>
-                                                                        data-shop-qty data-line-key="<?php echo $e($lineKey); ?>">
+                                                                        data-shop-qty
+                                                                        data-line-key="<?php echo $e($lineKey); ?>">
                                                                 </label>
                                                                 <button type="button" class="shopQtyControls__btn"
-                                                                    data-shop-increase data-line-key="<?php echo $e($lineKey); ?>"
+                                                                    data-shop-increase
+                                                                    data-line-key="<?php echo $e($lineKey); ?>"
                                                                     aria-label="Ajouter une unité à cette sélection">+</button>
                                                                 <button type="button" class="shopQtyControls__remove"
                                                                     data-shop-remove
@@ -617,7 +650,8 @@
                                     <div>
                                         <span class="shopStep">Finaliser</span>
                                         <h3 class="shopSectionHead__title">Finaliser sans paiement</h3>
-                                        <p class="shopSectionHead__hint">Deux étapes suffisent pour envoyer la demande. Nous confirmons ensuite avec vous le retrait ou la livraison.
+                                        <p class="shopSectionHead__hint">Deux étapes suffisent pour envoyer la demande.
+                                            Nous confirmons ensuite avec vous le retrait ou la livraison.
                                         </p>
                                     </div>
                                 </div>
@@ -664,7 +698,8 @@
                                 <div class="shopCheckoutPanel">
                                     <div class="shopCheckoutPanel__head">
                                         <h4>2. Retrait ou livraison</h4>
-                                        <p>Choisissez un créneau souhaité. La livraison reste proposée selon votre adresse.</p>
+                                        <p>Choisissez un créneau souhaité. La livraison reste proposée selon votre
+                                            adresse.</p>
                                     </div>
 
                                     <div class="shopFieldGrid">
