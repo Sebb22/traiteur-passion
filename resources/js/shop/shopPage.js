@@ -148,6 +148,7 @@ export function initShopPage() {
     const fulfillmentInputs = Array.from(form.querySelectorAll("[data-shop-fulfillment]"));
     const deliveryPanel = form.querySelector("[data-shop-delivery-panel]");
     const deliveryFields = Array.from(form.querySelectorAll("[data-shop-delivery-field]"));
+    const cardNodes = Array.from(form.querySelectorAll("[data-shop-item-card]"));
     const lineNodes = Array.from(form.querySelectorAll("[data-shop-order-line]"));
     const stockBadges = Array.from(form.querySelectorAll("[data-shop-stock]"));
     const inputs = Array.from(form.querySelectorAll("[data-shop-qty]"));
@@ -171,6 +172,7 @@ export function initShopPage() {
     );
     const desktopQuickAddMedia = window.matchMedia("(min-width: 981px)");
     const summarySheetMedia = window.matchMedia("(max-width: 980px)");
+    const compactDrawerMedia = window.matchMedia("(max-width: 980px)");
     let unbindDesktopToastMedia = () => {};
     let unbindDesktopQuickAddMedia = () => {};
     const promoEndsAt = form.getAttribute("data-promo-ends-at") || "";
@@ -186,6 +188,7 @@ export function initShopPage() {
     const isDesktopToast = () => desktopToastMedia.matches;
     const isDesktopQuickAdd = () => desktopQuickAddMedia.matches;
     const isSummarySheet = () => summarySheetMedia.matches;
+    const isCompactDrawerViewport = () => compactDrawerMedia.matches;
 
     const isPromoAvailable = () => {
         if (!promoConfig.active || !promoConfig.code || promoConfig.percent <= 0) {
@@ -411,6 +414,28 @@ export function initShopPage() {
         stockBadgesByItem.set(itemId, badges);
     });
 
+    const cards = new Map();
+    cardNodes.forEach((cardNode) => {
+        if (!(cardNode instanceof HTMLElement)) {
+            return;
+        }
+
+        const itemId = Number.parseInt(cardNode.getAttribute("data-item-id") || "0", 10);
+        if (!itemId) {
+            return;
+        }
+
+        const toggleButton = cardNode.querySelector("[data-shop-options-toggle]");
+        const drawer = cardNode.querySelector("[data-shop-options-drawer]");
+        cards.set(itemId, {
+            itemId,
+            cardNode,
+            toggleButton: toggleButton instanceof HTMLButtonElement ? toggleButton : null,
+            drawer: drawer instanceof HTMLElement ? drawer : null,
+            isOpen: drawer instanceof HTMLElement && !drawer.hidden,
+        });
+    });
+
     const items = new Map();
     lineNodes.forEach((node) => {
         const lineKey = String(node.getAttribute("data-line-key") || "").trim();
@@ -468,6 +493,107 @@ export function initShopPage() {
 
     const getUnitMultiplier = (item) =>
         Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
+
+    const getCardEntry = (itemOrId) => {
+        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId?.id;
+        return itemId ? cards.get(itemId) || null : null;
+    };
+
+    const getCardItems = (itemId) => {
+        return Array.from(items.values()).filter((item) => item.id === itemId);
+    };
+
+    const updateCardToggleLabel = (cardEntry, quantity = 0) => {
+        if (!cardEntry?.toggleButton) {
+            return;
+        }
+
+        const { toggleButton, isOpen } = cardEntry;
+        const closedLabel = toggleButton.dataset.closedLabel || "Ajouter au panier";
+        const openLabel = toggleButton.dataset.openLabel || "Fermer les options";
+        const filledLabel = toggleButton.dataset.filledLabel || closedLabel;
+        toggleButton.textContent = isOpen ? openLabel : quantity > 0 ? filledLabel : closedLabel;
+        toggleButton.classList.toggle("is-active", isOpen || quantity > 0);
+    };
+
+    const setOptionsDrawerOpen = (cardEntry, open) => {
+        if (!cardEntry?.drawer || !cardEntry.toggleButton) {
+            return;
+        }
+
+        if (open) {
+            cards.forEach((otherCardEntry) => {
+                if (otherCardEntry.itemId === cardEntry.itemId || !otherCardEntry.drawer) {
+                    return;
+                }
+
+                if (otherCardEntry.isOpen) {
+                    otherCardEntry.isOpen = false;
+                    otherCardEntry.drawer.hidden = true;
+                    otherCardEntry.cardNode.classList.remove("is-expanded");
+                    otherCardEntry.toggleButton?.setAttribute("aria-expanded", "false");
+
+                    const otherQuantity = getCardItems(otherCardEntry.itemId).reduce(
+                        (total, item) => total + getQuantity(item),
+                        0,
+                    );
+                    updateCardToggleLabel(otherCardEntry, otherQuantity);
+                }
+            });
+        }
+
+        cardEntry.isOpen = open;
+        cardEntry.drawer.hidden = !open;
+        cardEntry.cardNode.classList.toggle("is-expanded", open);
+        cardEntry.toggleButton.setAttribute("aria-expanded", String(open));
+
+        const quantity = getCardItems(cardEntry.itemId).reduce(
+            (total, item) => total + getQuantity(item),
+            0,
+        );
+        updateCardToggleLabel(cardEntry, quantity);
+
+        if (open && isCompactDrawerViewport()) {
+            window.requestAnimationFrame(() => {
+                cardEntry.cardNode.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest",
+                });
+            });
+        }
+    };
+
+    const syncCardState = (itemId) => {
+        const cardEntry = getCardEntry(itemId);
+        if (!cardEntry) {
+            return;
+        }
+
+        const cardItems = getCardItems(itemId);
+        if (cardItems.length === 0) {
+            return;
+        }
+
+        let totalQuantity = 0;
+        let hasAvailableLine = false;
+
+        cardItems.forEach((item) => {
+            totalQuantity += getQuantity(item);
+            if (getAvailableOrderQuantity(item) > 0 || getQuantity(item) > 0) {
+                hasAvailableLine = true;
+            }
+        });
+
+        cardEntry.cardNode.classList.toggle("is-in-cart", totalQuantity > 0);
+        cardEntry.cardNode.classList.toggle("is-sold-out", !hasAvailableLine);
+
+        if (cardEntry.toggleButton) {
+            cardEntry.toggleButton.disabled = !hasAvailableLine;
+        }
+
+        updateCardToggleLabel(cardEntry, totalQuantity);
+    };
 
     const getEffectivePriceCents = (item) => {
         return item.basePriceCents;
@@ -617,6 +743,7 @@ export function initShopPage() {
 
         item.node.classList.toggle("is-in-cart", quantity > 0);
         syncStockBadges(item.id);
+        syncCardState(item.id);
     };
 
     const setQuantity = (item, quantity) => {
@@ -946,6 +1073,16 @@ export function initShopPage() {
         button.addEventListener("click", () => {
             const item = items.get(String(button.getAttribute("data-line-key") || "").trim());
             setQuantity(item, getQuantity(item) + 1);
+        });
+    });
+
+    cards.forEach((cardEntry) => {
+        if (!cardEntry.toggleButton) {
+            return;
+        }
+
+        cardEntry.toggleButton.addEventListener("click", () => {
+            setOptionsDrawerOpen(cardEntry, !cardEntry.isOpen);
         });
     });
 
@@ -1293,6 +1430,13 @@ export function initShopPage() {
 
     renderSummary();
     syncFulfillmentState();
+    cards.forEach((cardEntry) => {
+        updateCardToggleLabel(cardEntry, 0);
+        if (cardEntry.drawer) {
+            setOptionsDrawerOpen(cardEntry, cardEntry.isOpen);
+        }
+        syncCardState(cardEntry.itemId);
+    });
     syncSummaryDockBounds();
     refreshStock({ silent: true });
     window.setInterval(() => refreshStock({ silent: true }), 15000);

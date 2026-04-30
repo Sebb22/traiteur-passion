@@ -281,7 +281,7 @@
                             <button type="button" class="shopSummaryTab" data-shop-summary-toggle aria-expanded="false"
                                 aria-controls="shopSummaryPanel" hidden>
                                 <span class="shopSummaryTab__icon" aria-hidden="true">
-                                    <?php echo $shopIcon('bag'); ?>
+                                    <?php echo $shopIcon('selection'); ?>
                                 </span>
                                 <span class="shopSummaryTab__main">
                                     <span class="shopSummaryTab__label">Panier</span>
@@ -459,7 +459,7 @@
                                                 'hint'                => 'Jusqu’à ' . $stockQuantity . ' ' . $pluralize($stockQuantity, 'unité', 'unités'),
                                                 'meta_hint'           => 'Ajout direct au panier',
                                                 'quantity_label'      => 'Nombre d’unités',
-                                                'button_label'        => 'Ajouter 1 unité',
+                                                'button_label'        => 'Ajouter au panier',
                                                 'cart_label_singular' => 'unité',
                                                 'cart_label_plural'   => 'unités',
                                             ];
@@ -468,6 +468,7 @@
                                         if (count($purchaseLines) > 1) {
                                             $cardPriceDisplay = 'Dès ' . $cardPriceDisplay;
                                         }
+                                        $primaryPurchaseLine = $purchaseLines[0] ?? null;
                                         $hasAvailableLine = false;
                                         foreach ($purchaseLines as $purchaseLine) {
                                             if ((int) ($purchaseLine['allowed'] ?? 0) > 0) {
@@ -482,7 +483,7 @@
                                             : ($isLowStock ? 'Plus que ' . $formatStockQuantity($stockQuantity, $stockUnit) : $formatStockQuantity($stockQuantity, $stockUnit));
                                     ?>
                                     <article class="shopItemCard<?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
-                                        data-item-id="<?php echo $itemId; ?>">
+                                        data-item-id="<?php echo $itemId; ?>" data-shop-item-card>
                                         <div class="shopItemCard__media">
                                             <?php if (($item['image_path'] ?? '') !== ''): ?>
                                             <img src="<?php echo $e($item['image_path'] ?? ''); ?>"
@@ -497,44 +498,112 @@
 
                                         <div class="shopItemCard__body">
                                             <div class="shopItemCard__top">
-                                                <div>
-                                                    <h4 class="shopItemCard__title">
-                                                        <?php echo $e($item['name'] ?? ''); ?></h4>
-                                                </div>
+                                                <h4 class="shopItemCard__title"><?php echo $e($item['name'] ?? ''); ?></h4>
                                                 <span
                                                     class="shopItemCard__price"><?php echo $e($cardPriceDisplay); ?></span>
                                             </div>
 
-                                            <div class="shopItemCard__content">
-                                                <?php if (($item['description'] ?? '') !== ''): ?>
-                                                <p class="shopItemCard__desc">
-                                                    <?php echo $e($item['description'] ?? ''); ?>
-                                                </p>
+                                            <div class="shopItemCard__footer">
+                                                <span
+                                                    class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
+                                                    data-shop-stock data-item-id="<?php echo $itemId; ?>">
+                                                    <span><?php echo $e($statusLabel); ?></span>
+                                                </span>
+
+                                                <?php if ($options !== []): ?>
+                                                <button type="button" class="btn btn--ghost shopItemCard__add"
+                                                    data-shop-options-toggle data-item-id="<?php echo $itemId; ?>"
+                                                    data-closed-label="Choisir un format"
+                                                    data-open-label="Masquer les formats"
+                                                    data-filled-label="Modifier le format"
+                                                    aria-expanded="false"
+                                                    aria-controls="shop-options-<?php echo $itemId; ?>"
+                                                    <?php echo $isSoldOut ? 'disabled' : ''; ?>>Choisir un format</button>
+                                                <?php elseif ($primaryPurchaseLine !== null): ?>
+                                                <?php
+                                                    $lineKey               = (string) ($primaryPurchaseLine['line_key'] ?? '');
+                                                    $lineOptionId          = (int) ($primaryPurchaseLine['option_id'] ?? 0);
+                                                    $lineLabel             = trim((string) ($primaryPurchaseLine['option_label'] ?? ''));
+                                                    $lineUnits             = max(1, (int) ($primaryPurchaseLine['option_units'] ?? 1));
+                                                    $linePrice             = (string) ($primaryPurchaseLine['price_display'] ?? '');
+                                                    $linePriceCents        = (int) ($primaryPurchaseLine['price_cents'] ?? 0);
+                                                    $lineAllowed           = max(0, (int) ($primaryPurchaseLine['allowed'] ?? 0));
+                                                    $lineSoldOut           = $stockQuantity <= 0 || $lineAllowed <= 0;
+                                                    $lineQuantityLabel     = trim((string) ($primaryPurchaseLine['quantity_label'] ?? 'Quantité'));
+                                                    $lineButtonLabel       = trim((string) ($primaryPurchaseLine['button_label'] ?? 'Ajouter'));
+                                                    $lineCartLabelSingular = trim((string) ($primaryPurchaseLine['cart_label_singular'] ?? 'article'));
+                                                    $lineCartLabelPlural   = trim((string) ($primaryPurchaseLine['cart_label_plural'] ?? 'articles'));
+                                                ?>
+                                                <div class="shopItemCard__inlineOrder<?php echo $lineSoldOut ? ' is-sold-out' : ''; ?>"
+                                                    data-shop-order-line data-line-key="<?php echo $e($lineKey); ?>"
+                                                    data-item-id="<?php echo $itemId; ?>"
+                                                    data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
+                                                    data-item-stock="<?php echo $stockQuantity; ?>"
+                                                    data-item-stock-unit="<?php echo $e($stockUnit); ?>"
+                                                    data-item-low-stock-threshold="<?php echo max(0, (int) ($item['low_stock_threshold'] ?? 0)); ?>"
+                                                    data-item-price="<?php echo $e($linePrice); ?>"
+                                                    data-item-price-cents="<?php echo $linePriceCents; ?>"
+                                                    data-option-id="<?php echo $lineOptionId; ?>"
+                                                    data-option-label="<?php echo $e($lineLabel); ?>"
+                                                    data-option-units="<?php echo $lineUnits; ?>"
+                                                    data-cart-label-singular="<?php echo $e($lineCartLabelSingular); ?>"
+                                                    data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
+                                                    <input type="hidden" name="shop_item[<?php echo $e($lineKey); ?>]"
+                                                        value="<?php echo $itemId; ?>">
+                                                    <input type="hidden"
+                                                        name="shop_option[<?php echo $e($lineKey); ?>]"
+                                                        value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
+                                                    <input type="hidden"
+                                                        name="shop_option_label[<?php echo $e($lineKey); ?>]"
+                                                        value="<?php echo $e($lineLabel); ?>">
+                                                    <input type="hidden"
+                                                        name="shop_option_units[<?php echo $e($lineKey); ?>]"
+                                                        value="<?php echo $lineUnits; ?>">
+
+                                                    <div class="shopItemCard__actions">
+                                                        <button type="button"
+                                                            class="btn btn--ghost shopItemCard__add" data-shop-add
+                                                            data-line-key="<?php echo $e($lineKey); ?>"
+                                                            <?php echo $lineSoldOut ? 'disabled' : ''; ?>><?php echo $e($lineButtonLabel); ?></button>
+
+                                                        <div class="shopQtyControls" data-shop-controls
+                                                            data-line-key="<?php echo $e($lineKey); ?>" hidden>
+                                                            <button type="button" class="shopQtyControls__btn"
+                                                                data-shop-decrease
+                                                                data-line-key="<?php echo $e($lineKey); ?>"
+                                                                aria-label="Retirer une unité de ce produit">−</button>
+                                                            <label class="shopQty shopQty--compact">
+                                                                <span
+                                                                    class="shopQty__label sr-only"><?php echo $e($lineQuantityLabel); ?></span>
+                                                                <input class="shopQty__input" type="number"
+                                                                    name="shop_quantity[<?php echo $e($lineKey); ?>]"
+                                                                    min="0" max="<?php echo $lineAllowed; ?>"
+                                                                    value="0"
+                                                                    <?php echo $lineSoldOut ? 'disabled' : ''; ?>
+                                                                    data-shop-qty
+                                                                    data-line-key="<?php echo $e($lineKey); ?>">
+                                                            </label>
+                                                            <button type="button" class="shopQtyControls__btn"
+                                                                data-shop-increase
+                                                                data-line-key="<?php echo $e($lineKey); ?>"
+                                                                aria-label="Ajouter une unité à ce produit">+</button>
+                                                            <button type="button" class="shopQtyControls__remove"
+                                                                data-shop-remove
+                                                                data-line-key="<?php echo $e($lineKey); ?>">Retirer</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <?php endif; ?>
                                             </div>
 
-                                            <div class="shopItemCard__purchase">
-                                                <div class="shopItemCard__purchaseHead">
-                                                    <span
-                                                        class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
-                                                        data-shop-stock data-item-id="<?php echo $itemId; ?>">
-                                                        <?php echo $shopIcon($isSoldOut ? 'alert' : ($isLowStock ? 'clock' : 'box')); ?>
-                                                        <span><?php echo $e($statusLabel); ?></span>
-                                                    </span>
-                                                    <p class="shopItemCard__purchaseHint">
-                                                        <?php echo $shopIcon($options !== [] ? 'layers' : 'bag'); ?>
-                                                        <span><?php echo $options !== [] ? 'Chaque ligne correspond à une sélection distincte. Vous pouvez combiner plusieurs formats pour un même produit.' : 'Ajout direct au panier.'; ?></span>
-                                                    </p>
-                                                </div>
-
-                                                <div class="shopPurchaseOptions">
-                                                    <?php if ($options !== []): ?>
-                                                    <p class="shopPurchaseOptions__intro">
-                                                        <?php echo $shopIcon('selection'); ?>
-                                                        <span>Formats disponibles : choisissez le nombre voulu sur
-                                                            chaque ligne.</span>
-                                                    </p>
-                                                    <?php endif; ?>
+                                            <?php if ($options !== []): ?>
+                                            <div class="shopItemCard__drawer" id="shop-options-<?php echo $itemId; ?>"
+                                                data-shop-options-drawer hidden>
+                                                <div class="shopItemCard__purchase">
+                                                    <div class="shopPurchaseOptions">
+                                                        <p class="shopPurchaseOptions__intro">
+                                                            <span>Choisissez un format puis ajustez la quantité.</span>
+                                                        </p>
                                                     <?php foreach ($purchaseLines as $purchaseLine): ?>
                                                     <?php
                                                         $lineKey               = (string) ($purchaseLine['line_key'] ?? '');
@@ -632,6 +701,8 @@
                                                     <?php endforeach; ?>
                                                 </div>
                                             </div>
+                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                     </article>
                                     <?php endforeach; ?>
