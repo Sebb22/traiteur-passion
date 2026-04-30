@@ -758,6 +758,30 @@
 
                                     <div class="adminCatalogOptions__body">
                                         <?php if (! empty($options)): ?>
+                                        <form action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/options/reorder"
+                                            method="post" class="adminReorderForm"
+                                            id="catalogOptionOrderForm-<?php echo (int) ($item['id'] ?? 0); ?>">
+                                            <input type="hidden" name="option_ids"
+                                                id="catalogOptionOrderInput-<?php echo (int) ($item['id'] ?? 0); ?>" value="">
+                                        </form>
+
+                                        <div class="adminCatalogItemsHead adminCatalogItemsHead--item">
+                                            <div>
+                                                <div class="adminCatalogOptions__title">Ordre des options</div>
+                                                <span class="adminHint">Réorganisez les formats de vente affichés pour ce produit.</span>
+                                            </div>
+                                            <div class="adminInlineActions adminInlineActions--reorder">
+                                                <button type="button" class="adminBtn"
+                                                    data-reorder-toggle="options-<?php echo (int) ($item['id'] ?? 0); ?>">Réordonner</button>
+                                                <button type="button" class="adminBtn adminBtn--primary"
+                                                    data-reorder-save="options-<?php echo (int) ($item['id'] ?? 0); ?>" hidden
+                                                    disabled>Enregistrer l'ordre</button>
+                                                <button type="button" class="adminBtn"
+                                                    data-reorder-cancel="options-<?php echo (int) ($item['id'] ?? 0); ?>"
+                                                    hidden>Annuler</button>
+                                            </div>
+                                        </div>
+
                                         <div class="adminTableWrap">
                                             <?php foreach ($options as $option): ?>
                                             <form id="shop-option-form-<?php echo (int) $option['id']; ?>"
@@ -771,14 +795,19 @@
                                                         <th><?php echo $e($optionQuantityLabel); ?></th>
                                                         <th>Prix</th>
                                                         <th>Visible</th>
+                                                        <th>Ordre</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody data-option-sortable
+                                                    data-item-id="<?php echo (int) ($item['id'] ?? 0); ?>"
+                                                    data-reorder-scope="options-<?php echo (int) ($item['id'] ?? 0); ?>"
+                                                    data-reorder-method="buttons">
                                                     <?php foreach ($options as $option): ?>
                                                     <?php $optionFormId        = 'shop-option-form-' . (int) $option['id']; ?>
                                                     <?php $optionQuantityValue = $resolveOptionQuantityInputValue($option, $itemStockUnit); ?>
-                                                    <tr id="option-<?php echo (int) $option['id']; ?>">
+                                                    <tr id="option-<?php echo (int) $option['id']; ?>"
+                                                        data-option-id="<?php echo (int) $option['id']; ?>">
                                                         <td data-label="Libellé">
                                                             <input class="adminInput" type="text" name="label"
                                                                 value="<?php echo $e($option['label'] ?? ''); ?>"
@@ -805,6 +834,14 @@
                                                                     <?php echo ! empty($option['is_active']) ? 'checked' : ''; ?>>
                                                                 <span>Visible</span>
                                                             </label>
+                                                        </td>
+                                                        <td data-label="Ordre">
+                                                            <div class="adminCatalogItem__reorderTools">
+                                                                <button type="button" class="adminOrderStep" data-reorder-move="up"
+                                                                    aria-label="Monter cette option">↑</button>
+                                                                <button type="button" class="adminOrderStep" data-reorder-move="down"
+                                                                    aria-label="Descendre cette option">↓</button>
+                                                            </div>
                                                         </td>
                                                         <td data-label="Actions">
                                                             <div class="adminOptionActions">

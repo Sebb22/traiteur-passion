@@ -51,6 +51,25 @@ export function initAdminCatalog() {
         });
     });
 
+    document.querySelectorAll("[data-option-sortable]").forEach((optionList) => {
+        const itemId = optionList.getAttribute("data-item-id");
+        const input = document.getElementById(`catalogOptionOrderInput-${itemId}`);
+        const form = document.getElementById(`catalogOptionOrderForm-${itemId}`);
+
+        if (!input || !form || !itemId) {
+            return;
+        }
+
+        initReorderableList({
+            list: optionList,
+            nodeSelector: "[data-option-id]",
+            idAttribute: "data-option-id",
+            input,
+            form,
+            scope: `options-${itemId}`,
+        });
+    });
+
     initCatalogImageUploadUX();
 }
 

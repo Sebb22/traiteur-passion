@@ -443,6 +443,25 @@ final class Shop
         }
     }
 
+    public function reorderItemOptions(int $itemId, array $optionIds): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_item_options
+             SET sort_order = :sort_order
+             WHERE id = :id AND item_id = :item_id'
+        );
+
+        $position = 10;
+        foreach ($optionIds as $optionId) {
+            $stmt->execute([
+                'id'         => (int) $optionId,
+                'item_id'    => $itemId,
+                'sort_order' => $position,
+            ]);
+            $position += 10;
+        }
+    }
+
     public function getAdminSummary(): array
     {
         $sections = $this->db->query(

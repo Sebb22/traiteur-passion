@@ -19,7 +19,6 @@
     grid-template-columns: 1fr;
 }
 
-
 /* LEFT */
 
 .adminSplit__media {
@@ -38,7 +37,10 @@
 .adminSplit__mediaOverlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(70% 70% at 20% 80%, rgba(0, 0, 0, 0.62), transparent 55%), radial-gradient(60% 60% at 70% 25%, rgba(0, 0, 0, 0.45), transparent 55%), linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.06));
+    background:
+        radial-gradient(70% 70% at 20% 80%, rgba(0, 0, 0, 0.62), transparent 55%),
+        radial-gradient(60% 60% at 70% 25%, rgba(0, 0, 0, 0.45), transparent 55%),
+        linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.06));
 }
 
 .adminSplit__mediaBadge {
@@ -54,7 +56,11 @@
 }
 
 .adminSplit__mediaKicker {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -71,7 +77,6 @@
     color: rgba(239, 231, 210, 0.96);
 }
 
-
 /* RIGHT PANEL */
 
 .adminSplit__panel {
@@ -79,7 +84,9 @@
     overflow-x: hidden;
     overflow-y: visible;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: radial-gradient(80% 60% at 60% 0%, rgba(255, 255, 255, 0.06), transparent 60%), linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    background:
+        radial-gradient(80% 60% at 60% 0%, rgba(255, 255, 255, 0.06), transparent 60%),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
     backdrop-filter: blur(10px);
     min-height: auto;
     min-width: 0;
@@ -88,7 +95,6 @@
     flex-direction: column;
     gap: 16px;
 }
-
 
 /* Header */
 
@@ -112,7 +118,11 @@
 
 .adminSubtitle {
     margin-top: 8px;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     line-height: 1.6;
     opacity: 0.75;
@@ -145,7 +155,6 @@
     margin-left: auto;
 }
 
-
 /* Buttons (Qitchen vibe) */
 
 .adminBtn {
@@ -156,8 +165,15 @@
     color: rgba(239, 231, 210, 0.92);
     text-decoration: none;
     cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -184,7 +200,6 @@
     }
 }
 
-
 /* Stats */
 
 .adminStats--panel {
@@ -200,14 +215,21 @@
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
     padding: 16px;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
     &:hover {
         transform: translateY(-2px);
         background: rgba(0, 0, 0, 0.3);
         border-color: rgba(255, 255, 255, 0.1);
     }
     &__label {
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        font-family:
+            "Inter",
+            system-ui,
+            -apple-system,
+            sans-serif;
         font-size: 11px;
         letter-spacing: 0.18em;
         text-transform: uppercase;
@@ -223,7 +245,6 @@
         color: rgba(239, 231, 210, 0.96);
     }
 }
-
 
 /* Card/table */
 
@@ -271,7 +292,11 @@
 }
 
 .adminCard__title {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -281,7 +306,11 @@
 }
 
 .adminHint {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 12px;
     opacity: 0.6;
     color: rgba(229, 229, 229, 0.92);
@@ -292,7 +321,6 @@
     min-height: 0;
     -webkit-overflow-scrolling: touch;
 }
-
 
 /* Table */
 
@@ -314,7 +342,11 @@
         vertical-align: top;
     }
     th {
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        font-family:
+            "Inter",
+            system-ui,
+            -apple-system,
+            sans-serif;
         font-weight: 800;
         font-size: 11px;
         letter-spacing: 0.16em;
@@ -324,7 +356,11 @@
         white-space: nowrap;
     }
     td {
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        font-family:
+            "Inter",
+            system-ui,
+            -apple-system,
+            sans-serif;
         font-size: 13px;
         color: rgba(229, 229, 229, 0.92);
     }
@@ -346,10 +382,9 @@
 .adminTable--contacts td,
 .adminTable--contacts .adminLink,
 .adminTable--contacts .adminInlineForm,
-.adminTable--contacts .adminInlineForm>* {
+.adminTable--contacts .adminInlineForm > * {
     min-width: 0;
 }
-
 
 /* Links */
 
@@ -357,13 +392,14 @@
     color: rgba(239, 231, 210, 0.92);
     text-decoration: none;
     border-bottom: 1px solid rgba(239, 231, 210, 0.22);
-    transition: border-color 0.2s ease, color 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        color 0.2s ease;
     &:hover {
         border-color: rgba(239, 231, 210, 0.85);
         color: rgba(239, 231, 210, 1);
     }
 }
-
 
 /* Badges : tu peux garder les tiens, ils sont OK */
 
@@ -424,7 +460,6 @@
     color: #ffe5aa;
 }
 
-
 /* Empty */
 
 .adminEmptyState {
@@ -433,7 +468,6 @@
     opacity: 0.55;
     font-size: 14px;
 }
-
 
 /* Responsive */
 
@@ -494,7 +528,11 @@
         }
         td::before {
             content: attr(data-label);
-            font-family: "Inter", system-ui, -apple-system, sans-serif;
+            font-family:
+                "Inter",
+                system-ui,
+                -apple-system,
+                sans-serif;
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.14em;
@@ -535,7 +573,6 @@
     }
 }
 
-
 /* TITRE BAS GAUCHE DANS L’IMAGE */
 
 .adminMediaTitle {
@@ -564,14 +601,17 @@
 
 .adminMediaTitle__sub {
     margin-top: 10px;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 12px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     opacity: 0.75;
     color: rgba(239, 231, 210, 0.88);
 }
-
 
 /* HEADER RIGHT : barre d’actions alignée */
 
@@ -588,7 +628,7 @@
     gap: 14px;
 }
 
-.adminPanelHead__row> :first-child {
+.adminPanelHead__row > :first-child {
     max-width: 980px;
 }
 
@@ -597,7 +637,11 @@
     padding: 12px 14px;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     color: rgba(239, 231, 210, 0.94);
     background: rgba(0, 0, 0, 0.24);
@@ -709,7 +753,11 @@
 }
 
 .adminCatalogSubsection {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -731,7 +779,9 @@
     flex-direction: column;
     gap: 20px;
     padding: 16px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.015), transparent 220px), rgba(0, 0, 0, 0.08);
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015), transparent 220px),
+        rgba(0, 0, 0, 0.08);
 }
 
 .adminCatalogSectionGrid,
@@ -748,7 +798,9 @@
 .adminEditorBlock {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.07);
-    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)), rgba(255, 255, 255, 0.03);
+    background:
+        linear-gradient(to bottom right, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.03);
     padding: 16px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
@@ -765,7 +817,9 @@
 .adminEditorBlock--nested {
     padding: 14px;
     border-color: rgba(239, 231, 210, 0.08);
-    background: linear-gradient(to bottom, rgba(239, 231, 210, 0.03), transparent 120px), rgba(0, 0, 0, 0.12);
+    background:
+        linear-gradient(to bottom, rgba(239, 231, 210, 0.03), transparent 120px),
+        rgba(0, 0, 0, 0.12);
 }
 
 .adminEditorBlock--full {
@@ -795,7 +849,7 @@
     cursor: pointer;
 }
 
-.adminEditorBlock--collapsible>.adminForm {
+.adminEditorBlock--collapsible > .adminForm {
     margin-top: 14px;
     padding-top: 14px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -829,7 +883,11 @@
 
 .adminEditorBlock__text {
     margin: 0;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     line-height: 1.6;
     color: rgba(229, 229, 229, 0.76);
@@ -840,7 +898,11 @@
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 8px;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 12px;
     color: rgba(229, 229, 229, 0.7);
 }
@@ -868,7 +930,9 @@
 .adminCatalogItemsHead--item {
     align-items: center;
     padding: 10px 12px;
-    background: linear-gradient(180deg, rgba(239, 231, 210, 0.035), rgba(255, 255, 255, 0.018)), rgba(255, 255, 255, 0.02);
+    background:
+        linear-gradient(180deg, rgba(239, 231, 210, 0.035), rgba(255, 255, 255, 0.018)),
+        rgba(255, 255, 255, 0.02);
 }
 
 .adminDragHandle {
@@ -884,7 +948,11 @@
     cursor: grab;
     font-size: 18px;
     opacity: 0.42;
-    transition: opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    transition:
+        opacity 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
     &:active {
         cursor: grabbing;
     }
@@ -946,7 +1014,11 @@
 
 .adminField__label,
 .adminCatalogOptions__title {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -976,7 +1048,11 @@
     background: rgba(255, 255, 255, 0.04);
     color: rgba(239, 231, 210, 0.95);
     padding: 11px 12px;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     resize: vertical;
     &:focus {
@@ -989,7 +1065,9 @@
 .adminSelect {
     appearance: none;
     color-scheme: dark;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)), rgba(15, 15, 18, 0.96);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
+        rgba(15, 15, 18, 0.96);
     option,
     optgroup {
         background: #101013;
@@ -1091,7 +1169,11 @@
     border: 1px solid rgba(239, 231, 210, 0.16);
     background: rgba(239, 231, 210, 0.06);
     color: rgba(239, 231, 210, 0.82);
-    font: 700 10px/1 "Inter", system-ui, -apple-system, sans-serif;
+    font:
+        700 10px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
@@ -1107,9 +1189,14 @@
 .adminCatalogItem {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.07);
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)), rgba(255, 255, 255, 0.03);
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
+        rgba(255, 255, 255, 0.03);
     overflow: hidden;
-    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease;
     &.is-filtered-out {
         display: none;
     }
@@ -1119,7 +1206,9 @@
     }
     &[open] {
         border-color: rgba(239, 231, 210, 0.16);
-        background: linear-gradient(to bottom, rgba(239, 231, 210, 0.04), rgba(255, 255, 255, 0.015)), rgba(255, 255, 255, 0.03);
+        background:
+            linear-gradient(to bottom, rgba(239, 231, 210, 0.04), rgba(255, 255, 255, 0.015)),
+            rgba(255, 255, 255, 0.03);
     }
 }
 
@@ -1130,7 +1219,11 @@
     align-items: flex-start;
     padding: 14px 16px;
     cursor: pointer;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     color: rgba(239, 231, 210, 0.92);
     background: rgba(255, 255, 255, 0.018);
     transition: background 0.2s ease;
@@ -1158,7 +1251,11 @@
 
 .adminCatalogItem__summaryText {
     margin: 0;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     line-height: 1.6;
     color: rgba(229, 229, 229, 0.76);
@@ -1193,11 +1290,16 @@
     border: 1px solid rgba(239, 231, 210, 0.14);
     background: rgba(255, 255, 255, 0.035);
     color: rgba(239, 231, 210, 0.84);
-    font: 700 13px/1 "Inter", system-ui, -apple-system, sans-serif;
+    font:
+        700 13px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     cursor: pointer;
 }
 
-.adminCatalogItems.is-reorder-active .adminOrderStep {
+.adminCatalogItems.is-reorder-active .adminOrderStep,
+.adminTable--options tbody.is-reorder-active .adminOrderStep {
     display: inline-flex;
 }
 
@@ -1271,6 +1373,10 @@
     width: 120px;
 }
 
+.adminTable--options td:nth-child(5) {
+    width: 90px;
+}
+
 .adminTable--options td:last-child {
     width: 190px;
 }
@@ -1285,7 +1391,11 @@
     gap: 8px;
     min-height: 42px;
     color: rgba(239, 231, 210, 0.86);
-    font: 600 12px/1 "Inter", system-ui, -apple-system, sans-serif;
+    font:
+        600 12px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
 }
 
 .adminOptionActions {
@@ -1311,9 +1421,17 @@
     height: 90px;
     border-radius: 10px;
     overflow: hidden;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%), linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%), linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
+    background:
+        linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
     background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-position:
+        0 0,
+        0 8px,
+        8px -8px,
+        -8px 0;
 }
 
 .adminImagePreview__thumb {
@@ -1326,7 +1444,11 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 12px;
     color: rgba(239, 231, 210, 0.86);
     word-break: break-word;
@@ -1343,7 +1465,11 @@
 }
 
 .adminLivePreview__head {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1363,7 +1489,11 @@
     flex-direction: column;
     gap: 6px;
     figcaption {
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        font-family:
+            "Inter",
+            system-ui,
+            -apple-system,
+            sans-serif;
         font-size: 11px;
         color: rgba(239, 231, 210, 0.72);
     }
@@ -1372,9 +1502,17 @@
 .adminLivePreview__checker {
     border-radius: 10px;
     overflow: hidden;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.07) 25%, transparent 25%), linear-gradient(-45deg, rgba(255, 255, 255, 0.07) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.07) 75%), linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.07) 75%);
+    background:
+        linear-gradient(45deg, rgba(255, 255, 255, 0.07) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.07) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.07) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.07) 75%);
     background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-position:
+        0 0,
+        0 8px,
+        8px -8px,
+        -8px 0;
     border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
@@ -1385,7 +1523,11 @@
 }
 
 .adminLivePreview__hint {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     color: rgba(239, 231, 210, 0.66);
 }
@@ -1403,7 +1545,11 @@
 
 .adminUploadLoader {
     display: none;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 12px;
     color: rgba(239, 231, 210, 0.9);
     align-items: center;
@@ -1442,7 +1588,9 @@
 .adminForm--option {
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.14)), rgba(0, 0, 0, 0.16);
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.14)),
+        rgba(0, 0, 0, 0.16);
     padding: 14px;
 }
 
@@ -1484,7 +1632,11 @@
                 }
                 td::before {
                     content: attr(data-label);
-                    font-family: "Inter", system-ui, -apple-system, sans-serif;
+                    font-family:
+                        "Inter",
+                        system-ui,
+                        -apple-system,
+                        sans-serif;
                     font-size: 11px;
                     font-weight: 700;
                     letter-spacing: 0.14em;
@@ -1550,7 +1702,6 @@
     }
 }
 
-
 /* Actions : même hauteur, alignés sur une ligne */
 
 .adminPanelHead__actions {
@@ -1566,7 +1717,6 @@
         height: 100%;
     }
 }
-
 
 /* Boutons : hauteur cohérente */
 
@@ -1629,7 +1779,9 @@
     gap: 16px;
     padding: 12px;
     border-radius: 22px;
-    background: radial-gradient(120% 140% at 0% 0%, rgba(239, 231, 210, 0.12), transparent 50%), linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    background:
+        radial-gradient(120% 140% at 0% 0%, rgba(239, 231, 210, 0.12), transparent 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1641,7 +1793,11 @@
 
 .adminOverviewHero__eyebrow,
 .adminOverviewHero__summaryLabel {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -1667,7 +1823,11 @@
 }
 
 .adminOverviewHero__summaryMeta {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     line-height: 1.6;
     color: rgba(229, 229, 229, 0.82);
@@ -1722,7 +1882,11 @@
 }
 
 .adminStatusPill__label {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -1754,7 +1918,11 @@
 }
 
 .adminQuickLinkCard__eyebrow {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -1768,7 +1936,11 @@
 }
 
 .adminQuickLinkCard__meta {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     line-height: 1.6;
     color: rgba(229, 229, 229, 0.82);
@@ -1784,7 +1956,11 @@
     display: grid;
     gap: 4px;
     color: rgba(239, 231, 210, 0.78);
-    font: 400 13px/1.6 "Inter", system-ui, -apple-system, sans-serif;
+    font:
+        400 13px/1.6 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
 }
 
 .adminDashboardPromoMeta strong {
@@ -1813,14 +1989,22 @@
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 14px;
     color: rgba(239, 231, 210, 0.94);
 }
 
 .adminMiniList__meta,
 .adminMiniList__aside {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 12px;
     line-height: 1.6;
     color: rgba(229, 229, 229, 0.72);
@@ -1835,7 +2019,11 @@
     align-items: center;
     gap: 6px;
     color: rgba(206, 237, 195, 0.96);
-    font: 600 11px/1.4 "Inter", system-ui, -apple-system, sans-serif;
+    font:
+        600 11px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -1856,7 +2044,11 @@
 
 .adminTypeRow__label,
 .adminTypeRow__value {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 13px;
     color: rgba(239, 231, 210, 0.9);
 }
@@ -1909,7 +2101,11 @@
 }
 
 .adminInfoItem__label {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -1917,7 +2113,11 @@
 }
 
 .adminInfoItem__value {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 14px;
     line-height: 1.6;
     color: rgba(239, 231, 210, 0.94);
@@ -1939,7 +2139,11 @@
     border: 1px solid rgba(255, 255, 255, 0.06);
     background: rgba(255, 255, 255, 0.03);
     padding: 16px;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 14px;
     line-height: 1.75;
     color: rgba(239, 231, 210, 0.9);
@@ -1967,7 +2171,11 @@
 .adminMenuItem__price,
 .adminMenuItem__name,
 .adminMenuItem__quantity {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
 }
 
 .adminMenuItem__category {
@@ -2026,7 +2234,11 @@
 }
 
 .adminRequestCard__eyebrow {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -2061,7 +2273,11 @@
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background: rgba(255, 255, 255, 0.025);
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 14px;
     line-height: 1.7;
     color: rgba(239, 231, 210, 0.9);
@@ -2115,7 +2331,7 @@
     .adminPanelHead__actionsGroup--utility {
         margin-left: 0;
     }
-    .adminPanelHead__actions>.adminBtn,
+    .adminPanelHead__actions > .adminBtn,
     .adminPanelHead__actionsGroup .adminBtn,
     .adminPanelHead__actionsGroup form,
     .adminPanelHead__actionsGroup form .adminBtn {
@@ -2154,11 +2370,11 @@
     .adminInlineForm--requestStatus .adminBtn--sm {
         width: 100%;
     }
-    .adminRequestCard__actions>.adminBtn,
-    .adminRequestCard__actions>form {
+    .adminRequestCard__actions > .adminBtn,
+    .adminRequestCard__actions > form {
         width: 100%;
     }
-    .adminRequestCard__actions>.adminBtn {
+    .adminRequestCard__actions > .adminBtn {
         justify-content: center;
     }
 }
@@ -2169,12 +2385,12 @@
         grid-template-columns: 1fr;
         width: 100%;
     }
-    .adminSplit--contacts .adminPanelHead__actions>.adminBtn,
-    .adminSplit--contacts .adminPanelHead__actions>form,
-    .adminSplit--contacts .adminPanelHead__actions>form>.adminBtn {
+    .adminSplit--contacts .adminPanelHead__actions > .adminBtn,
+    .adminSplit--contacts .adminPanelHead__actions > form,
+    .adminSplit--contacts .adminPanelHead__actions > form > .adminBtn {
         width: 100%;
     }
-    .adminSplit--contacts .adminPanelHead__actions>form {
+    .adminSplit--contacts .adminPanelHead__actions > form {
         display: flex;
     }
     .adminSplit--contacts .adminCard__head {

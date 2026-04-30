@@ -34,6 +34,32 @@ final class AdminController
         }
     }
 
+    public function reorderShopItemOptions(string $itemId): void
+    {
+        AdminAuth::requireAuth();
+
+        $itemIdInt = (int) $itemId;
+        $optionIds = $_POST['option_ids'] ?? [];
+        if (is_string($optionIds)) {
+            $optionIds = array_filter(array_map('trim', explode(',', $optionIds)));
+        }
+
+        if (! is_array($optionIds) || $optionIds === []) {
+            $this->pushFlash('error', 'Ordre des options boutique invalide.');
+            $this->redirectShop('#item-' . $itemIdInt);
+        }
+
+        try {
+            (new Shop())->reorderItemOptions($itemIdInt, array_map('intval', $optionIds));
+            $this->pushFlash('success', 'Ordre des options boutique mis à jour.');
+        } catch (\Throwable $e) {
+            error_log('Shop item option reorder error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de réordonner les options boutique.');
+        }
+
+        $this->redirectShop('#item-' . $itemIdInt);
+    }
+
     public function updateShopItemOption(string $optionId): void
     {
         AdminAuth::requireAuth();
