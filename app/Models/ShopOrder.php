@@ -387,10 +387,11 @@ final class ShopOrder
         }
 
         $itemsStmt = $this->db->prepare(
-            'SELECT *
-             FROM boutique_order_items
-             WHERE order_id = :order_id
-             ORDER BY id ASC',
+            'SELECT boi.*, bi.image_path, bi.image_alt, bi.short_description AS item_description
+             FROM boutique_order_items boi
+             LEFT JOIN boutique_items bi ON bi.id = boi.item_id
+             WHERE boi.order_id = :order_id
+             ORDER BY boi.id ASC',
         );
         $itemsStmt->execute(['order_id' => $orderId]);
         $order['items'] = $itemsStmt->fetchAll();

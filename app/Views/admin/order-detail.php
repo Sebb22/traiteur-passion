@@ -1,7 +1,7 @@
 <?php
-    $order         = is_array($order ?? null) ? $order : [];
-    $statusOptions = is_array($statusOptions ?? null) ? $statusOptions : [];
-    $flash         = is_array($flash ?? null) ? $flash : null;
+    $order         = isset($order) && is_array($order) ? $order : [];
+    $statusOptions = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
+    $flash         = isset($flash) && is_array($flash) ? $flash : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -25,6 +25,34 @@
     $orderItems        = is_array($order['items'] ?? null) ? $order['items'] : [];
     $subtotalCents     = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
     $discountCents     = max(0, (int) ($order['discount_cents'] ?? 0));
+    $orderStatusKey    = (string) ($order['status'] ?? 'new');
+        $orderStatusLabel  = (string) ($statusOptions[$orderStatusKey] ?? ucfirst($orderStatusKey));
+        $previewSummary    = [
+            ['label' => 'Reference', 'value' => '#' . (int) ($order['id'] ?? 0)],
+            ['label' => 'Mode', 'value' => $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'],
+            ['label' => 'Date', 'value' => $formatDate($order['pickup_date'] ?? null)],
+            ['label' => 'Creneau', 'value' => (string) ($order['pickup_slot'] ?? '-')],
+            ['label' => 'Articles', 'value' => (string) ((int) ($order['item_count'] ?? 0))],
+            ['label' => 'Total', 'value' => $formatPrice($order['total_cents'] ?? 0)],
+            ['label' => 'Statut', 'value' => $orderStatusLabel],
+        ];
+    switch ($orderStatusKey) {
+    case 'confirmed':
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est confirmee', (int) ($order['id'] ?? 0));
+        break;
+    case 'preparing':
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est en preparation', (int) ($order['id'] ?? 0));
+        break;
+    case 'completed':
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est finalisee', (int) ($order['id'] ?? 0));
+        break;
+    case 'cancelled':
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d a ete annulee', (int) ($order['id'] ?? 0));
+        break;
+    default:
+        $defaultMailSubject = sprintf('Traiteur Passion - Suivi de votre commande #%d', (int) ($order['id'] ?? 0));
+        break;
+    }
     $deliveryAddress   = trim(implode(', ', array_filter([
     trim((string) ($order['delivery_address'] ?? '')),
     trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? ''))),
@@ -237,6 +265,97 @@
                                     <?php endforeach; ?>
                                 </select>
                             </label>
+                            <label class="adminField adminField--checkbox">
+                                <span class="adminField__label">Prevenir le client par email</span>
+                                <input type="checkbox" class="adminCheckbox" name="notify_client" value="1">
+                            </label>
+                            <label class="adminField adminField--full">
+                                <span class="adminField__label">Objet du mail</span>
+                                <div class="adminMailPreview__subjectRow">
+                                    <input type="text" name="client_subject" class="adminInput"
+                                        value="<?php echo $e($defaultMailSubject); ?>" data-mail-subject>
+                                    <button type="button" class="adminBtn adminBtn--sm" data-mail-subject-reset>Objet auto</button>
+                                </div>
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Message complementaire pour le client</span>
+                                <textarea name="client_message" class="adminTextarea" rows="4"
+                                    placeholder="Confirmation, precision de retrait, ajustement logistique..." data-mail-message></textarea>
+                            </label>
+                            <div class="adminMailPreview" data-mail-preview-root
+                                data-mail-kind="order"
+                                data-reference="<?php echo (int) ($order['id'] ?? 0); ?>"
+                                data-client-name="<?php echo $e($order['customer_name'] ?? 'Client'); ?>"
+                                data-status-labels="<?php echo $e((string) json_encode($statusOptions, JSON_UNESCAPED_UNICODE)); ?>">
+                                <div class="adminMailPreview__eyebrow">Apercu du mail client</div>
+                                <div class="adminMailPreview__shell">
+                                    <div class="adminMailPreview__hero">
+                                        <span class="adminMailPreview__badge" data-mail-preview-badge></span>
+                                        <p class="adminMailPreview__label">Suivi client</p>
+                                        <h3 class="adminMailPreview__title" data-mail-preview-title></h3>
+                                        <p class="adminMailPreview__summary" data-mail-preview-summary></p>
+                                    </div>
+                                    <div class="adminMailPreview__body">
+                                        <p class="adminMailPreview__greeting" data-mail-preview-greeting></p>
+                                        <div class="adminMailPreview__block">
+                                            <div class="adminMailPreview__blockLabel">Objet</div>
+                                            <p class="adminMailPreview__blockText" data-mail-preview-subject></p>
+                                        </div>
+                                        <div class="adminMailPreview__block">
+                                            <div class="adminMailPreview__blockLabel">Introduction</div>
+                                            <p class="adminMailPreview__blockText" data-mail-preview-intro></p>
+                                        </div>
+                                        <div class="adminMailPreview__block">
+                                            <div class="adminMailPreview__blockLabel">Point de suivi</div>
+                                            <p class="adminMailPreview__blockText" data-mail-preview-message></p>
+                                        </div>
+                                        <div class="adminMailPreview__block">
+                                            <div class="adminMailPreview__blockLabel">Prochaine etape</div>
+                                            <p class="adminMailPreview__blockText" data-mail-preview-next-step></p>
+                                        </div>
+                                        <div class="adminMailPreview__block">
+                                            <div class="adminMailPreview__blockLabel">Recap de la commande</div>
+                                            <div class="adminMailPreview__summaryGrid">
+                                                <?php foreach ($previewSummary as $summaryItem): ?>
+                                                <div class="adminMailPreview__summaryItem">
+                                                    <span class="adminMailPreview__summaryLabel"><?php echo $e($summaryItem['label']); ?></span>
+                                                    <span class="adminMailPreview__summaryValue"><?php echo $e($summaryItem['value']); ?></span>
+                                                </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                        <?php if ($orderItems !== []): ?>
+                                        <div class="adminMailPreview__block">
+                                            <div class="adminMailPreview__blockLabel">Produits retenus</div>
+                                            <div class="adminMailPreview__items">
+                                                <?php foreach ($orderItems as $item): ?>
+                                                <article class="adminMailPreview__itemCard">
+                                                    <?php if (! empty($item['image_path'])): ?>
+                                                    <img class="adminMailPreview__itemThumb" src="<?php echo $e($item['image_path']); ?>"
+                                                        alt="<?php echo $e($item['image_alt'] ?? ($item['item_name_snapshot'] ?? 'Produit')); ?>" loading="lazy">
+                                                    <?php endif; ?>
+                                                    <div class="adminMailPreview__itemBody">
+                                                        <p class="adminMailPreview__itemCategory"><?php echo $e($item['section_name_snapshot'] ?? '-'); ?></p>
+                                                        <p class="adminMailPreview__itemTitle"><?php echo $e($item['item_name_snapshot'] ?? '-'); ?></p>
+                                                        <?php if (! empty($item['item_description'])): ?>
+                                                        <p class="adminMailPreview__itemDetail"><?php echo $e($item['item_description']); ?></p>
+                                                        <?php endif; ?>
+                                                        <p class="adminMailPreview__itemMeta">
+                                                            Prix <?php echo $e($formatPrice($item['unit_price_cents'] ?? 0)); ?>
+                                                            <span>•</span>
+                                                            Qte <?php echo (int) ($item['quantity'] ?? 0); ?>
+                                                        </p>
+                                                    </div>
+                                                </article>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
+                                        <p class="adminMailPreview__closing" data-mail-preview-closing></p>
+                                    </div>
+                                </div>
+                                <p class="adminHint">Le mail part avec cet objet et ce contenu si la case d'envoi est cochée.</p>
+                            </div>
                             <button type="submit" class="adminBtn adminBtn--primary">Enregistrer le statut</button>
                         </form>
                     </div>

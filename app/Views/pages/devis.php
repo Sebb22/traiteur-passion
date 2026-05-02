@@ -79,7 +79,7 @@
                     <div class="contactInfo">
                         <span class="contactInfo__k">Email</span>
                         <a class="contactInfo__v"
-                            href="mailto:contact@traiteurpassion.fr">contact@traiteurpassion.fr</a>
+                            href="mailto:contact@trateurpassion.fr">contact@trateurpassion.fr</a>
                     </div>
                     <div class="contactInfo">
                         <span class="contactInfo__k">Zone</span>

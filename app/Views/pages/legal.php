@@ -1,6 +1,6 @@
 <?php
     $legalAddress = '631 rue de Compiègne, 60162 Vignemont';
-    $legalEmail   = 'contact@traiteurpassion.com';
+    $legalEmail   = 'contact@trateurpassion.fr';
 ?>
 
 <main class="siteMain siteContainer snapY">

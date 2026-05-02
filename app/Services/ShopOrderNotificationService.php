@@ -63,6 +63,38 @@ final class ShopOrderNotificationService
 
     /**
      * @param array<string,mixed> $orderData
+     * @return array{enabled:bool,client_status_sent:bool,errors:list<string>}
+     */
+    public function dispatchStatusUpdate(
+        int $orderId,
+        array $orderData,
+        string $previousStatus,
+        string $nextStatus,
+        ?string $customMessage = null,
+        ?string $customSubject = null
+    ): array {
+        $result = [
+            'enabled'            => $this->mailer->isEnabled(),
+            'client_status_sent' => false,
+            'errors'             => [],
+        ];
+
+        if (! $this->mailer->isEnabled()) {
+            return $result;
+        }
+
+        try {
+            $this->sendClientStatusUpdate($orderId, $orderData, $previousStatus, $nextStatus, $customMessage, $customSubject);
+            $result['client_status_sent'] = true;
+        } catch (\Throwable $e) {
+            $result['errors'][] = 'Suivi client: ' . $e->getMessage();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<string,mixed> $orderData
      */
     private function sendAdminNotification(int $orderId, array $orderData): void
     {
@@ -205,6 +237,91 @@ final class ShopOrderNotificationService
     }
 
     /**
+     * @param array<string,mixed> $orderData
+     */
+    private function sendClientStatusUpdate(
+        int $orderId,
+        array $orderData,
+        string $previousStatus,
+        string $nextStatus,
+        ?string $customMessage,
+        ?string $customSubject
+    ): void {
+        $clientEmail = trim((string) ($orderData['customer_email'] ?? ''));
+        if (! filter_var($clientEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new \RuntimeException('Adresse client invalide.');
+        }
+
+        $statusLabel       = ShopOrder::STATUS_LABELS[$nextStatus] ?? ucfirst($nextStatus);
+        $summaryFields     = $this->summaryFieldsWithStatus($orderId, $orderData, $previousStatus, $nextStatus);
+        $orderItems        = $this->orderItemsViewData($orderData['items'] ?? []);
+        $theme             = $this->emailTheme('client');
+        $statusMessage     = $this->statusUpdateMessage($nextStatus, $customMessage);
+        $statusMessageHtml = nl2br($this->escape($statusMessage));
+        $defaultSubject    = $this->statusUpdateSubject($orderId, $nextStatus);
+        $subject           = $this->customSubjectOrFallback($customSubject, $defaultSubject);
+
+        $htmlBody = $this->renderEmailTemplate('client-acknowledgement', [
+            'requestLabel'        => 'commande boutique',
+            'clientName'          => $this->valueOrFallback($orderData['customer_name'] ?? null),
+            'contactId'           => $orderId,
+            'referenceLabel'      => 'Reference de commande',
+            'introCopy'           => $this->statusUpdateIntroCopy($nextStatus),
+            'nextStepCopy'        => $this->statusUpdateNextStepCopy($nextStatus),
+            'messageBlockTitle'   => 'Point de suivi',
+            'selectionBlockTitle' => 'Recapitulatif de votre commande',
+            'ctaBackground'       => $theme['buttonBackground'],
+            'ctaTextColor'        => $theme['buttonTextColor'],
+            'closingCopy'         => $this->statusUpdateClosingCopy($nextStatus),
+            'clientMessageHtml'   => $statusMessageHtml,
+            'summaryFields'       => $summaryFields,
+            'menuItems'           => $orderItems,
+            'ctaLabel'            => 'Revenir a la boutique',
+            'ctaUrl'              => $this->shopUrl(),
+        ], [
+            'title'            => $this->statusUpdateTitle($nextStatus),
+            'preheader'        => $this->statusUpdatePreheader($orderId, $nextStatus),
+            'eyebrow'          => 'Suivi client',
+            'heroBadge'        => $this->statusUpdateBadge($nextStatus),
+            'heroSummary'      => $this->statusUpdateHeroSummary($nextStatus),
+            'accentColor'      => $theme['accentColor'],
+            'pageBackground'   => $theme['pageBackground'],
+            'panelBackground'  => $theme['panelBackground'],
+            'footerBackground' => $theme['footerBackground'],
+            'borderColor'      => $theme['borderColor'],
+            'eyebrowColor'     => $theme['eyebrowColor'],
+            'heroBackground'   => $theme['heroBackground'],
+            'heroTextColor'    => $theme['heroTextColor'],
+            'heroAccent'       => $theme['heroAccent'],
+            'badgeBackground'  => $theme['badgeBackground'],
+            'badgeColor'       => $theme['badgeColor'],
+            'footerNote'       => 'Cet email vous informe d\'une mise a jour de votre commande. Vous pouvez y repondre directement si un point reste a preciser.',
+        ]);
+
+        $textBody = sprintf(
+            "Bonjour %s,\n\n%s\n\n%s\n\n%s\n\nRecapitulatif\n%s\n%s\n\nA tres vite,\n%s",
+            (string) ($orderData['customer_name'] ?? ''),
+            $this->statusUpdateIntroCopy($nextStatus),
+            $this->statusUpdateNextStepCopy($nextStatus),
+            $statusMessage,
+            $this->buildSummaryText($summaryFields),
+            $this->renderOrderItemsText($orderItems),
+            $this->appName(),
+        );
+
+        $this->mailer->send(
+            [[
+                'email' => $clientEmail,
+                'name'  => (string) ($orderData['customer_name'] ?? ''),
+            ]],
+            $subject,
+            $htmlBody,
+            $textBody,
+            $this->firstAdminRecipient(),
+        );
+    }
+
+    /**
      * @return list<array{email:string,name?:string}>
      */
     private function adminRecipients(): array
@@ -273,19 +390,38 @@ final class ShopOrderNotificationService
     }
 
     /**
+     * @param array<string,mixed> $orderData
+     * @return array<int,array{label:string,value:string}>
+     */
+    private function summaryFieldsWithStatus(int $orderId, array $orderData, string $previousStatus, string $nextStatus): array
+    {
+        $fields = [
+            ['label' => 'Statut precedent', 'value' => ShopOrder::STATUS_LABELS[$previousStatus] ?? ucfirst($previousStatus)],
+            ['label' => 'Statut actuel', 'value' => ShopOrder::STATUS_LABELS[$nextStatus] ?? ucfirst($nextStatus)],
+        ];
+
+        return array_merge($this->summaryFields($orderId, $orderData), $fields);
+    }
+
+    /**
      * @param array<int,array<string,mixed>> $orderItems
-     * @return array<int,array{category:string,name:string,price:string,quantity:string}>
+     * @return array<int,array{category:string,name:string,price:string,quantity:string,image_url:?string,image_alt:string,detail:string}>
      */
     private function orderItemsViewData(array $orderItems): array
     {
         return array_map(function (array $item): array {
             $priceLabel = trim((string) ($item['unit_price_label'] ?? ''));
+            $imageUrl   = trim((string) ($item['image_path'] ?? ''));
+            $detail     = trim((string) ($item['item_description'] ?? ''));
 
             return [
                 'category' => (string) ($item['section_name_snapshot'] ?? ''),
                 'name'     => (string) ($item['item_name_snapshot'] ?? ''),
                 'price'    => $priceLabel !== '' ? $priceLabel : $this->formatPrice((int) ($item['unit_price_cents'] ?? 0)),
                 'quantity' => (string) max(0, (int) ($item['quantity'] ?? 0)),
+                'image_url' => $imageUrl !== '' ? $imageUrl : null,
+                'image_alt' => (string) (($item['image_alt'] ?? null) ?? ($item['item_name_snapshot'] ?? 'Produit')),
+                'detail'    => $detail,
             ];
         }, $orderItems);
     }
@@ -509,5 +645,166 @@ final class ShopOrderNotificationService
     private function escape(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
+    private function statusUpdateSubject(int $orderId, string $status): string
+    {
+        $appName = $this->appName();
+
+        switch ($status) {
+            case 'confirmed':
+                return sprintf('%s - Votre commande #%d est confirmee', $appName, $orderId);
+            case 'preparing':
+                return sprintf('%s - Votre commande #%d est en preparation', $appName, $orderId);
+            case 'completed':
+                return sprintf('%s - Votre commande #%d est finalisee', $appName, $orderId);
+            case 'cancelled':
+                return sprintf('%s - Votre commande #%d a ete annulee', $appName, $orderId);
+            default:
+                return sprintf('%s - Suivi de votre commande #%d', $appName, $orderId);
+        }
+    }
+
+    private function statusUpdateTitle(string $status): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                return 'Votre commande est confirmee';
+            case 'preparing':
+                return 'Votre commande est en preparation';
+            case 'completed':
+                return 'Votre commande est finalisee';
+            case 'cancelled':
+                return 'Votre commande est annulee';
+            default:
+                return 'Suivi de votre commande';
+        }
+    }
+
+    private function statusUpdatePreheader(int $orderId, string $status): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                return sprintf('Votre commande #%d a bien ete confirmee par notre equipe.', $orderId);
+            case 'preparing':
+                return sprintf('Votre commande #%d est maintenant en preparation.', $orderId);
+            case 'completed':
+                return sprintf('Votre commande #%d est maintenant finalisee.', $orderId);
+            case 'cancelled':
+                return sprintf('Votre commande #%d a ete annulee.', $orderId);
+            default:
+                return sprintf('Voici le dernier point de suivi pour votre commande #%d.', $orderId);
+        }
+    }
+
+    private function statusUpdateBadge(string $status): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                return 'Commande confirmee';
+            case 'preparing':
+                return 'Preparation en cours';
+            case 'completed':
+                return 'Commande finalisee';
+            case 'cancelled':
+                return 'Commande annulee';
+            default:
+                return 'Suivi commande';
+        }
+    }
+
+    private function statusUpdateIntroCopy(string $status): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                return 'Votre commande a bien ete confirmee par notre equipe.';
+            case 'preparing':
+                return 'Votre commande est maintenant en preparation.';
+            case 'completed':
+                return 'Votre commande est maintenant finalisee.';
+            case 'cancelled':
+                return 'Votre commande a ete annulee.';
+            default:
+                return 'Votre commande a fait l\'objet d\'une mise a jour.';
+        }
+    }
+
+    private function statusUpdateNextStepCopy(string $status): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                return 'Nous conservons votre demande dans notre planning et vous recontactons si un ajustement logistique est necessaire. Vous pouvez aussi repondre directement a cet email si un detail doit etre confirme.';
+            case 'preparing':
+                return 'Notre equipe avance maintenant sur la preparation et le bon deroulement du retrait ou de la livraison. Si un changement de derniere minute est necessaire, repondez directement a cet email.';
+            case 'completed':
+                return 'Le dossier est considere comme boucle. Si vous avez besoin d\'un nouveau retrait ou d\'une nouvelle commande, vous pouvez nous recontacter librement.';
+            case 'cancelled':
+                return 'Si vous souhaitez relancer la commande sur une autre date ou un autre format, repondez simplement a cet email.';
+            default:
+                return 'Nous vous tenons informes de la suite donnee a votre commande.';
+        }
+    }
+
+    private function statusUpdateClosingCopy(string $status): string
+    {
+        if ($status === 'cancelled') {
+            return 'Nous restons disponibles si vous souhaitez repartir sur une nouvelle commande ou une autre date.';
+        }
+
+        if ($status === 'completed') {
+            return 'Merci pour votre confiance. Vous pouvez repondre a cet email si vous souhaitez preparer une prochaine commande.';
+        }
+
+        return 'Conservez cette reference de commande. Vous pouvez repondre directement a cet email si un point doit etre precise avant le retrait ou la livraison.';
+    }
+
+    private function statusUpdateHeroSummary(string $status): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                return 'Votre commande est confirmee et integree dans notre suivi.';
+            case 'preparing':
+                return 'Votre commande est entree dans le flux de preparation.';
+            case 'completed':
+                return 'Le cycle de votre commande est maintenant clos.';
+            case 'cancelled':
+                return 'La commande a ete fermee avec statut annule.';
+            default:
+                return 'Votre commande vient d\'etre mise a jour.';
+        }
+    }
+
+    private function statusUpdateMessage(string $status, ?string $customMessage): string
+    {
+        switch ($status) {
+            case 'confirmed':
+                $defaultMessage = 'Votre commande est bien prise en charge.';
+                break;
+            case 'preparing':
+                $defaultMessage = 'Notre equipe est en train de preparer votre commande.';
+                break;
+            case 'completed':
+                $defaultMessage = 'Votre commande est marquee comme finalisee.';
+                break;
+            case 'cancelled':
+                $defaultMessage = 'Votre commande est actuellement classee comme annulee.';
+                break;
+            default:
+                $defaultMessage = 'Votre commande a ete mise a jour.';
+                break;
+        }
+
+        $customMessage = trim((string) ($customMessage ?? ''));
+        if ($customMessage === '') {
+            return $defaultMessage;
+        }
+
+        return $defaultMessage . "\n\nMessage de notre equipe\n" . $customMessage;
+    }
+
+    private function customSubjectOrFallback(?string $customSubject, string $fallback): string
+    {
+        $customSubject = trim((string) ($customSubject ?? ''));
+        return $customSubject === '' ? $fallback : $customSubject;
     }
 }

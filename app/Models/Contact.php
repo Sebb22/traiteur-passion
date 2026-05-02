@@ -245,7 +245,14 @@ final class Contact
         }
 
         // Get associated menu items
-        $sql  = "SELECT * FROM contact_menu_items WHERE contact_id = :contact_id";
+        $sql  = "SELECT cmi.*,
+                mi.image_path,
+                mi.image_alt,
+                mi.short_description AS item_description
+             FROM contact_menu_items cmi
+             LEFT JOIN menu_sections ms ON ms.name = cmi.menu_item_category
+             LEFT JOIN menu_items mi ON mi.section_id = ms.id AND mi.name = cmi.menu_item_name
+             WHERE cmi.contact_id = :contact_id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':contact_id' => $id]);
 

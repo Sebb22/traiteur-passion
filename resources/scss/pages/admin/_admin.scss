@@ -1136,6 +1136,250 @@
     flex-direction: column;
 }
 
+.adminMailPreview {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(255, 250, 245, 0.08), rgba(255, 255, 255, 0.03));
+    transition:
+        opacity 0.2s ease,
+        filter 0.2s ease,
+        transform 0.2s ease;
+}
+
+.adminMailPreview.is-disabled {
+    opacity: 0.62;
+    filter: saturate(0.72);
+}
+
+.adminMailPreview__eyebrow,
+.adminMailPreview__blockLabel,
+.adminMailPreview__label {
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.adminMailPreview__eyebrow,
+.adminMailPreview__blockLabel {
+    color: #72584a;
+}
+
+.adminMailPreview__shell {
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid rgba(226, 207, 196, 0.36);
+    background: #fffdfa;
+    color: #231f20;
+}
+
+.adminMailPreview__hero {
+    display: grid;
+    gap: 10px;
+    padding: 22px 24px;
+    background: linear-gradient(135deg, #6c3d2e, #8f4b2f);
+    color: #fff8f4;
+}
+
+.adminMailPreview__badge {
+    width: fit-content;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #f1ddd2;
+    color: #7a422d;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.adminMailPreview__label {
+    margin: 0;
+    color: #f4cfbe;
+}
+
+.adminMailPreview__title {
+    margin: 0;
+    font-family: "Forum", serif;
+    font-size: 32px;
+    line-height: 1;
+}
+
+.adminMailPreview__summary,
+.adminMailPreview__greeting,
+.adminMailPreview__blockText,
+.adminMailPreview__closing {
+    margin: 0;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.adminMailPreview__summary {
+    color: #f6dfd3;
+}
+
+.adminMailPreview__greeting,
+.adminMailPreview__blockText {
+    color: #2d2521;
+}
+
+.adminMailPreview__body {
+    display: grid;
+    gap: 14px;
+    padding: 22px 24px;
+    background: #fffdfa;
+}
+
+.adminMailPreview__block {
+    display: grid;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid #e6dccf;
+    background: #fff9f3;
+}
+
+.adminMailPreview__summaryGrid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.adminMailPreview__summaryItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: #f8fafc;
+}
+
+.adminMailPreview__summaryLabel {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.adminMailPreview__summaryValue {
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.adminMailPreview__items {
+    display: grid;
+    gap: 12px;
+}
+
+.adminMailPreview__itemCard {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.adminMailPreview__itemThumb {
+    width: 88px;
+    height: 88px;
+    object-fit: cover;
+    border-radius: 14px;
+    background: #e2e8f0;
+}
+
+.adminMailPreview__itemBody {
+    min-width: 0;
+}
+
+.adminMailPreview__itemCategory,
+.adminMailPreview__itemTitle,
+.adminMailPreview__itemDetail,
+.adminMailPreview__itemMeta {
+    margin: 0;
+}
+
+.adminMailPreview__itemCategory {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.adminMailPreview__itemTitle {
+    margin-top: 2px;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.adminMailPreview__itemDetail {
+    margin-top: 6px;
+    color: #475569;
+    line-height: 1.55;
+}
+
+.adminMailPreview__itemMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-top: 8px;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.adminMailPreview__itemMeta span {
+    color: #94a3b8;
+}
+
+.adminMailPreview__closing {
+    color: #5c5148;
+}
+
+@media (max-width: 640px) {
+    .adminMailPreview__itemCard {
+        grid-template-columns: 1fr;
+    }
+
+    .adminMailPreview__itemThumb {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+.adminMailPreview__subjectRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.adminMailPreview__subjectRow .adminInput {
+    flex: 1 1 280px;
+}
+
 .adminInlineForm--full {
     width: 100%;
 }
@@ -2369,6 +2613,10 @@
     .adminInlineForm--requestStatus .adminSelect--compact,
     .adminInlineForm--requestStatus .adminBtn--sm {
         width: 100%;
+    }
+    .adminMailPreview__subjectRow {
+        flex-direction: column;
+        align-items: stretch;
     }
     .adminRequestCard__actions > .adminBtn,
     .adminRequestCard__actions > form {

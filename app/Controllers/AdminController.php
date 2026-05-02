@@ -11,7 +11,9 @@ use App\Models\Contact;
 use App\Models\Menu;
 use App\Models\Shop;
 use App\Models\ShopOrder;
+use App\Services\ContactNotificationService;
 use App\Services\MenuImageService;
+use App\Services\ShopOrderNotificationService;
 use App\Services\ShopPromoService;
 
 final class AdminController
@@ -492,11 +494,49 @@ final class AdminController
         $status   = trim((string) ($_POST['status'] ?? ''));
         $redirect = $this->safeAdminRedirect((string) ($_POST['redirect'] ?? '/admin/boutique#orders'));
 
-        if ((new ShopOrder())->updateStatus($orderId, $status)) {
-            $this->pushFlash('success', 'Statut de commande boutique mis à jour.');
-        } else {
-            $this->pushFlash('error', 'Impossible de mettre à jour ce statut de commande boutique.');
+        $orderModel = new ShopOrder();
+        $order      = $orderModel->getByIdWithItems($orderId);
+
+        if (! is_array($order)) {
+            $this->pushFlash('error', 'Commande boutique introuvable.');
+            header('Location: /admin/boutique#orders');
+            exit;
         }
+
+        $previousStatus = (string) ($order['status'] ?? 'new');
+        if (! $orderModel->updateStatus($orderId, $status)) {
+            $this->pushFlash('error', 'Impossible de mettre à jour ce statut de commande boutique.');
+            header('Location: ' . $redirect);
+            exit;
+        }
+
+        $notifyClient = $this->shouldNotifyClient($_POST);
+        $mailResult   = null;
+
+        if ($notifyClient) {
+            $updatedOrder = $orderModel->getByIdWithItems($orderId);
+            if (is_array($updatedOrder)) {
+                $mailResult = (new ShopOrderNotificationService())->dispatchStatusUpdate(
+                    $orderId,
+                    $updatedOrder,
+                    $previousStatus,
+                    $status,
+                    $this->statusUpdateMessageFromPost($_POST),
+                    $this->statusUpdateSubjectFromPost($_POST),
+                );
+            } else {
+                $mailResult = [
+                    'enabled'            => false,
+                    'client_status_sent' => false,
+                    'errors'             => ['Commande boutique rechargement impossible apres mise a jour.'],
+                ];
+            }
+        }
+
+        $this->pushFlash(
+            'success',
+            $this->buildStatusFlashMessage('Statut de commande boutique mis a jour.', $notifyClient, $mailResult),
+        );
 
         header('Location: ' . $redirect);
         exit;
@@ -849,11 +889,42 @@ final class AdminController
             exit;
         }
 
-        if ($contactModel->updateStatus($contactId, $status)) {
-            $this->pushFlash('success', 'Statut mis à jour.');
-        } else {
+        $previousStatus = (string) ($contactExists['status'] ?? 'new');
+        if (! $contactModel->updateStatus($contactId, $status)) {
             $this->pushFlash('error', 'Impossible de mettre à jour le statut.');
+            header('Location: ' . $redirect);
+            exit;
         }
+
+        $notifyClient = $this->shouldNotifyClient($_POST);
+        $mailResult   = null;
+
+        if ($notifyClient) {
+            $updatedContact = $contactModel->getById($contactId);
+            if (is_array($updatedContact)) {
+                $mailResult = (new ContactNotificationService())->dispatchStatusUpdate(
+                    $this->resolveContactRequestKind($updatedContact),
+                    $contactId,
+                    $updatedContact,
+                    is_array($updatedContact['menu_items'] ?? null) ? $updatedContact['menu_items'] : [],
+                    $previousStatus,
+                    $status,
+                    $this->statusUpdateMessageFromPost($_POST),
+                    $this->statusUpdateSubjectFromPost($_POST),
+                );
+            } else {
+                $mailResult = [
+                    'enabled'            => false,
+                    'client_status_sent' => false,
+                    'errors'             => ['Dossier rechargement impossible apres mise a jour.'],
+                ];
+            }
+        }
+
+        $this->pushFlash(
+            'success',
+            $this->buildStatusFlashMessage('Statut mis a jour.', $notifyClient, $mailResult),
+        );
 
         header('Location: ' . $redirect);
         exit;
@@ -1000,6 +1071,60 @@ final class AdminController
     private function sanitizeContactStatusFilter(string $status): string
     {
         return isset(Contact::STATUS_LABELS[$status]) ? $status : '';
+    }
+
+    private function shouldNotifyClient(array $input): bool
+    {
+        return (string) ($input['notify_client'] ?? '') === '1';
+    }
+
+    private function statusUpdateMessageFromPost(array $input): ?string
+    {
+        $message = trim((string) ($input['client_message'] ?? ''));
+        return $message === '' ? null : $message;
+    }
+
+    private function statusUpdateSubjectFromPost(array $input): ?string
+    {
+        $subject = trim((string) ($input['client_subject'] ?? ''));
+        return $subject === '' ? null : $subject;
+    }
+
+    /**
+     * @param array<string,mixed>|null $mailResult
+     */
+    private function buildStatusFlashMessage(string $baseMessage, bool $notifyClient, ?array $mailResult): string
+    {
+        if (! $notifyClient) {
+            return $baseMessage;
+        }
+
+        if (! is_array($mailResult)) {
+            return $baseMessage . ' Email client non envoye.';
+        }
+
+        if (($mailResult['client_status_sent'] ?? false) === true) {
+            return $baseMessage . ' Email client envoye.';
+        }
+
+        if (($mailResult['enabled'] ?? true) !== true) {
+            return $baseMessage . ' Service mail desactive : aucun email client envoye.';
+        }
+
+        $errors = is_array($mailResult['errors'] ?? null) ? $mailResult['errors'] : [];
+        if ($errors !== []) {
+            return $baseMessage . ' Email client non envoye : ' . implode(' | ', $errors);
+        }
+
+        return $baseMessage . ' Email client non envoye.';
+    }
+
+    /**
+     * @param array<string,mixed> $contact
+     */
+    private function resolveContactRequestKind(array $contact): string
+    {
+        return ! empty($contact['menu_items']) ? 'quote' : 'contact';
     }
 
     private function handleMenuItemImageUpload(Menu $menuModel, int $itemId): void

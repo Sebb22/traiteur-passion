@@ -1,14 +1,14 @@
 <?php
-    $contacts           = is_array($contacts ?? null) ? $contacts : [];
-    $stats              = is_array($stats ?? null) ? $stats : [];
-    $filters            = is_array($filters ?? null) ? $filters : ['status' => '', 'q' => ''];
-    $statusOptions      = is_array($statusOptions ?? null) ? $statusOptions : [];
-    $orderStatusOptions = is_array($orderStatusOptions ?? null) ? $orderStatusOptions : [];
-    $orderStats         = is_array($orderStats ?? null) ? $orderStats : [];
-    $recentOrders       = is_array($recentOrders ?? null) ? $recentOrders : [];
-    $orderLoadError     = is_string($orderLoadError ?? null) ? $orderLoadError : null;
+    $contacts           = isset($contacts) && is_array($contacts) ? $contacts : [];
+    $stats              = isset($stats) && is_array($stats) ? $stats : [];
+    $filters            = isset($filters) && is_array($filters) ? $filters : ['status' => '', 'q' => ''];
+    $statusOptions      = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
+    $orderStatusOptions = isset($orderStatusOptions) && is_array($orderStatusOptions) ? $orderStatusOptions : [];
+    $orderStats         = isset($orderStats) && is_array($orderStats) ? $orderStats : [];
+    $recentOrders       = isset($recentOrders) && is_array($recentOrders) ? $recentOrders : [];
+    $orderLoadError     = isset($orderLoadError) && is_string($orderLoadError) ? $orderLoadError : null;
     $filteredCount      = (int) ($filteredCount ?? count($contacts));
-    $flash              = is_array($flash ?? null) ? $flash : null;
+    $flash              = isset($flash) && is_array($flash) ? $flash : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -276,6 +276,12 @@
                                         </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <label class="adminField adminField--checkbox">
+                                        <span class="adminField__label">Mail client</span>
+                                        <input type="checkbox" class="adminCheckbox" name="notify_client" value="1">
+                                    </label>
+                                    <input type="text" class="adminInput" name="client_message"
+                                        placeholder="Message optionnel au client">
                                     <div class="adminInlineActions">
                                         <button type="submit" class="adminBtn adminBtn--sm">Mettre à jour</button>
                                         <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminBtn">Détail</a>
@@ -295,7 +301,7 @@
             <div class="adminCard__head">
                 <div class="adminCard__title">Liste des demandes et devis</div>
                 <div class="adminCard__meta">
-                    <span class="adminHint">Ouvrez un dossier pour lire le détail complet ou mettez à jour le statut directement ici.</span>
+                    <span class="adminHint">Ouvrez un dossier pour lire le détail complet ou personnaliser visuellement le mail client avant envoi.</span>
                 </div>
             </div>
 
@@ -371,6 +377,12 @@
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
+                                <label class="adminField adminField--checkbox">
+                                    <span class="adminField__label">Mail client</span>
+                                    <input type="checkbox" class="adminCheckbox" name="notify_client" value="1">
+                                </label>
+                                <input type="text" class="adminInput" name="client_message"
+                                    placeholder="Message optionnel au client">
                                 <button type="submit" class="adminBtn adminBtn--sm">Mettre à jour</button>
                             </div>
                         </form>

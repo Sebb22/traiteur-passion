@@ -11,6 +11,7 @@ import { initShopPage } from "./shop/shopPage";
 import { initAdminCatalog } from "./admin/catalog";
 import { initAdminBlog } from "./admin/blog";
 import { initAdminLogin } from "./admin/login";
+import { initAdminMailPreview } from "./admin/mailPreview";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
 import { initShopPromoBanner } from "./generic/shopPromoBanner";
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initAdminCatalog();
     initAdminBlog();
     initAdminLogin();
+    initAdminMailPreview();
     initShopPromoBanner();
 
     enableWheelRedirect();

@@ -9,7 +9,7 @@
     /** @var string $ctaTextColor */
     /** @var string $clientMessageHtml */
     /** @var array<int,array{label:string,value:string}> $summaryFields */
-    /** @var array<int,array{category:string,name:string,price:string,quantity:string}> $menuItems */
+    /** @var array<int,array{category:string,name:string,price:string,quantity:string,image_url:?string,image_alt?:string,detail?:string}> $menuItems */
     /** @var string|null $adminDetailUrl */
     /** @var string|null $ctaLabel */
 
@@ -69,35 +69,28 @@
     <?php if ($menuItems === []): ?>
     <p style="margin:0;font-size:15px;line-height:1.7;color:#4d433c;">Aucun item sélectionné.</p>
     <?php else: ?>
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-        style="border-collapse:collapse;">
+    <?php foreach ($menuItems as $item): ?>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 12px 0;border:1px solid #e6dccf;border-radius:16px;background:#fff9f3;overflow:hidden;">
         <tr>
-            <th
-                style="padding:8px 10px;border:1px solid #e6dccf;background:#f6f0e8;text-align:left;font-size:12px;color:#4d433c;">
-                Catégorie</th>
-            <th
-                style="padding:8px 10px;border:1px solid #e6dccf;background:#f6f0e8;text-align:left;font-size:12px;color:#4d433c;">
-                Item</th>
-            <th
-                style="padding:8px 10px;border:1px solid #e6dccf;background:#f6f0e8;text-align:left;font-size:12px;color:#4d433c;">
-                Prix</th>
-            <th
-                style="padding:8px 10px;border:1px solid #e6dccf;background:#f6f0e8;text-align:left;font-size:12px;color:#4d433c;">
-                Qté</th>
+            <?php if (! empty($item['image_url'])): ?>
+            <td style="width:92px;padding:14px 0 14px 14px;vertical-align:top;">
+                <img src="<?php echo $e($item['image_url']); ?>" alt="<?php echo $e($item['image_alt'] ?? $item['name']); ?>" style="display:block;width:78px;height:78px;object-fit:cover;border-radius:14px;border:1px solid #eadfd4;">
+            </td>
+            <?php endif; ?>
+            <td style="padding:14px;vertical-align:top;">
+                <p style="margin:0 0 4px 0;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8b6f47;font-weight:700;"><?php echo $e($item['category']); ?></p>
+                <p style="margin:0 0 6px 0;font-size:17px;line-height:1.4;color:#231f20;font-weight:700;"><?php echo $e($item['name']); ?></p>
+                <?php if (! empty($item['detail'])): ?>
+                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.6;color:#5c5148;"><?php echo $e($item['detail']); ?></p>
+                <?php endif; ?>
+                <p style="margin:0;font-size:14px;line-height:1.6;color:#231f20;">
+                    <strong>Prix :</strong> <?php echo $e($item['price']); ?>
+                    <span style="display:inline-block;margin-left:12px;"><strong>Qté :</strong> <?php echo $e($item['quantity']); ?></span>
+                </p>
+            </td>
         </tr>
-        <?php foreach ($menuItems as $item): ?>
-        <tr>
-            <td style="padding:8px 10px;border:1px solid #e6dccf;font-size:14px;color:#231f20;">
-                <?php echo $e($item['category']); ?></td>
-            <td style="padding:8px 10px;border:1px solid #e6dccf;font-size:14px;color:#231f20;">
-                <?php echo $e($item['name']); ?></td>
-            <td style="padding:8px 10px;border:1px solid #e6dccf;font-size:14px;color:#231f20;">
-                <?php echo $e($item['price']); ?></td>
-            <td style="padding:8px 10px;border:1px solid #e6dccf;font-size:14px;color:#231f20;">
-                <?php echo $e($item['quantity']); ?></td>
-        </tr>
-        <?php endforeach; ?>
     </table>
+    <?php endforeach; ?>
     <?php endif; ?>
 </div>
 
