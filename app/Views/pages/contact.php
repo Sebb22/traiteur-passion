@@ -78,6 +78,16 @@
                     </div>
                 </section>
 
+                <?php
+                    $locationCardVariant     = 'full';
+                    $locationCardTitle       = 'Nous trouver';
+                    $locationCardEyebrow     = 'Traiteur Passion • lieu de retrait & entreprise';
+                    $locationCardDescription = 'Pour un retrait boutique ou un premier repère avant votre devis, voici l’adresse de Traiteur Passion. Nous confirmons ensuite avec vous le bon créneau ou la logistique adaptée à votre événement.';
+                    $locationCardClass       = 'contactLocationCard';
+                    $locationCardShowFacts   = false;
+                    require dirname(__DIR__) . '/partials/location-card.php';
+                ?>
+
                 <?php require dirname(__DIR__) . '/partials/menu-footer.php'; ?>
 
             </div>

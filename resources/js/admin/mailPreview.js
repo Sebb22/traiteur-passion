@@ -167,8 +167,7 @@ const ORDER_COPY = {
             "Nous conservons votre demande dans notre planning et vous recontactons si un ajustement logistique est necessaire.",
         preparing:
             "Notre equipe avance maintenant sur la preparation et le bon deroulement du retrait ou de la livraison.",
-        ready:
-            "Votre commande est prete. Vous pouvez venir sur le creneau prevu ou nous repondre directement si un ajustement est necessaire.",
+        ready: "Votre commande est prete. Vous pouvez venir sur le creneau prevu ou nous repondre directement si un ajustement est necessaire.",
         completed:
             "Le dossier est considere comme boucle. Si vous avez besoin d'un nouveau retrait ou d'une nouvelle commande, vous pouvez nous recontacter librement.",
         cancelled:
@@ -194,8 +193,7 @@ const ORDER_COPY = {
     statusClosings: {
         cancelled:
             "Nous restons disponibles si vous souhaitez repartir sur une nouvelle commande ou une autre date.",
-        ready:
-            "Conservez cette reference et repondez directement a cet email si vous devez nous prevenir d'un retard ou d'un ajustement de retrait.",
+        ready: "Conservez cette reference et repondez directement a cet email si vous devez nous prevenir d'un retard ou d'un ajustement de retrait.",
         completed:
             "Merci pour votre confiance. Vous pouvez repondre a cet email si vous souhaitez preparer une prochaine commande.",
         default:

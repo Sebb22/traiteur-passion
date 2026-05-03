@@ -14,6 +14,7 @@ import { initAdminLogin } from "./admin/login";
 import { initAdminMailPreview } from "./admin/mailPreview";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
+import { initLocationCards } from "./generic/locationCard";
 import { initShopPromoBanner } from "./generic/shopPromoBanner";
 import { initToastSystem } from "./generic/toast";
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initAdminBlog();
     initAdminLogin();
     initAdminMailPreview();
+    initLocationCards();
     initShopPromoBanner();
 
     enableWheelRedirect();

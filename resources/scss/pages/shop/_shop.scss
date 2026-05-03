@@ -200,10 +200,7 @@
     border-radius: 999px;
     background: rgba(239, 231, 210, 0.1);
     border: 1px solid rgba(239, 231, 210, 0.18);
-    font:
-        600 11px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: rgba(239, 231, 210, 0.92);
@@ -217,10 +214,7 @@
 .shopItemCard__desc,
 .shopNotice p {
     margin: 0;
-    font:
-        400 14px/1.7 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 14px/1.7 "Inter", system-ui, sans-serif;
     color: rgba(239, 231, 210, 0.74);
 }
 
@@ -239,13 +233,8 @@
     display: grid;
     gap: 14px;
     padding: 20px 20px 22px;
-    background:
-        radial-gradient(120% 160% at 0% 0%, rgba(181, 155, 104, 0.16), transparent 42%),
-        radial-gradient(120% 160% at 100% 0%, rgba(196, 126, 54, 0.14), transparent 38%),
-        rgba(255, 255, 255, 0.03);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 16px 40px rgba(0, 0, 0, 0.18);
+    background: radial-gradient(120% 160% at 0% 0%, rgba(181, 155, 104, 0.16), transparent 42%), radial-gradient(120% 160% at 100% 0%, rgba(196, 126, 54, 0.14), transparent 38%), rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 16px 40px rgba(0, 0, 0, 0.18);
 }
 
 .shopIntro__eyebrow {
@@ -257,10 +246,7 @@
     border-radius: 999px;
     border: 1px solid rgba(239, 231, 210, 0.16);
     background: rgba(239, 231, 210, 0.05);
-    font:
-        600 10px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 10px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(239, 231, 210, 0.76);
@@ -289,17 +275,10 @@
     padding: 0 15px;
     border-radius: 999px;
     border: 1px solid var(--shop-pill-border);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.005)),
-        var(--shop-pill-bg);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.025),
-        0 8px 18px rgba(0, 0, 0, 0.12);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.005)), var(--shop-pill-bg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 8px 18px rgba(0, 0, 0, 0.12);
     color: rgba(233, 226, 210, 0.76);
-    font:
-        600 11px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
@@ -349,9 +328,7 @@
     height: 22px;
     border-radius: 999px;
     background: color-mix(in srgb, var(--shop-pill-accent) 10%, rgba(255, 255, 255, 0.012));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 0 0 1px color-mix(in srgb, var(--shop-pill-accent) 16%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px color-mix(in srgb, var(--shop-pill-accent) 16%, transparent);
     color: var(--shop-pill-accent);
     transform: translateY(-0.5px);
 }
@@ -376,9 +353,7 @@
     padding: 14px 14px 15px;
     border-radius: 16px;
     border: 1px solid rgba(239, 231, 210, 0.1);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
-        rgba(12, 9, 7, 0.3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)), rgba(12, 9, 7, 0.3);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
@@ -410,10 +385,7 @@
     background: rgba(239, 231, 210, 0.08);
     border: 1px solid rgba(239, 231, 210, 0.12);
     color: rgba(239, 231, 210, 0.82);
-    font:
-        700 10px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 10px/1.2 "Inter", system-ui, sans-serif;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
@@ -422,14 +394,10 @@
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    background:
-        radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.12), transparent 42%),
-        color-mix(in srgb, var(--shop-step-accent) 22%, rgba(12, 9, 7, 0.72));
+    background: radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.12), transparent 42%), color-mix(in srgb, var(--shop-step-accent) 22%, rgba(12, 9, 7, 0.72));
     border: 1px solid color-mix(in srgb, var(--shop-step-accent) 60%, rgba(239, 231, 210, 0.08));
     color: var(--shop-step-accent);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 10px 18px rgba(0, 0, 0, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 18px rgba(0, 0, 0, 0.16);
 }
 
 .shopIntroStep__icon .shopIconGlyph {
@@ -444,19 +412,13 @@
 .shopIntroStep__title {
     display: block;
     margin-bottom: 4px;
-    font:
-        700 14px/1.35 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 14px/1.35 "Inter", system-ui, sans-serif;
     color: rgba(239, 231, 210, 0.92);
 }
 
 .shopIntroStep__copy {
     margin: 0;
-    font:
-        400 12px/1.55 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 12px/1.55 "Inter", system-ui, sans-serif;
     color: rgba(239, 231, 210, 0.72);
 }
 
@@ -471,10 +433,7 @@
 
 .shopIntro__highlightTitle {
     color: rgba(239, 231, 210, 0.92);
-    font:
-        700 12px/1.35 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 12px/1.35 "Inter", system-ui, sans-serif;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
@@ -486,10 +445,7 @@
     gap: 9px;
     max-width: 780px;
     color: rgba(239, 231, 210, 0.68);
-    font:
-        500 12px/1.55 "Inter",
-        system-ui,
-        sans-serif;
+    font: 500 12px/1.55 "Inter", system-ui, sans-serif;
     letter-spacing: 0.03em;
 }
 
@@ -530,10 +486,7 @@
     border: 1px solid rgba(239, 231, 210, 0.16);
     background: rgba(239, 231, 210, 0.08);
     color: rgba(239, 231, 210, 0.88);
-    font:
-        600 11px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
@@ -571,12 +524,8 @@
     padding: 14px;
     border-radius: 20px;
     border: 1px solid rgba(239, 231, 210, 0.1);
-    background:
-        radial-gradient(120% 160% at 0% 0%, rgba(181, 155, 104, 0.12), transparent 42%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.04),
-        0 12px 28px rgba(0, 0, 0, 0.14);
+    background: radial-gradient(120% 160% at 0% 0%, rgba(181, 155, 104, 0.12), transparent 42%), linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 28px rgba(0, 0, 0, 0.14);
 }
 
 .shopCatalogNav__head,
@@ -604,10 +553,7 @@
     border: 1px solid rgba(239, 231, 210, 0.16);
     background: rgba(239, 231, 210, 0.05);
     color: rgba(239, 231, 210, 0.76);
-    font:
-        700 10px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 10px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.18em;
     text-transform: uppercase;
 }
@@ -615,10 +561,7 @@
 .shopCatalogNav__title {
     margin: 0;
     color: rgba(239, 231, 210, 0.76);
-    font:
-        400 13px/1.6 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 13px/1.6 "Inter", system-ui, sans-serif;
 }
 
 .shopCatalogNav__stat {
@@ -630,14 +573,9 @@
     padding: 0 12px;
     border-radius: 999px;
     border: 1px solid rgba(188, 160, 118, 0.12);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)),
-        rgba(14, 12, 11, 0.48);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)), rgba(14, 12, 11, 0.48);
     color: rgba(233, 226, 210, 0.72);
-    font:
-        700 10px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 10px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.16em;
     text-transform: uppercase;
 }
@@ -719,9 +657,7 @@
     background: linear-gradient(180deg, rgba(239, 231, 210, 0.16), rgba(239, 231, 210, 0.06));
     border-color: rgba(239, 231, 210, 0.3);
     color: rgba(239, 231, 210, 0.94);
-    box-shadow:
-        0 10px 20px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 @media (min-width: 981px) {
@@ -770,10 +706,7 @@
     box-shadow: 0 16px 30px rgba(0, 0, 0, 0.26);
     transform: translateY(18px);
     opacity: 0;
-    transition:
-        transform 180ms ease,
-        opacity 180ms ease,
-        background-color 180ms ease;
+    transition: transform 180ms ease, opacity 180ms ease, background-color 180ms ease;
 }
 
 .shopSummaryTab__icon {
@@ -783,14 +716,10 @@
     width: 52px;
     height: 52px;
     border-radius: 16px;
-    background:
-        radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.14), transparent 42%),
-        rgba(239, 231, 210, 0.09);
+    background: radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.14), transparent 42%), rgba(239, 231, 210, 0.09);
     border: 1px solid rgba(239, 231, 210, 0.14);
     color: rgba(239, 231, 210, 0.9);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        0 10px 20px rgba(0, 0, 0, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 20px rgba(0, 0, 0, 0.18);
 }
 
 .shopSummaryTab__icon .shopIconGlyph {
@@ -798,10 +727,7 @@
 }
 
 .shopSummaryTab__label {
-    font:
-        700 10px/1.1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 10px/1.1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: rgba(239, 231, 210, 0.62);
@@ -809,9 +735,7 @@
 
 .shopSummaryTab__count,
 .shopSummaryTab__total {
-    font:
-        400 16px/1 "Forum",
-        serif;
+    font: 400 16px/1 "Forum", serif;
 }
 
 .shopSummaryTab__main,
@@ -828,10 +752,7 @@
 
 .shopSummaryTab__items,
 .shopSummaryTab__cta {
-    font:
-        600 12px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 12px/1.2 "Inter", system-ui, sans-serif;
     color: rgba(239, 231, 210, 0.72);
 }
 
@@ -859,9 +780,7 @@
         box-shadow: 0 16px 30px rgba(0, 0, 0, 0.26);
     }
     50% {
-        box-shadow:
-            0 20px 40px rgba(0, 0, 0, 0.34),
-            0 0 0 1px rgba(239, 231, 210, 0.08);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(239, 231, 210, 0.08);
     }
 }
 
@@ -897,9 +816,7 @@ body.shop-summary-open {
 
 .shopCatalogSection {
     scroll-margin-top: var(--menu-section-scroll-margin, 132px);
-    background:
-        radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, 0.04), transparent 42%),
-        rgba(255, 255, 255, 0.03);
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, 0.04), transparent 42%), rgba(255, 255, 255, 0.03);
 }
 
 .shopFieldGrid,
@@ -919,14 +836,17 @@ body.shop-summary-open {
     border: 1px solid rgba(239, 231, 210, 0.08);
 }
 
+.shopField[hidden],
+.shopFieldGrid[hidden],
+.shopDeliveryFields[hidden] {
+    display: none !important;
+}
+
 .shopDeliveryFields__note {
     grid-column: 1 / -1;
     margin: 0;
     color: rgba(239, 231, 210, 0.66);
-    font:
-        400 13px/1.6 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 13px/1.6 "Inter", system-ui, sans-serif;
 }
 
 .shopFulfillmentChoices {
@@ -955,29 +875,20 @@ body.shop-summary-open {
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.18);
-    transition:
-        border-color 180ms ease,
-        background-color 180ms ease,
-        transform 180ms ease;
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
 .shopFulfillmentChoice__body strong {
     color: rgba(255, 255, 255, 0.96);
-    font:
-        700 15px/1.3 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 15px/1.3 "Inter", system-ui, sans-serif;
 }
 
 .shopFulfillmentChoice__body small {
     color: rgba(239, 231, 210, 0.7);
-    font:
-        400 13px/1.5 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 13px/1.5 "Inter", system-ui, sans-serif;
 }
 
-.shopFulfillmentChoice input:checked + .shopFulfillmentChoice__body {
+.shopFulfillmentChoice input:checked+.shopFulfillmentChoice__body {
     border-color: rgba(239, 231, 210, 0.26);
     background: linear-gradient(135deg, rgba(239, 231, 210, 0.1), rgba(239, 231, 210, 0.03));
     transform: translateY(-1px);
@@ -995,10 +906,7 @@ body.shop-summary-open {
 .shopField__label,
 .shopQty__label,
 .shopStep {
-    font:
-        700 11px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 11px/1.2 "Inter", system-ui, sans-serif;
     letter-spacing: 0.15em;
     text-transform: uppercase;
 }
@@ -1027,10 +935,7 @@ body.shop-summary-open {
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(0, 0, 0, 0.28);
     color: rgba(239, 231, 210, 0.92);
-    font:
-        400 14px/1.5 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 14px/1.5 "Inter", system-ui, sans-serif;
     padding: 13px 14px;
 }
 
@@ -1051,10 +956,7 @@ body.shop-summary-open {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.2));
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    transition:
-        transform 180ms ease,
-        border-color 180ms ease,
-        background 180ms ease;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
 .shopItemCard:hover {
@@ -1134,10 +1036,7 @@ body.shop-summary-open {
 .shopCheckoutPanel__head h4 {
     display: inline-flex;
     width: fit-content;
-    font:
-        700 11px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 11px/1.2 "Inter", system-ui, sans-serif;
     letter-spacing: 0.15em;
     text-transform: uppercase;
 }
@@ -1149,18 +1048,13 @@ body.shop-summary-open {
 }
 
 .shopItemCard__title {
-    font:
-        700 20px/1.3 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 20px/1.3 "Inter", system-ui, sans-serif;
     max-width: 24ch;
     text-wrap: balance;
 }
 
 .shopItemCard__price {
-    font:
-        400 22px/1 "Forum",
-        serif;
+    font: 400 22px/1 "Forum", serif;
     white-space: nowrap;
 }
 
@@ -1203,15 +1097,11 @@ body.shop-summary-open {
 .shopItemCard.is-expanded,
 .shopItemCard.is-in-cart {
     border-color: rgba(239, 231, 210, 0.18);
-    background:
-        radial-gradient(130% 150% at 0% 0%, rgba(222, 182, 108, 0.08), transparent 42%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.18));
+    background: radial-gradient(130% 150% at 0% 0%, rgba(222, 182, 108, 0.08), transparent 42%), linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.18));
 }
 
 .shopItemCard.is-expanded {
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 16px 28px rgba(0, 0, 0, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 16px 28px rgba(0, 0, 0, 0.14);
 }
 
 .shopItemCard__purchaseHead {
@@ -1228,10 +1118,7 @@ body.shop-summary-open {
     align-items: center;
     gap: 8px;
     color: rgba(239, 231, 210, 0.58);
-    font:
-        400 12px/1.45 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 12px/1.45 "Inter", system-ui, sans-serif;
 }
 
 .shopItemCard__purchaseHint .shopIconGlyph,
@@ -1258,10 +1145,7 @@ body.shop-summary-open {
     align-items: center;
     gap: 8px;
     color: rgba(239, 231, 210, 0.68);
-    font:
-        500 11px/1.45 "Inter",
-        system-ui,
-        sans-serif;
+    font: 500 11px/1.45 "Inter", system-ui, sans-serif;
     padding: 0 2px 2px;
 }
 
@@ -1271,23 +1155,15 @@ body.shop-summary-open {
     gap: 8px;
     padding: 10px;
     border-radius: 14px;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012)),
-        rgba(255, 255, 255, 0.022);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012)), rgba(255, 255, 255, 0.022);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    transition:
-        border-color 180ms ease,
-        background-color 180ms ease,
-        box-shadow 180ms ease,
-        transform 180ms ease;
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
 .shopPurchaseOption:hover {
     border-color: rgba(239, 231, 210, 0.12);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.032);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)), rgba(255, 255, 255, 0.032);
 }
 
 .shopPurchaseOption.is-sold-out {
@@ -1296,13 +1172,8 @@ body.shop-summary-open {
 
 .shopPurchaseOption.is-in-cart {
     border-color: rgba(222, 182, 108, 0.3);
-    background:
-        radial-gradient(130% 160% at 0% 0%, rgba(222, 182, 108, 0.12), transparent 42%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.03);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.04),
-        0 12px 22px rgba(0, 0, 0, 0.12);
+    background: radial-gradient(130% 160% at 0% 0%, rgba(222, 182, 108, 0.12), transparent 42%), linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)), rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 22px rgba(0, 0, 0, 0.12);
 }
 
 .shopPurchaseOption__head {
@@ -1323,10 +1194,7 @@ body.shop-summary-open {
 }
 
 .shopPurchaseOption__title {
-    font:
-        700 12px/1.35 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 12px/1.35 "Inter", system-ui, sans-serif;
     letter-spacing: 0.01em;
 }
 
@@ -1339,9 +1207,7 @@ body.shop-summary-open {
     border-radius: 999px;
     border: 1px solid rgba(222, 182, 108, 0.18);
     background: linear-gradient(180deg, rgba(222, 182, 108, 0.14), rgba(222, 182, 108, 0.04));
-    font:
-        400 17px/1.05 "Forum",
-        serif;
+    font: 400 17px/1.05 "Forum", serif;
     white-space: nowrap;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
@@ -1357,10 +1223,7 @@ body.shop-summary-open {
     border: 1px solid rgba(239, 231, 210, 0.1);
     background: rgba(239, 231, 210, 0.05);
     color: rgba(239, 231, 210, 0.68);
-    font:
-        500 10px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 500 10px/1.2 "Inter", system-ui, sans-serif;
 }
 
 .shopPurchaseOption__meta {
@@ -1368,10 +1231,7 @@ body.shop-summary-open {
     display: inline-flex;
     align-items: center;
     color: rgba(239, 231, 210, 0.74);
-    font:
-        600 9px/1.35 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 9px/1.35 "Inter", system-ui, sans-serif;
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
@@ -1395,10 +1255,7 @@ body.shop-summary-open {
 
 .shopQty__label {
     color: rgba(239, 231, 210, 0.76);
-    font:
-        600 11px/1.3 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1.3 "Inter", system-ui, sans-serif;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
@@ -1411,9 +1268,7 @@ body.shop-summary-open {
     display: grid;
     gap: 14px;
     padding: 16px 18px;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
-        rgba(255, 255, 255, 0.03);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)), rgba(255, 255, 255, 0.03);
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
     align-self: start;
     max-width: 760px;
@@ -1421,9 +1276,7 @@ body.shop-summary-open {
     margin-inline: auto;
     opacity: 0;
     transform: translateY(12px);
-    transition:
-        transform 220ms ease,
-        opacity 180ms ease;
+    transition: transform 220ms ease, opacity 180ms ease;
 }
 
 .shopSummaryDock:not(.is-open) .shopSummary {
@@ -1467,10 +1320,7 @@ body.shop-summary-open {
     border: 1px solid rgba(239, 231, 210, 0.14);
     background: rgba(239, 231, 210, 0.05);
     color: rgba(239, 231, 210, 0.76);
-    font:
-        700 11px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 11px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
@@ -1480,10 +1330,7 @@ body.shop-summary-open {
     border: 0;
     background: transparent;
     color: rgba(239, 231, 210, 0.68);
-    font:
-        700 10px/1.1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 10px/1.1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     padding: 0;
@@ -1510,19 +1357,14 @@ body.shop-summary-open {
 
 .shopSummaryMetric__label {
     color: rgba(239, 231, 210, 0.56);
-    font:
-        700 10px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 10px/1.2 "Inter", system-ui, sans-serif;
     letter-spacing: 0.15em;
     text-transform: uppercase;
 }
 
 .shopSummaryMetric__value {
     color: rgba(239, 231, 210, 0.94);
-    font:
-        400 18px/1.05 "Forum",
-        serif;
+    font: 400 18px/1.05 "Forum", serif;
 }
 
 .shopSummary__cta {
@@ -1535,9 +1377,7 @@ body.shop-summary-open {
 }
 
 .shopSummary__count {
-    font:
-        400 26px/1 "Forum",
-        serif;
+    font: 400 26px/1 "Forum", serif;
     color: rgba(239, 231, 210, 0.94);
 }
 
@@ -1552,9 +1392,7 @@ body.shop-summary-open {
     border: 1px solid rgba(255, 255, 255, 0.06);
     color: rgba(239, 231, 210, 0.86);
     strong {
-        font:
-            400 28px/1 "Forum",
-            serif;
+        font: 400 28px/1 "Forum", serif;
         color: rgba(239, 231, 210, 0.95);
     }
 }
@@ -1567,10 +1405,7 @@ body.shop-summary-open {
 .shopSummary__totalsMain small,
 .shopSummary__discount {
     color: rgba(239, 231, 210, 0.68);
-    font:
-        500 12px/1.4 "Inter",
-        system-ui,
-        sans-serif;
+    font: 500 12px/1.4 "Inter", system-ui, sans-serif;
 }
 
 .shopSummary__discount {
@@ -1597,9 +1432,7 @@ body.shop-summary-open {
 .shopSummary__promoHead strong {
     display: block;
     margin-top: 2px;
-    font:
-        400 22px/1.05 "Forum",
-        serif;
+    font: 400 22px/1.05 "Forum", serif;
 }
 
 .shopSummary__promoCountdown,
@@ -1607,10 +1440,7 @@ body.shop-summary-open {
 .shopSummary__promoCopy,
 .shopSummary__promoState {
     margin: 0;
-    font:
-        400 13px/1.6 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 13px/1.6 "Inter", system-ui, sans-serif;
 }
 
 .shopSummary__promoCountdown {
@@ -1666,10 +1496,7 @@ body.shop-summary-open {
     border-radius: 14px;
     background: rgba(0, 0, 0, 0.16);
     color: rgba(239, 231, 210, 0.88);
-    font:
-        400 13px/1.45 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 13px/1.45 "Inter", system-ui, sans-serif;
 }
 
 .shopSummary__lineMain,
@@ -1681,10 +1508,7 @@ body.shop-summary-open {
 
 .shopSummary__lineMain small {
     color: rgba(239, 231, 210, 0.6);
-    font:
-        400 12px/1.4 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 12px/1.4 "Inter", system-ui, sans-serif;
 }
 
 .shopSummary__lineAside {
@@ -1709,10 +1533,7 @@ body.shop-summary-open {
     background: rgba(239, 231, 210, 0.08);
     color: rgba(239, 231, 210, 0.92);
     cursor: pointer;
-    font:
-        500 18px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 500 18px/1 "Inter", system-ui, sans-serif;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1728,10 +1549,7 @@ body.shop-summary-open {
     min-width: 18px;
     text-align: center;
     color: rgba(239, 231, 210, 0.9);
-    font:
-        600 11px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1 "Inter", system-ui, sans-serif;
 }
 
 .shopItemCard__meta {
@@ -1762,10 +1580,7 @@ body.shop-summary-open {
 
 .shopItemCard__limit {
     color: rgba(239, 231, 210, 0.56);
-    font:
-        600 11px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1.2 "Inter", system-ui, sans-serif;
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
@@ -1776,10 +1591,7 @@ body.shop-summary-open {
     background: transparent;
     color: rgba(239, 231, 210, 0.62);
     cursor: pointer;
-    font:
-        600 11px/1 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 11px/1 "Inter", system-ui, sans-serif;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 0;
@@ -1792,10 +1604,7 @@ body.shop-summary-open {
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.03);
     color: rgba(239, 231, 210, 0.78);
-    transition:
-        border-color 180ms ease,
-        background-color 180ms ease,
-        color 180ms ease;
+    transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
 }
 
 .shopQtyControls__remove:hover {
@@ -1841,10 +1650,7 @@ body.shop-summary-open {
     margin-top: 16px;
     padding: 14px 16px;
     border-radius: 16px;
-    font:
-        600 13px/1.6 "Inter",
-        system-ui,
-        sans-serif;
+    font: 600 13px/1.6 "Inter", system-ui, sans-serif;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1898,20 +1704,14 @@ body.shop-summary-open {
 
 .shopCheckoutGuide__item strong {
     color: rgba(239, 231, 210, 0.92);
-    font:
-        700 11px/1.2 "Inter",
-        system-ui,
-        sans-serif;
+    font: 700 11px/1.2 "Inter", system-ui, sans-serif;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
 
 .shopCheckoutGuide__item span {
     color: rgba(239, 231, 210, 0.72);
-    font:
-        400 13px/1.5 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 13px/1.5 "Inter", system-ui, sans-serif;
 }
 
 .shopCheckoutLayout {
@@ -1936,10 +1736,7 @@ body.shop-summary-open {
 .shopCheckoutPanel__head p {
     margin: 0;
     color: rgba(239, 231, 210, 0.62);
-    font:
-        400 14px/1.6 "Inter",
-        system-ui,
-        sans-serif;
+    font: 400 14px/1.6 "Inter", system-ui, sans-serif;
 }
 
 .shopCustomerCard.is-disabled {
@@ -1947,9 +1744,7 @@ body.shop-summary-open {
 }
 
 .shopItemCard.is-in-cart {
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.04),
-        0 12px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 24px rgba(0, 0, 0, 0.12);
 }
 
 .shopItemCard__actions {
@@ -1986,29 +1781,17 @@ body.shop-summary-open {
     padding: 0 14px;
     border-radius: 13px;
     border-color: rgba(222, 182, 108, 0.2);
-    background:
-        linear-gradient(180deg, rgba(222, 182, 108, 0.16), rgba(222, 182, 108, 0.06)),
-        rgba(255, 255, 255, 0.03);
+    background: linear-gradient(180deg, rgba(222, 182, 108, 0.16), rgba(222, 182, 108, 0.06)), rgba(255, 255, 255, 0.03);
     color: rgba(249, 240, 217, 0.96);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        0 10px 20px rgba(0, 0, 0, 0.1);
-    transition:
-        border-color 180ms ease,
-        background-color 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .shopPurchaseOption .shopItemCard__add:hover {
     border-color: rgba(232, 194, 120, 0.3);
-    background:
-        linear-gradient(180deg, rgba(232, 194, 120, 0.22), rgba(232, 194, 120, 0.08)),
-        rgba(255, 255, 255, 0.035);
+    background: linear-gradient(180deg, rgba(232, 194, 120, 0.22), rgba(232, 194, 120, 0.08)), rgba(255, 255, 255, 0.035);
     transform: translateY(-1px);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 12px 24px rgba(0, 0, 0, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 24px rgba(0, 0, 0, 0.14);
 }
 
 .shopPurchaseOption .shopItemCard__add:disabled {
@@ -2024,9 +1807,7 @@ body.shop-summary-open {
 
 .shopPurchaseOption .shopItemCard__add.is-active {
     border-color: rgba(232, 194, 120, 0.34);
-    background:
-        linear-gradient(180deg, rgba(232, 194, 120, 0.24), rgba(232, 194, 120, 0.1)),
-        rgba(255, 255, 255, 0.04);
+    background: linear-gradient(180deg, rgba(232, 194, 120, 0.24), rgba(232, 194, 120, 0.1)), rgba(255, 255, 255, 0.04);
     color: rgba(255, 247, 226, 0.98);
 }
 
@@ -2046,9 +1827,7 @@ body.shop-summary-open {
     padding: 6px 8px;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012)),
-        rgba(0, 0, 0, 0.16);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012)), rgba(0, 0, 0, 0.16);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -2057,28 +1836,18 @@ body.shop-summary-open {
     height: 46px;
     border-radius: 14px;
     border: 1px solid rgba(232, 194, 120, 0.18);
-    background:
-        linear-gradient(180deg, rgba(232, 194, 120, 0.14), rgba(232, 194, 120, 0.04)),
-        rgba(239, 231, 210, 0.04);
+    background: linear-gradient(180deg, rgba(232, 194, 120, 0.14), rgba(232, 194, 120, 0.04)), rgba(239, 231, 210, 0.04);
     color: rgba(250, 238, 210, 0.96);
     cursor: pointer;
     font-size: 22px;
     line-height: 1;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        0 8px 18px rgba(0, 0, 0, 0.12);
-    transition:
-        border-color 180ms ease,
-        background-color 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 18px rgba(0, 0, 0, 0.12);
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .shopQtyControls__btn:hover {
     border-color: rgba(232, 194, 120, 0.28);
-    background:
-        linear-gradient(180deg, rgba(232, 194, 120, 0.22), rgba(232, 194, 120, 0.08)),
-        rgba(239, 231, 210, 0.05);
+    background: linear-gradient(180deg, rgba(232, 194, 120, 0.22), rgba(232, 194, 120, 0.08)), rgba(239, 231, 210, 0.05);
     transform: translateY(-1px);
 }
 
@@ -2131,9 +1900,7 @@ body.shop-summary-open {
         min-height: 62px;
         padding: 10px 12px;
         border-radius: 22px;
-        background:
-            linear-gradient(145deg, rgba(239, 231, 210, 0.1), rgba(239, 231, 210, 0.025)),
-            rgba(11, 11, 11, 0.965);
+        background: linear-gradient(145deg, rgba(239, 231, 210, 0.1), rgba(239, 231, 210, 0.025)), rgba(11, 11, 11, 0.965);
         border-color: rgba(239, 231, 210, 0.1);
         box-shadow: 0 14px 24px rgba(0, 0, 0, 0.24);
         transform: translateY(18px);
@@ -2197,9 +1964,7 @@ body.shop-summary-open {
         grid-template-columns: 1fr;
         gap: 8px;
         padding: 12px;
-        background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
-            rgba(11, 11, 11, 0.95);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), rgba(11, 11, 11, 0.95);
         border-color: rgba(239, 231, 210, 0.09);
         border-radius: 24px;
         box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
@@ -2221,9 +1986,7 @@ body.shop-summary-open {
         transform: translateY(0) scale(1);
     }
     .shopSummaryDock.is-open .shopSummaryTab {
-        background:
-            linear-gradient(145deg, rgba(239, 231, 210, 0.14), rgba(239, 231, 210, 0.04)),
-            rgba(11, 11, 11, 0.975);
+        background: linear-gradient(145deg, rgba(239, 231, 210, 0.14), rgba(239, 231, 210, 0.04)), rgba(11, 11, 11, 0.975);
         animation: none;
     }
     .shopSummary__hero,
@@ -2427,27 +2190,19 @@ body.shop-summary-open {
         text-align: right;
     }
     .shopSummaryTab__label {
-        font:
-            700 10px/1.1 "Inter",
-            system-ui,
-            sans-serif;
+        font: 700 10px/1.1 "Inter", system-ui, sans-serif;
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: rgba(239, 231, 210, 0.58);
     }
     .shopSummaryTab__count,
     .shopSummaryTab__total {
-        font:
-            400 18px/1 "Forum",
-            serif;
+        font: 400 18px/1 "Forum", serif;
         color: rgba(239, 231, 210, 0.95);
     }
     .shopSummaryTab__items,
     .shopSummaryTab__cta {
-        font:
-            600 12px/1.2 "Inter",
-            system-ui,
-            sans-serif;
+        font: 600 12px/1.2 "Inter", system-ui, sans-serif;
         color: rgba(239, 231, 210, 0.72);
     }
     .shopSummaryOverlay[hidden] {

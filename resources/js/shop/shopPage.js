@@ -148,6 +148,7 @@ export function initShopPage() {
     const fulfillmentInputs = Array.from(form.querySelectorAll("[data-shop-fulfillment]"));
     const deliveryPanel = form.querySelector("[data-shop-delivery-panel]");
     const deliveryFields = Array.from(form.querySelectorAll("[data-shop-delivery-field]"));
+    const pickupLocationPanel = form.querySelector("[data-shop-pickup-location]");
     const cardNodes = Array.from(form.querySelectorAll("[data-shop-item-card]"));
     const lineNodes = Array.from(form.querySelectorAll("[data-shop-order-line]"));
     const stockBadges = Array.from(form.querySelectorAll("[data-shop-stock]"));
@@ -825,6 +826,10 @@ export function initShopPage() {
 
         if (deliveryPanel instanceof HTMLElement) {
             deliveryPanel.hidden = !wantsDelivery;
+        }
+
+        if (pickupLocationPanel instanceof HTMLElement) {
+            pickupLocationPanel.hidden = wantsDelivery;
         }
 
         deliveryFields.forEach((field) => {

@@ -436,22 +436,22 @@
                                                     $availableSelections = min($availableSelections, $optionStock);
                                                 }
                                                 $purchaseLines[] = [
-                                                    'line_key'            => 'item-' . $itemId . '-option-' . $optionId,
-                                                    'option_id'           => $optionId,
-                                                    'option_label'        => trim((string) ($option['label'] ?? '')),
+                                                    'line_key'              => 'item-' . $itemId . '-option-' . $optionId,
+                                                    'option_id'             => $optionId,
+                                                    'option_label'          => trim((string) ($option['label'] ?? '')),
                                                     'option_stock_quantity' => $optionStock,
-                                                    'option_units'        => $optionUnits,
-                                                    'price_cents'         => (int) ($option['price_cents'] ?? 0),
-                                                    'price_display'       => $formatPrice($option),
-                                                    'allowed'             => $availableSelections,
-                                                    'hint'                => 'Jusqu’à ' . $availableSelections . ' ' . $pluralize($availableSelections, $selectionSingular, $selectionPlural),
-                                                    'meta_hint'           => $conversionHint,
-                                                    'quantity_label'      => $stockUnit === 'g'
+                                                    'option_units'          => $optionUnits,
+                                                    'price_cents'           => (int) ($option['price_cents'] ?? 0),
+                                                    'price_display'         => $formatPrice($option),
+                                                    'allowed'               => $availableSelections,
+                                                    'hint'                  => 'Jusqu’à ' . $availableSelections . ' ' . $pluralize($availableSelections, $selectionSingular, $selectionPlural),
+                                                    'meta_hint'             => $conversionHint,
+                                                    'quantity_label'        => $stockUnit === 'g'
                                                         ? 'Nombre de formats'
                                                         : ($optionUnits > 1 ? 'Nombre de lots' : 'Nombre d’unités'),
-                                                    'button_label'        => 'Ajouter 1 ' . $selectionSingular,
-                                                    'cart_label_singular' => $selectionSingular,
-                                                    'cart_label_plural'   => $selectionPlural,
+                                                    'button_label'          => 'Ajouter 1 ' . $selectionSingular,
+                                                    'cart_label_singular'   => $selectionSingular,
+                                                    'cart_label_plural'     => $selectionPlural,
                                                 ];
                                             }
                                         } else {
@@ -803,6 +803,18 @@
                                                     </span>
                                                 </label>
                                             </div>
+                                        </div>
+                                        <div class="shopField shopField--full" data-shop-pickup-location>
+                                            <?php
+                                                $locationCardVariant     = 'compact';
+                                                $locationCardTitle       = 'Lieu de retrait';
+                                                $locationCardEyebrow     = 'Commande boutique • retrait organisé';
+                                                $locationCardDescription = 'Le retrait s’effectue à cette adresse, sur créneau confirmé avec vous après enregistrement de la demande.';
+                                                $locationCardClass       = 'shopLocationCard';
+                                                $locationCardShowFacts   = false;
+                                                $locationCardShowMap     = false;
+                                                require dirname(__DIR__) . '/partials/location-card.php';
+                                            ?>
                                         </div>
                                         <label class="shopField">
                                             <span class="shopField__label">Date souhaitée</span>

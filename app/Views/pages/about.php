@@ -245,6 +245,14 @@
                         Dites-nous le format, le lieu, vos envies (et vos contraintes alimentaires si besoin) — on vous
                         propose une formule claire.
                     </p>
+                    <?php
+                        $locationCardVariant     = 'compact';
+                        $locationCardTitle       = 'Où nous trouver';
+                        $locationCardEyebrow     = 'Maison familiale • Vignemont';
+                        $locationCardDescription = 'Traiteur Passion est basé à Vignemont, près de Compiègne. Un repère utile si vous préparez un retrait, une dégustation ou un échange logistique.';
+                        $locationCardClass       = 'aboutLocationCard';
+                        require dirname(__DIR__) . '/partials/location-card.php';
+                    ?>
                     <a class="btn btn--primary" href="/contact">Demander un devis</a>
                 </section>
 
