@@ -20,31 +20,31 @@
     /** @var string $heroSummary */
     /** @var string|null $appUrl */
 
-    $e = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-    $logoSrc = null;
-    $legalAddress = '631 rue de Compiègne, 60162 Vignemont';
-    $contactEmail = 'contact@trateurpassion.fr';
-    $contactPhoneHref = '+33659215349';
+    $e                 = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    $logoSrc           = null;
+    $legalAddress      = '631 rue de Compiègne, 60162 Vignemont';
+    $contactEmail      = 'contact@traiteurpassion.fr';
+    $contactPhoneHref  = '+33659215349';
     $contactPhoneLabel = '0659215349 - Mylène - relation clientèle';
-    $signatureName = 'Kévin Brien';
-    $quickLinks = [];
+    $signatureName     = 'Kévin Brien';
+    $quickLinks        = [];
 
     if (! empty($appUrl)) {
-        $logoSrc = rtrim((string) $appUrl, '/') . '/uploads/images/logos/logo.png';
-        $quickLinks = [
-            ['label' => 'Carte évènementielle', 'url' => rtrim((string) $appUrl, '/') . '/carte-évènementielle'],
-            ['label' => 'Boutique', 'url' => rtrim((string) $appUrl, '/') . '/boutique-en-ligne'],
-            ['label' => 'Contact', 'url' => rtrim((string) $appUrl, '/') . '/contact'],
-            ['label' => 'Mentions légales', 'url' => rtrim((string) $appUrl, '/') . '/mentions-legales'],
-        ];
+    $logoSrc    = rtrim((string) $appUrl, '/') . '/uploads/images/logos/logo.png';
+    $quickLinks = [
+        ['label' => 'Carte évènementielle', 'url' => rtrim((string) $appUrl, '/') . '/carte-évènementielle'],
+        ['label' => 'Boutique', 'url' => rtrim((string) $appUrl, '/') . '/boutique-en-ligne'],
+        ['label' => 'Contact', 'url' => rtrim((string) $appUrl, '/') . '/contact'],
+        ['label' => 'Mentions légales', 'url' => rtrim((string) $appUrl, '/') . '/mentions-legales'],
+    ];
     } else {
-        $logoPath = dirname(__DIR__, 3) . '/public/uploads/images/logos/logo.png';
-        if (is_file($logoPath) && is_readable($logoPath)) {
-            $logoData = @file_get_contents($logoPath);
-            if (is_string($logoData) && $logoData !== '') {
-                $logoSrc = 'data:image/png;base64,' . base64_encode($logoData);
-            }
+    $logoPath = dirname(__DIR__, 3) . '/public/uploads/images/logos/logo.png';
+    if (is_file($logoPath) && is_readable($logoPath)) {
+        $logoData = @file_get_contents($logoPath);
+        if (is_string($logoData) && $logoData !== '') {
+            $logoSrc = 'data:image/png;base64,' . base64_encode($logoData);
         }
+    }
     }
 ?>
 <!DOCTYPE html>

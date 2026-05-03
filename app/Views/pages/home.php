@@ -6,9 +6,9 @@
                 <section class="home-hero">
                     <video class="home-hero__video" autoplay muted loop playsinline preload="metadata"
                         poster="/uploads/pages/home/hero-poster.jpg" aria-hidden="true">
-                        <source media="(max-width: 767px)" src="/uploads/pages/home/videos/Intro%20TP.mp4"
+                        <source media="(max-width: 767px)" src="/uploads/pages/home/videos/Intro%20TP%20Final.mp4"
                             type="video/mp4">
-                        <source src="/uploads/pages/home/videos/videoHome2.mp4" type="video/mp4">
+                        <source src="/uploads/pages/home/videos/Intro%20TP%20Final.mp4" type="video/mp4">
                     </video>
                     <!--
                     <div class="home-hero__logo" aria-hidden="true">

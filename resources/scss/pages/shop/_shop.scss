@@ -1208,11 +1208,11 @@ body.shop-summary-open {
         linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.18));
 }
 
-    .shopItemCard.is-expanded {
-        box-shadow:
+.shopItemCard.is-expanded {
+    box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
         0 16px 28px rgba(0, 0, 0, 0.14);
-    }
+}
 
 .shopItemCard__purchaseHead {
     display: flex;

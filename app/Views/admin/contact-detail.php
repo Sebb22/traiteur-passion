@@ -22,14 +22,14 @@
     $mailRequestKind    = $menuSelectionCount > 0 ? 'quote' : 'contact';
     $contactStatusKey   = (string) ($contact['status'] ?? 'new');
     $contactStatusLabel = (string) ($statusOptions[$contactStatusKey] ?? ucfirst($contactStatusKey));
-        $previewSummary     = [
-            ['label' => 'Reference', 'value' => '#' . (int) ($contact['id'] ?? 0)],
-            ['label' => 'Type', 'value' => (string) ($contact['type'] ?? '-')],
-            ['label' => 'Date', 'value' => $formatDate($contact['date'] ?? null)],
-            ['label' => 'Personnes', 'value' => (string) ($contact['people'] ?? '-')],
-            ['label' => 'Lieu', 'value' => (string) ($contact['location'] ?? '-')],
-            ['label' => 'Statut', 'value' => $contactStatusLabel],
-        ];
+    $previewSummary     = [
+    ['label' => 'Reference', 'value' => '#' . (int) ($contact['id'] ?? 0)],
+    ['label' => 'Type', 'value' => (string) ($contact['type'] ?? '-')],
+    ['label' => 'Date', 'value' => $formatDate($contact['date'] ?? null)],
+    ['label' => 'Personnes', 'value' => (string) ($contact['people'] ?? '-')],
+    ['label' => 'Lieu', 'value' => (string) ($contact['location'] ?? '-')],
+    ['label' => 'Statut', 'value' => $contactStatusLabel],
+    ];
     if ($mailRequestKind === 'quote') {
     switch ($contactStatusKey) {
         case 'in_progress':

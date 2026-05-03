@@ -245,7 +245,7 @@ final class Contact
         }
 
         // Get associated menu items
-        $sql  = "SELECT cmi.*,
+        $sql = "SELECT cmi.*,
                 mi.image_path,
                 mi.image_alt,
                 mi.short_description AS item_description

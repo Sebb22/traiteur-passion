@@ -51,7 +51,8 @@
         <!-- LEFT : visuel -->
         <div class="menuSplit__left" aria-label="Visuel de la carte">
             <div class="menuHero">
-                <img class="menuHero__img" src="/uploads/pages/menu/images/menu3Illu.webp" alt="" aria-hidden="true">
+                <img class="menuHero__img" src="/uploads/pages/menu/images/menuIllu2-1200.webp" alt=""
+                    aria-hidden="true">
                 <div>
                     <h1 class="menuHero__title">Carte évènementielle</h1>
                 </div>
@@ -65,24 +66,33 @@
                 <header class="menuIntro">
                     <span class="menuIntro__eyebrow">Compiègne • Oise • prestations sur mesure</span>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
-                    <h2 class="menuIntro__title">Traiteur évènementiel à Compiègne pour mariages, cocktails et réceptions</h2>
+                    <h2 class="menuIntro__title">Traiteur évènementiel à Compiègne pour mariages, cocktails et
+                        réceptions</h2>
                     <span class="menuSectionTitle__line" aria-hidden="true"></span>
-                    <p class="menuIntro__copy">La carte évènementielle rassemble nos formats pour mariage, anniversaire, cocktail, repas d'entreprise et réception privée. Vous repérez ici les bases de votre prestation, puis nous ajustons avec vous les quantités, le service, la livraison et les contraintes alimentaires.</p>
+                    <p class="menuIntro__copy">La carte évènementielle rassemble nos formats pour mariage, anniversaire,
+                        cocktail, repas d'entreprise et réception privée. Vous repérez ici les bases de votre
+                        prestation, puis nous ajustons avec vous les quantités, le service, la livraison et les
+                        contraintes alimentaires.</p>
                     <div class="menuIntro__story" aria-label="Signature Traiteur Passion">
                         <article class="menuIntroCard">
                             <span class="menuIntroCard__kicker">Cuisine</span>
                             <strong class="menuIntroCard__title">Une lecture plus gourmande que standardisée</strong>
-                            <p class="menuIntroCard__copy">Pièces cocktail, buffets, plateaux et boissons sont pensés pour garder de la fraîcheur, du rythme et une vraie cohérence de table.</p>
+                            <p class="menuIntroCard__copy">Pièces cocktail, buffets, plateaux et boissons sont pensés
+                                pour garder de la fraîcheur, du rythme et une vraie cohérence de table.</p>
                         </article>
                         <article class="menuIntroCard">
                             <span class="menuIntroCard__kicker">Méthode</span>
-                            <strong class="menuIntroCard__title">Une base claire, puis un devis affiné avec vous</strong>
-                            <p class="menuIntroCard__copy">Cette page sert à cadrer les formats, les volumes et l'esprit de réception avant d'ajuster le service, la logistique et les contraintes alimentaires.</p>
+                            <strong class="menuIntroCard__title">Une base claire, puis un devis affiné avec
+                                vous</strong>
+                            <p class="menuIntroCard__copy">Cette page sert à cadrer les formats, les volumes et l'esprit
+                                de réception avant d'ajuster le service, la logistique et les contraintes alimentaires.
+                            </p>
                         </article>
                         <article class="menuIntroCard">
                             <span class="menuIntroCard__kicker">Territoire</span>
                             <strong class="menuIntroCard__title">Compiègne, Oise et réceptions sur mesure</strong>
-                            <p class="menuIntroCard__copy">Mariage, anniversaire, cocktail d'entreprise ou déjeuner d'équipe: la carte s'adapte au contexte réel de votre évènement.</p>
+                            <p class="menuIntroCard__copy">Mariage, anniversaire, cocktail d'entreprise ou déjeuner
+                                d'équipe: la carte s'adapte au contexte réel de votre évènement.</p>
                         </article>
                     </div>
                     <div class="menuIntro__meta" aria-label="Points forts de la carte évènementielle">
@@ -110,7 +120,8 @@
                 <?php foreach ($sections as $sectionIndex => $section): ?>
                 <?php $editorial         = $sectionEditorial[$section['slug']] ?? null; ?>
                 <?php $sectionSearchHint = trim((string) ($section['description'] !== '' ? $section['description'] : ($editorial['searchHint'] ?? ''))); ?>
-                <section class="menuSection menuSection--tone-<?php echo($sectionIndex % 3) + 1; ?>" id="<?php echo $e($section['slug']); ?>">
+                <section class="menuSection menuSection--tone-<?php echo($sectionIndex % 3) + 1; ?>"
+                    id="<?php echo $e($section['slug']); ?>">
 
                     <header class="menuSectionTitle">
                         <span class="menuSectionTitle__line" aria-hidden="true"></span>
