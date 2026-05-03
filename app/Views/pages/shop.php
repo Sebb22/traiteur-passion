@@ -415,8 +415,11 @@
                                         $purchaseLines = [];
                                         if ($options !== []) {
                                             foreach ($options as $option) {
-                                                $optionId          = (int) ($option['id'] ?? 0);
-                                                $optionUnits       = $resolveOptionUnits($option, $stockUnit);
+                                                $optionId    = (int) ($option['id'] ?? 0);
+                                                $optionUnits = $resolveOptionUnits($option, $stockUnit);
+                                                $optionStock = array_key_exists('stock_quantity', $option) && $option['stock_quantity'] !== null
+                                                    ? max(0, (int) $option['stock_quantity'])
+                                                    : null;
                                                 $selectionSingular = $stockUnit === 'g'
                                                     ? 'format'
                                                     : ($optionUnits > 1 ? 'lot' : 'unité');
@@ -429,10 +432,14 @@
                                                         ? '1 lot = ' . $formatStockQuantity($optionUnits, 'unit')
                                                         : 'Vente à l’unité');
                                                 $availableSelections = (int) floor($stockQuantity / max(1, $optionUnits));
-                                                $purchaseLines[]     = [
+                                                if ($optionStock !== null) {
+                                                    $availableSelections = min($availableSelections, $optionStock);
+                                                }
+                                                $purchaseLines[] = [
                                                     'line_key'            => 'item-' . $itemId . '-option-' . $optionId,
                                                     'option_id'           => $optionId,
                                                     'option_label'        => trim((string) ($option['label'] ?? '')),
+                                                    'option_stock_quantity' => $optionStock,
                                                     'option_units'        => $optionUnits,
                                                     'price_cents'         => (int) ($option['price_cents'] ?? 0),
                                                     'price_display'       => $formatPrice($option),
@@ -469,7 +476,7 @@
                                             $cardPriceDisplay = 'Dès ' . $cardPriceDisplay;
                                         }
                                         $primaryPurchaseLine = $purchaseLines[0] ?? null;
-                                        $hasAvailableLine = false;
+                                        $hasAvailableLine    = false;
                                         foreach ($purchaseLines as $purchaseLine) {
                                             if ((int) ($purchaseLine['allowed'] ?? 0) > 0) {
                                                 $hasAvailableLine = true;
@@ -545,6 +552,7 @@
                                                     data-item-price-cents="<?php echo $linePriceCents; ?>"
                                                     data-option-id="<?php echo $lineOptionId; ?>"
                                                     data-option-label="<?php echo $e($lineLabel); ?>"
+                                                    data-option-stock="<?php echo array_key_exists('option_stock_quantity', $primaryPurchaseLine) && $primaryPurchaseLine['option_stock_quantity'] !== null ? max(0, (int) $primaryPurchaseLine['option_stock_quantity']) : ''; ?>"
                                                     data-option-units="<?php echo $lineUnits; ?>"
                                                     data-cart-label-singular="<?php echo $e($lineCartLabelSingular); ?>"
                                                     data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
@@ -633,6 +641,7 @@
                                                         data-item-price-cents="<?php echo $linePriceCents; ?>"
                                                         data-option-id="<?php echo $lineOptionId; ?>"
                                                         data-option-label="<?php echo $e($lineLabel); ?>"
+                                                        data-option-stock="<?php echo array_key_exists('option_stock_quantity', $purchaseLine) && $purchaseLine['option_stock_quantity'] !== null ? max(0, (int) $purchaseLine['option_stock_quantity']) : ''; ?>"
                                                         data-option-units="<?php echo $lineUnits; ?>"
                                                         data-cart-label-singular="<?php echo $e($lineCartLabelSingular); ?>"
                                                         data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">

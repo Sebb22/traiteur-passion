@@ -15,6 +15,7 @@ final class ShopOrder
         'new'       => 'Nouvelle',
         'confirmed' => 'Confirmée',
         'preparing' => 'En préparation',
+        'ready'     => 'Commande prête',
         'completed' => 'Retirée',
         'cancelled' => 'Annulée',
     ];
@@ -26,6 +27,11 @@ final class ShopOrder
 
     /** @var list<string>|null */
     private ?array $itemColumns = null;
+    /** @var list<string>|null */
+    private ?array $optionColumns = null;
+
+    /** @var list<string>|null */
+    private ?array $orderItemColumns = null;
 
     public function __construct()
     {
@@ -95,8 +101,9 @@ final class ShopOrder
             ))));
             $optionsById = $this->getItemOptionsByIds($selectedOptionIds);
 
-            $conflicts            = [];
-            $requestedUnitsByItem = [];
+            $conflicts              = [];
+            $requestedUnitsByItem   = [];
+            $requestedCountByOption = [];
             foreach ($requested as $selection) {
                 $itemId   = (int) ($selection['item_id'] ?? 0);
                 $row      = $itemsById[$itemId] ?? null;
@@ -143,14 +150,34 @@ final class ShopOrder
                     ? $this->resolveBundleUnitsFromOption($option)
                     : max(1, (int) ($selection['option_units'] ?? 1));
                 $requestedUnitsByItem[$itemId] = ($requestedUnitsByItem[$itemId] ?? 0) + ($quantity * $bundleUnits);
+                if (is_array($option)) {
+                    $optionId = (int) ($option['id'] ?? 0);
+                    if ($optionId > 0) {
+                        $requestedCountByOption[$optionId] = ($requestedCountByOption[$optionId] ?? 0) + $quantity;
+                    }
+                }
 
                 if (! $isAvailable || $requestedUnitsByItem[$itemId] > $available) {
                     $conflicts[] = [
                         'item_id'   => $itemId,
-                        'name'      => (string) ($row['name'] ?? 'Produit indisponible'),
+                        'name'      => $this->conflictName((string) ($row['name'] ?? 'Produit indisponible'), $option['label'] ?? null),
                         'requested' => $quantity,
                         'available' => $bundleUnits > 0 ? (int) floor($available / $bundleUnits) : 0,
                     ];
+                    continue;
+                }
+
+                if (is_array($option) && $this->optionHasDedicatedStock($option)) {
+                    $availableOptionCount = max(0, (int) ($option['stock_quantity'] ?? 0));
+                    $optionId             = (int) ($option['id'] ?? 0);
+                    if ($optionId > 0 && ($requestedCountByOption[$optionId] ?? 0) > $availableOptionCount) {
+                        $conflicts[] = [
+                            'item_id'   => $itemId,
+                            'name'      => $this->conflictName((string) ($row['name'] ?? 'Produit indisponible'), $option['label'] ?? null),
+                            'requested' => $quantity,
+                            'available' => $availableOptionCount,
+                        ];
+                    }
                 }
             }
 
@@ -238,20 +265,38 @@ final class ShopOrder
 
             $orderId = (int) $this->db->lastInsertId();
 
-            $lineStmt = $this->db->prepare(
-                'INSERT INTO boutique_order_items (
-                    order_id, item_id, item_name_snapshot, section_name_snapshot,
-                    unit_price_cents, unit_price_label, quantity, line_total_cents
-                 ) VALUES (
-                    :order_id, :item_id, :item_name_snapshot, :section_name_snapshot,
-                    :unit_price_cents, :unit_price_label, :quantity, :line_total_cents
-                 )',
-            );
+            $linePayloadColumns = [
+                'order_id',
+                'item_id',
+                'item_name_snapshot',
+                'section_name_snapshot',
+                'unit_price_cents',
+                'unit_price_label',
+                'quantity',
+                'line_total_cents',
+            ];
+            if ($this->hasOrderItemColumn('option_id')) {
+                $linePayloadColumns[] = 'option_id';
+            }
+
+            $lineStmt = $this->db->prepare(sprintf(
+                'INSERT INTO boutique_order_items (%s) VALUES (%s)',
+                implode(', ', $linePayloadColumns),
+                implode(', ', array_map(static fn(string $column): string => ':' . $column, $linePayloadColumns)),
+            ));
             $stockStmt = $this->db->prepare(
                 'UPDATE boutique_items
                  SET stock_quantity = stock_quantity - :quantity
                  WHERE id = :id',
             );
+            $optionStockStmt = null;
+            if ($this->hasOptionColumn('stock_quantity')) {
+                $optionStockStmt = $this->db->prepare(
+                    'UPDATE boutique_item_options
+                     SET stock_quantity = stock_quantity - :quantity
+                     WHERE id = :id AND stock_quantity IS NOT NULL',
+                );
+            }
 
             foreach ($requested as $selection) {
                 $itemId                   = (int) ($selection['item_id'] ?? 0);
@@ -276,7 +321,7 @@ final class ShopOrder
                     (string) ($item['stock_unit'] ?? 'unit'),
                 );
 
-                $lineStmt->execute([
+                $linePayload = [
                     'order_id'              => $orderId,
                     'item_id'               => $itemId,
                     'item_name_snapshot'    => $this->buildItemNameSnapshot((string) ($item['name'] ?? ''), $optionLabelSnapshot),
@@ -285,12 +330,23 @@ final class ShopOrder
                     'unit_price_label'      => $this->resolveUnitPriceLabel($unitPriceCents, $option['price_label'] ?? ($item['price_label'] ?? null)),
                     'quantity'              => $quantity,
                     'line_total_cents'      => $unitPriceCents * $quantity,
-                ]);
+                ];
+                if ($this->hasOrderItemColumn('option_id')) {
+                    $linePayload['option_id'] = $optionId > 0 ? $optionId : null;
+                }
+                $lineStmt->execute($linePayload);
 
                 $stockStmt->execute([
                     'id'       => $itemId,
                     'quantity' => $quantity * $bundleUnits,
                 ]);
+
+                if ($optionStockStmt !== null && is_array($option) && $this->optionHasDedicatedStock($option)) {
+                    $optionStockStmt->execute([
+                        'id'       => (int) ($option['id'] ?? 0),
+                        'quantity' => $quantity,
+                    ]);
+                }
             }
 
             $this->db->commit();
@@ -322,6 +378,7 @@ final class ShopOrder
                     SUM(CASE WHEN status = 'new' THEN 1 ELSE 0 END) AS new_count,
                     SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) AS confirmed_count,
                     SUM(CASE WHEN status = 'preparing' THEN 1 ELSE 0 END) AS preparing_count,
+                    SUM(CASE WHEN status = 'ready' THEN 1 ELSE 0 END) AS ready_count,
                     SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_count,
                     SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count
              FROM boutique_orders",
@@ -332,6 +389,7 @@ final class ShopOrder
             'new_count'       => (int) ($summary['new_count'] ?? 0),
             'confirmed_count' => (int) ($summary['confirmed_count'] ?? 0),
             'preparing_count' => (int) ($summary['preparing_count'] ?? 0),
+            'ready_count'     => (int) ($summary['ready_count'] ?? 0),
             'completed_count' => (int) ($summary['completed_count'] ?? 0),
             'cancelled_count' => (int) ($summary['cancelled_count'] ?? 0),
         ];
@@ -432,7 +490,7 @@ final class ShopOrder
 
             if ($status === 'cancelled' && $stockRestoredAt === null) {
                 $itemStmt = $this->db->prepare(
-                    'SELECT item_id, quantity, item_name_snapshot
+                    'SELECT item_id, quantity, item_name_snapshot' . ($this->hasOrderItemColumn('option_id') ? ', option_id' : '') . '
                      FROM boutique_order_items
                      WHERE order_id = :order_id',
                 );
@@ -444,6 +502,14 @@ final class ShopOrder
                      SET stock_quantity = stock_quantity + :quantity
                      WHERE id = :id',
                 );
+                $restoreOptionStmt = null;
+                if ($this->hasOptionColumn('stock_quantity')) {
+                    $restoreOptionStmt = $this->db->prepare(
+                        'UPDATE boutique_item_options
+                         SET stock_quantity = stock_quantity + :quantity
+                         WHERE id = :id AND stock_quantity IS NOT NULL',
+                    );
+                }
 
                 foreach ($items as $item) {
                     $restoreStmt->execute([
@@ -454,6 +520,16 @@ final class ShopOrder
                             (string) ($item['item_name_snapshot'] ?? ''),
                         ),
                     ]);
+
+                    if ($restoreOptionStmt !== null) {
+                        $optionId = (int) ($item['option_id'] ?? 0);
+                        if ($optionId > 0) {
+                            $restoreOptionStmt->execute([
+                                'id'       => $optionId,
+                                'quantity' => max(0, (int) ($item['quantity'] ?? 0)),
+                            ]);
+                        }
+                    }
                 }
 
                 $updateStmt = $this->db->prepare(
@@ -511,7 +587,8 @@ final class ShopOrder
 
         $placeholders = implode(',', array_fill(0, count($optionIds), '?'));
         $stmt         = $this->db->prepare(
-            "SELECT id, item_id, label, quantity, price_cents, price_label, is_active
+            "SELECT id, item_id, label, quantity, price_cents, price_label, is_active,
+                    {$this->optionStockSelectSql()} AS stock_quantity
              FROM boutique_item_options
              WHERE id IN ({$placeholders})",
         );
@@ -533,7 +610,8 @@ final class ShopOrder
         }
 
         $stmt = $this->db->prepare(
-            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active
+            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active,
+                    ' . $this->optionStockSelectSql() . ' AS stock_quantity
              FROM boutique_item_options
              WHERE item_id = :item_id AND label = :label
              LIMIT 1',
@@ -553,6 +631,12 @@ final class ShopOrder
         $optionLabel = trim($optionLabel);
 
         return $optionLabel === '' ? $itemName : $itemName . ' — ' . $optionLabel;
+    }
+
+    private function conflictName(string $itemName, $optionLabel = null): string
+    {
+        $option = trim((string) ($optionLabel ?? ''));
+        return $option === '' ? $itemName : $itemName . ' — ' . $option;
     }
 
     private function buildOptionLabelSnapshot(string $optionLabel, int $bundleUnits, string $stockUnit): string
@@ -619,6 +703,17 @@ final class ShopOrder
         return $this->parseOptionUnitsFromLabel($label);
     }
 
+    /**
+     * @param array<string,mixed> $option
+     */
+    private function optionHasDedicatedStock(array $option): bool
+    {
+        return $this->hasOptionColumn('stock_quantity')
+        && array_key_exists('stock_quantity', $option)
+        && $option['stock_quantity'] !== null
+        && trim((string) $option['stock_quantity']) !== '';
+    }
+
     private function parseOptionUnitsFromLabel(string $label): int
     {
         $label = trim($label);
@@ -665,9 +760,24 @@ final class ShopOrder
         return $this->hasItemColumn('stock_unit') ? $alias . '.stock_unit' : "'unit'";
     }
 
+    private function optionStockSelectSql(string $alias = 'boutique_item_options'): string
+    {
+        return $this->hasOptionColumn('stock_quantity') ? $alias . '.stock_quantity' : 'NULL';
+    }
+
     private function hasItemColumn(string $column): bool
     {
         return in_array($column, $this->getItemColumns(), true);
+    }
+
+    private function hasOptionColumn(string $column): bool
+    {
+        return in_array($column, $this->getOptionColumns(), true);
+    }
+
+    private function hasOrderItemColumn(string $column): bool
+    {
+        return in_array($column, $this->getOrderItemColumns(), true);
     }
 
     /**
@@ -688,6 +798,26 @@ final class ShopOrder
         )));
 
         return $this->itemColumns;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getOptionColumns(): array
+    {
+        if ($this->optionColumns !== null) {
+            return $this->optionColumns;
+        }
+
+        $stmt = $this->db->query('SHOW COLUMNS FROM boutique_item_options');
+        $rows = $stmt !== false ? $stmt->fetchAll() : [];
+
+        $this->optionColumns = array_values(array_filter(array_map(
+            static fn(array $row): string => (string) ($row['Field'] ?? ''),
+            is_array($rows) ? $rows : [],
+        )));
+
+        return $this->optionColumns;
     }
 
     private function hasOrderColumn(string $column): bool
@@ -713,5 +843,25 @@ final class ShopOrder
         )));
 
         return $this->orderColumns;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getOrderItemColumns(): array
+    {
+        if ($this->orderItemColumns !== null) {
+            return $this->orderItemColumns;
+        }
+
+        $stmt = $this->db->query('SHOW COLUMNS FROM boutique_order_items');
+        $rows = $stmt !== false ? $stmt->fetchAll() : [];
+
+        $this->orderItemColumns = array_values(array_filter(array_map(
+            static fn(array $row): string => (string) ($row['Field'] ?? ''),
+            is_array($rows) ? $rows : [],
+        )));
+
+        return $this->orderItemColumns;
     }
 }

@@ -11,6 +11,9 @@ final class Shop
     /** @var list<string>|null */
     private ?array $itemColumns = null;
 
+    /** @var list<string>|null */
+    private ?array $optionColumns = null;
+
     /**
      * Récupère les options d'achat (lots) pour un item donné
      * @param int $itemId
@@ -19,7 +22,8 @@ final class Shop
     public function getItemOptions(int $itemId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active, sort_order
+            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active, sort_order,
+                    ' . $this->optionStockSelectSql() . ' AS stock_quantity
              FROM boutique_item_options
              WHERE item_id = :item_id
              ORDER BY sort_order ASC, id ASC'
@@ -36,11 +40,7 @@ final class Shop
      */
     public function createItemOption(int $itemId, array $data): int
     {
-        $stmt = $this->db->prepare(
-            'INSERT INTO boutique_item_options (item_id, label, quantity, price_cents, price_label, is_active, sort_order)
-             VALUES (:item_id, :label, :quantity, :price_cents, :price_label, :is_active, :sort_order)'
-        );
-        $stmt->execute([
+        $payload = [
             'item_id'     => $itemId,
             'label'       => trim((string) ($data['label'] ?? '')),
             'quantity'    => max(1, (int) ($data['quantity'] ?? 1)),
@@ -48,7 +48,20 @@ final class Shop
             'price_label' => $this->nullableString($data['price_label'] ?? null),
             'is_active'   => ! empty($data['is_active']) ? 1 : 0,
             'sort_order'  => $this->resolveItemOptionSortOrderForCreate($itemId),
-        ]);
+        ];
+
+        if ($this->hasOptionColumn('stock_quantity')) {
+            $payload['stock_quantity'] = $this->nullableNonNegativeInt($data['stock_quantity'] ?? null);
+        }
+
+        $columns = array_keys($payload);
+        $stmt    = $this->db->prepare(sprintf(
+            'INSERT INTO boutique_item_options (%s) VALUES (%s)',
+            implode(', ', $columns),
+            implode(', ', array_map(static fn(string $column): string => ':' . $column, $columns)),
+        ));
+        $stmt->execute($payload);
+
         return (int) $this->db->lastInsertId();
     }
 
@@ -62,12 +75,7 @@ final class Shop
             throw new \InvalidArgumentException('Option boutique introuvable.');
         }
 
-        $stmt = $this->db->prepare(
-            'UPDATE boutique_item_options
-             SET label = :label, quantity = :quantity, price_cents = :price_cents, price_label = :price_label, is_active = :is_active, sort_order = :sort_order
-             WHERE id = :id'
-        );
-        $stmt->execute([
+        $payload = [
             'id'          => $optionId,
             'label'       => trim((string) ($data['label'] ?? '')),
             'quantity'    => max(1, (int) ($data['quantity'] ?? 1)),
@@ -75,7 +83,27 @@ final class Shop
             'price_label' => $this->resolveItemOptionPriceLabelForUpdate($existing, $data),
             'is_active'   => ! empty($data['is_active']) ? 1 : 0,
             'sort_order'  => (int) ($existing['sort_order'] ?? 0),
-        ]);
+        ];
+
+        if ($this->hasOptionColumn('stock_quantity')) {
+            $payload['stock_quantity'] = $this->nullableNonNegativeInt($data['stock_quantity'] ?? null);
+        }
+
+        $setClauses = [];
+        foreach (array_keys($payload) as $column) {
+            if ($column === 'id') {
+                continue;
+            }
+
+            $setClauses[] = $column . ' = :' . $column;
+        }
+
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_item_options
+             SET ' . implode(', ', $setClauses) . '
+             WHERE id = :id'
+        );
+        $stmt->execute($payload);
     }
 
     /**
@@ -659,7 +687,8 @@ final class Shop
     public function getItemOptionById(int $optionId): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT id, item_id, price_label, sort_order
+            'SELECT id, item_id, label, quantity, price_cents, price_label, is_active, sort_order,
+                    ' . $this->optionStockSelectSql() . ' AS stock_quantity
              FROM boutique_item_options
              WHERE id = :id
              LIMIT 1'
@@ -719,6 +748,16 @@ final class Shop
         }
 
         return (int) round($amount * 100);
+    }
+
+    private function nullableNonNegativeInt($value): ?int
+    {
+        $stringValue = trim((string) ($value ?? ''));
+        if ($stringValue === '') {
+            return null;
+        }
+
+        return max(0, (int) $stringValue);
     }
 
     private function slugify(string $value): string
@@ -781,9 +820,19 @@ final class Shop
         return $this->hasItemColumn('stock_unit') ? $alias . '.stock_unit' : "'unit'";
     }
 
+    private function optionStockSelectSql(string $alias = 'boutique_item_options'): string
+    {
+        return $this->hasOptionColumn('stock_quantity') ? $alias . '.stock_quantity' : 'NULL';
+    }
+
     private function hasItemColumn(string $column): bool
     {
         return in_array($column, $this->getItemColumns(), true);
+    }
+
+    private function hasOptionColumn(string $column): bool
+    {
+        return in_array($column, $this->getOptionColumns(), true);
     }
 
     /**
@@ -804,5 +853,25 @@ final class Shop
         )));
 
         return $this->itemColumns;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getOptionColumns(): array
+    {
+        if ($this->optionColumns !== null) {
+            return $this->optionColumns;
+        }
+
+        $stmt = $this->db->query('SHOW COLUMNS FROM boutique_item_options');
+        $rows = $stmt !== false ? $stmt->fetchAll() : [];
+
+        $this->optionColumns = array_values(array_filter(array_map(
+            static fn(array $row): string => (string) ($row['Field'] ?? ''),
+            is_array($rows) ? $rows : [],
+        )));
+
+        return $this->optionColumns;
     }
 }

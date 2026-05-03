@@ -114,6 +114,7 @@ final class AdminController
             'new_count'       => 0,
             'confirmed_count' => 0,
             'preparing_count' => 0,
+            'ready_count'     => 0,
             'completed_count' => 0,
             'cancelled_count' => 0,
         ];
@@ -843,6 +844,7 @@ final class AdminController
             'new_count'       => 0,
             'confirmed_count' => 0,
             'preparing_count' => 0,
+            'ready_count'     => 0,
             'completed_count' => 0,
             'cancelled_count' => 0,
         ];

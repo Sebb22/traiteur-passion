@@ -77,6 +77,14 @@
 
     return $storedQuantity;
     };
+
+    $resolveOptionStockInputValue = static function (array $option): string {
+    if (! array_key_exists('stock_quantity', $option) || $option['stock_quantity'] === null || trim((string) $option['stock_quantity']) === '') {
+        return '';
+    }
+
+    return (string) max(0, (int) $option['stock_quantity']);
+    };
 ?>
 
 <div class="adminSplit adminSplit--catalog"
@@ -793,6 +801,7 @@
                                                     <tr>
                                                         <th>Libellé</th>
                                                         <th><?php echo $e($optionQuantityLabel); ?></th>
+                                                        <th>Stock option</th>
                                                         <th>Prix</th>
                                                         <th>Visible</th>
                                                         <th>Ordre</th>
@@ -806,6 +815,7 @@
                                                     <?php foreach ($options as $option): ?>
                                                     <?php $optionFormId        = 'shop-option-form-' . (int) $option['id']; ?>
                                                     <?php $optionQuantityValue = $resolveOptionQuantityInputValue($option, $itemStockUnit); ?>
+                                                    <?php $optionStockValue    = $resolveOptionStockInputValue($option); ?>
                                                     <tr id="option-<?php echo (int) $option['id']; ?>"
                                                         data-option-id="<?php echo (int) $option['id']; ?>">
                                                         <td data-label="Libellé">
@@ -819,6 +829,13 @@
                                                                 value="<?php echo $optionQuantityValue; ?>"
                                                                 placeholder="<?php echo $e($optionQuantityPlaceholder); ?>"
                                                                 form="<?php echo $e($optionFormId); ?>" required>
+                                                        </td>
+                                                        <td data-label="Stock option">
+                                                            <input class="adminInput adminInput--sm" type="number"
+                                                                name="stock_quantity" min="0"
+                                                                value="<?php echo $e($optionStockValue); ?>"
+                                                                placeholder="Ex: 1"
+                                                                form="<?php echo $e($optionFormId); ?>">
                                                         </td>
                                                         <td data-label="Prix">
                                                             <input class="adminInput" type="text" name="price_euros"
@@ -880,6 +897,10 @@
                                                 placeholder="<?php echo $e($optionQuantityPlaceholder); ?>" required
                                                 class="adminInput adminInput--sm">
 
+                                            <input type="number" name="stock_quantity" min="0"
+                                                placeholder="Stock option, ex: 1"
+                                                class="adminInput adminInput--sm">
+
                                             <input type="text" name="price_euros" inputmode="decimal"
                                                 placeholder="Prix, ex: 12,50" class="adminInput adminInput--sm">
 
@@ -897,6 +918,7 @@
                                         <span class="adminHint"><?php echo $itemStockUnit === 'g'
                                                                     ? 'Pour une vente au poids, saisissez la quantité vendue en grammes : 100 pour 100 g, 250 pour 250 g, 1000 pour 1 kg. Le libellé sert surtout à l’affichage public.'
                                                                     : 'Pour une vente à l’unité, indiquez la taille du lot : 1 pour « Unité », 4 pour « Lot de 4 », 6 pour « Lot de 6 ». Si le libellé contient déjà « Lot de 8 », gardez aussi 8 ici pour que le stock reste lisible en admin.'; ?></span>
+                                        <span class="adminHint">Le champ "Stock option" limite une option précise. Laissez vide pour n'utiliser que le stock global du produit. Mettez 1 pour une pièce unique, 2 ou plus pour un stock limité sur cette option.</span>
                                     </div>
                                 </details>
                             </div>

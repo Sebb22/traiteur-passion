@@ -23,24 +23,30 @@ const CONTACT_COPY = {
             default: "Suivi de votre devis #{{reference}}",
         },
         statusIntros: {
-            in_progress: "Votre demande de devis est maintenant en cours de traitement par notre equipe.",
+            in_progress:
+                "Votre demande de devis est maintenant en cours de traitement par notre equipe.",
             quoted: "Votre dossier a avance jusqu'a l'etape devis envoye.",
             completed: "Votre demande de devis est maintenant cloturee.",
             cancelled: "Votre demande de devis a ete annulee ou classee sans suite.",
             default: "Votre demande de devis a fait l'objet d'une mise a jour.",
         },
         statusNextSteps: {
-            in_progress: "Nous analysons maintenant votre besoin, les contraintes de date, de volume et les arbitrages utiles avant notre retour.",
+            in_progress:
+                "Nous analysons maintenant votre besoin, les contraintes de date, de volume et les arbitrages utiles avant notre retour.",
             quoted: "Si un point manque ou si vous souhaitez ajuster le perimetre, repondez directement a cet email pour que nous puissions affiner la suite.",
-            completed: "Le dossier est considere comme finalise. Nous restons disponibles si vous souhaitez relancer un besoin complementaire.",
-            cancelled: "Si vous souhaitez reouvrir le sujet ou repartir sur une autre base, vous pouvez simplement repondre a ce message.",
+            completed:
+                "Le dossier est considere comme finalise. Nous restons disponibles si vous souhaitez relancer un besoin complementaire.",
+            cancelled:
+                "Si vous souhaitez reouvrir le sujet ou repartir sur une autre base, vous pouvez simplement repondre a ce message.",
             default: "Nous vous tenons informes des prochaines etapes sur votre demande de devis.",
         },
         statusSummaries: {
-            in_progress: "Votre devis est en cours d'analyse avec vos contraintes et votre selection.",
+            in_progress:
+                "Votre devis est en cours d'analyse avec vos contraintes et votre selection.",
             quoted: "Votre dossier est passe au stade devis envoye et reste ouvert a vos ajustements.",
             completed: "Le cycle de devis est maintenant clos sur votre dossier.",
-            cancelled: "Le dossier a ete ferme, avec possibilite de repartir sur une nouvelle demande.",
+            cancelled:
+                "Le dossier a ete ferme, avec possibilite de repartir sur une nouvelle demande.",
             default: "Votre demande de devis vient d'etre mise a jour.",
         },
         statusMessages: {
@@ -52,8 +58,10 @@ const CONTACT_COPY = {
         },
         statusClosings: {
             quoted: "Conservez bien cette reference et revenez vers nous si vous souhaitez arbitrer une quantite, une composition ou le format de service.",
-            cancelled: "Si le contexte change, nous pourrons reprendre votre besoin a partir de cet historique.",
-            default: "Vous pouvez continuer a nous preciser vos attentes en reponse a cet email pour accelerer un cadrage propre.",
+            cancelled:
+                "Si le contexte change, nous pourrons reprendre votre besoin a partir de cet historique.",
+            default:
+                "Vous pouvez continuer a nous preciser vos attentes en reponse a cet email pour accelerer un cadrage propre.",
         },
     },
     contact: {
@@ -80,17 +88,21 @@ const CONTACT_COPY = {
             default: "Suivi de votre demande #{{reference}}",
         },
         statusIntros: {
-            in_progress: "Votre prise de contact est maintenant en cours de traitement par notre equipe.",
+            in_progress:
+                "Votre prise de contact est maintenant en cours de traitement par notre equipe.",
             quoted: "Votre dossier a avance jusqu'a l'etape devis envoye.",
             completed: "Votre demande est maintenant cloturee.",
             cancelled: "Votre demande a ete annulee ou classee sans suite.",
             default: "Votre demande a fait l'objet d'une mise a jour.",
         },
         statusNextSteps: {
-            in_progress: "Nous analysons maintenant votre besoin, les contraintes de date, de volume et les arbitrages utiles avant notre retour.",
+            in_progress:
+                "Nous analysons maintenant votre besoin, les contraintes de date, de volume et les arbitrages utiles avant notre retour.",
             quoted: "Si un point manque ou si vous souhaitez ajuster le perimetre, repondez directement a cet email pour que nous puissions affiner la suite.",
-            completed: "Le dossier est considere comme finalise. Nous restons disponibles si vous souhaitez relancer un besoin complementaire.",
-            cancelled: "Si vous souhaitez reouvrir le sujet ou repartir sur une autre base, vous pouvez simplement repondre a ce message.",
+            completed:
+                "Le dossier est considere comme finalise. Nous restons disponibles si vous souhaitez relancer un besoin complementaire.",
+            cancelled:
+                "Si vous souhaitez reouvrir le sujet ou repartir sur une autre base, vous pouvez simplement repondre a ce message.",
             default: "Nous vous tenons informes de la suite donnee a votre prise de contact.",
         },
         statusSummaries: {
@@ -108,8 +120,10 @@ const CONTACT_COPY = {
             default: "Votre demande a ete mise a jour.",
         },
         statusClosings: {
-            cancelled: "Si le contexte change, nous pourrons reprendre votre besoin a partir de cet historique.",
-            default: "Vous pouvez repondre a cet email si vous devez ajouter une precision utile a notre equipe.",
+            cancelled:
+                "Si le contexte change, nous pourrons reprendre votre besoin a partir de cet historique.",
+            default:
+                "Vous pouvez repondre a cet email si vous devez ajouter une precision utile a notre equipe.",
         },
     },
 };
@@ -119,6 +133,7 @@ const ORDER_COPY = {
     statusBadges: {
         confirmed: "Commande confirmee",
         preparing: "Preparation en cours",
+        ready: "Commande prete",
         completed: "Commande finalisee",
         cancelled: "Commande annulee",
         default: "Suivi commande",
@@ -126,6 +141,7 @@ const ORDER_COPY = {
     statusTitles: {
         confirmed: "Votre commande est confirmee",
         preparing: "Votre commande est en preparation",
+        ready: "Votre commande est prete",
         completed: "Votre commande est finalisee",
         cancelled: "Votre commande est annulee",
         default: "Suivi de votre commande",
@@ -133,6 +149,7 @@ const ORDER_COPY = {
     statusSubjects: {
         confirmed: "Votre commande #{{reference}} est confirmee",
         preparing: "Votre commande #{{reference}} est en preparation",
+        ready: "Votre commande #{{reference}} est prete",
         completed: "Votre commande #{{reference}} est finalisee",
         cancelled: "Votre commande #{{reference}} a ete annulee",
         default: "Suivi de votre commande #{{reference}}",
@@ -140,20 +157,28 @@ const ORDER_COPY = {
     statusIntros: {
         confirmed: "Votre commande a bien ete confirmee par notre equipe.",
         preparing: "Votre commande est maintenant en preparation.",
+        ready: "Votre commande est maintenant prete.",
         completed: "Votre commande est maintenant finalisee.",
         cancelled: "Votre commande a ete annulee.",
         default: "Votre commande a fait l'objet d'une mise a jour.",
     },
     statusNextSteps: {
-        confirmed: "Nous conservons votre demande dans notre planning et vous recontactons si un ajustement logistique est necessaire.",
-        preparing: "Notre equipe avance maintenant sur la preparation et le bon deroulement du retrait ou de la livraison.",
-        completed: "Le dossier est considere comme boucle. Si vous avez besoin d'un nouveau retrait ou d'une nouvelle commande, vous pouvez nous recontacter librement.",
-        cancelled: "Si vous souhaitez relancer la commande sur une autre date ou un autre format, repondez simplement a cet email.",
+        confirmed:
+            "Nous conservons votre demande dans notre planning et vous recontactons si un ajustement logistique est necessaire.",
+        preparing:
+            "Notre equipe avance maintenant sur la preparation et le bon deroulement du retrait ou de la livraison.",
+        ready:
+            "Votre commande est prete. Vous pouvez venir sur le creneau prevu ou nous repondre directement si un ajustement est necessaire.",
+        completed:
+            "Le dossier est considere comme boucle. Si vous avez besoin d'un nouveau retrait ou d'une nouvelle commande, vous pouvez nous recontacter librement.",
+        cancelled:
+            "Si vous souhaitez relancer la commande sur une autre date ou un autre format, repondez simplement a cet email.",
         default: "Nous vous tenons informes de la suite donnee a votre commande.",
     },
     statusSummaries: {
         confirmed: "Votre commande est confirmee et integree dans notre suivi.",
         preparing: "Votre commande est entree dans le flux de preparation.",
+        ready: "Votre commande est terminee et attend maintenant son retrait ou sa remise.",
         completed: "Le cycle de votre commande est maintenant clos.",
         cancelled: "La commande a ete fermee avec statut annule.",
         default: "Votre commande vient d'etre mise a jour.",
@@ -161,14 +186,20 @@ const ORDER_COPY = {
     statusMessages: {
         confirmed: "Votre commande est bien prise en charge.",
         preparing: "Notre equipe est en train de preparer votre commande.",
+        ready: "Votre commande est prete et peut maintenant etre retiree ou remise selon l'organisation prevue.",
         completed: "Votre commande est marquee comme finalisee.",
         cancelled: "Votre commande est actuellement classee comme annulee.",
         default: "Votre commande a ete mise a jour.",
     },
     statusClosings: {
-        cancelled: "Nous restons disponibles si vous souhaitez repartir sur une nouvelle commande ou une autre date.",
-        completed: "Merci pour votre confiance. Vous pouvez repondre a cet email si vous souhaitez preparer une prochaine commande.",
-        default: "Conservez cette reference de commande. Vous pouvez repondre directement a cet email si un point doit etre precise avant le retrait ou la livraison.",
+        cancelled:
+            "Nous restons disponibles si vous souhaitez repartir sur une nouvelle commande ou une autre date.",
+        ready:
+            "Conservez cette reference et repondez directement a cet email si vous devez nous prevenir d'un retard ou d'un ajustement de retrait.",
+        completed:
+            "Merci pour votre confiance. Vous pouvez repondre a cet email si vous souhaitez preparer une prochaine commande.",
+        default:
+            "Conservez cette reference de commande. Vous pouvez repondre directement a cet email si un point doit etre precise avant le retrait ou la livraison.",
     },
 };
 
@@ -224,24 +255,24 @@ export function initAdminMailPreview() {
         const statusLabels = parseStatusLabels(root.getAttribute("data-status-labels"));
         const statusSelect = form.querySelector('select[name="status"]');
         const notifyInput = form.querySelector('input[name="notify_client"]');
-        const subjectInput = form.querySelector('[data-mail-subject]');
-        const messageInput = form.querySelector('[data-mail-message]');
-        const subjectReset = form.querySelector('[data-mail-subject-reset]');
+        const subjectInput = form.querySelector("[data-mail-subject]");
+        const messageInput = form.querySelector("[data-mail-message]");
+        const subjectReset = form.querySelector("[data-mail-subject-reset]");
 
         if (!statusSelect || !notifyInput || !subjectInput || !messageInput) {
             return;
         }
 
         const preview = {
-            badge: root.querySelector('[data-mail-preview-badge]'),
-            title: root.querySelector('[data-mail-preview-title]'),
-            summary: root.querySelector('[data-mail-preview-summary]'),
-            greeting: root.querySelector('[data-mail-preview-greeting]'),
-            subject: root.querySelector('[data-mail-preview-subject]'),
-            intro: root.querySelector('[data-mail-preview-intro]'),
-            message: root.querySelector('[data-mail-preview-message]'),
-            nextStep: root.querySelector('[data-mail-preview-next-step]'),
-            closing: root.querySelector('[data-mail-preview-closing]'),
+            badge: root.querySelector("[data-mail-preview-badge]"),
+            title: root.querySelector("[data-mail-preview-title]"),
+            summary: root.querySelector("[data-mail-preview-summary]"),
+            greeting: root.querySelector("[data-mail-preview-greeting]"),
+            subject: root.querySelector("[data-mail-preview-subject]"),
+            intro: root.querySelector("[data-mail-preview-intro]"),
+            message: root.querySelector("[data-mail-preview-message]"),
+            nextStep: root.querySelector("[data-mail-preview-next-step]"),
+            closing: root.querySelector("[data-mail-preview-closing]"),
         };
 
         let subjectManuallyEdited = false;

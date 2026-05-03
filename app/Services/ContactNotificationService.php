@@ -550,15 +550,15 @@ final class ContactNotificationService
     private function menuItemsViewData(array $menuItems): array
     {
         return array_map(function (array $item): array {
-            $imageUrl = trim((string) ($item['image_path'] ?? ''));
+            $imageUrl = $this->emailImageUrl($item['image_path'] ?? null);
             $detail   = trim((string) ($item['item_description'] ?? ''));
 
             return [
-                'category' => (string) (($item['category'] ?? null) ?? ($item['menu_item_category'] ?? '')),
-                'name'     => (string) (($item['name'] ?? null) ?? ($item['menu_item_name'] ?? '')),
-                'price'    => (string) (($item['price'] ?? null) ?? ($item['menu_item_price'] ?? 'Sur devis')),
-                'quantity' => (string) ($item['quantity'] ?? 1),
-                'image_url' => $imageUrl !== '' ? $imageUrl : null,
+                'category'  => (string) (($item['category'] ?? null) ?? ($item['menu_item_category'] ?? '')),
+                'name'      => (string) (($item['name'] ?? null) ?? ($item['menu_item_name'] ?? '')),
+                'price'     => (string) (($item['price'] ?? null) ?? ($item['menu_item_price'] ?? 'Sur devis')),
+                'quantity'  => (string) ($item['quantity'] ?? 1),
+                'image_url' => $imageUrl,
                 'image_alt' => (string) (($item['image_alt'] ?? null) ?? (($item['name'] ?? null) ?? ($item['menu_item_name'] ?? 'Produit'))),
                 'detail'    => $detail,
             ];
@@ -634,6 +634,62 @@ final class ContactNotificationService
     private function appUrl(): ?string
     {
         return Url::resolveBaseUrl((string) ($this->appConfig['url'] ?? ''));
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function emailImageUrl($value): ?string
+    {
+        $imagePath = trim((string) ($value ?? ''));
+        if ($imagePath === '') {
+            return null;
+        }
+
+        if (preg_match('#^(https?:)?//#i', $imagePath) === 1 || str_starts_with($imagePath, 'data:') || str_starts_with($imagePath, 'cid:')) {
+            return $imagePath;
+        }
+
+        $appUrl = $this->appUrl();
+        if ($appUrl !== null) {
+            if (str_starts_with($imagePath, '/')) {
+                return $appUrl . $imagePath;
+            }
+
+            return $appUrl . '/' . ltrim($imagePath, '/');
+        }
+
+        return $this->emailEmbeddedImage($imagePath);
+    }
+
+    private function emailEmbeddedImage(string $imagePath): ?string
+    {
+        $publicPath = $this->resolvePublicPath($imagePath);
+        if ($publicPath === null || ! is_file($publicPath) || ! is_readable($publicPath)) {
+            return null;
+        }
+
+        $imageData = @file_get_contents($publicPath);
+        if (! is_string($imageData) || $imageData === '') {
+            return null;
+        }
+
+        $mimeType = mime_content_type($publicPath);
+        if (! is_string($mimeType) || $mimeType === '') {
+            $mimeType = 'application/octet-stream';
+        }
+
+        return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+    }
+
+    private function resolvePublicPath(string $imagePath): ?string
+    {
+        $normalizedPath = ltrim($imagePath, '/');
+        if ($normalizedPath === '' || str_contains($normalizedPath, '..')) {
+            return null;
+        }
+
+        return dirname(__DIR__, 2) . '/public/' . $normalizedPath;
     }
 
     private function adminDetailUrl(int $contactId): ?string

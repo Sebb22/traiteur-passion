@@ -168,6 +168,10 @@
                         <div class="adminStatusPill__label">Commandes nouvelles</div>
                         <div class="adminStatusPill__value"><?php echo (int) ($orderStats['new_count'] ?? 0); ?></div>
                     </div>
+                    <div class="adminStatusPill">
+                        <div class="adminStatusPill__label">Commandes prêtes</div>
+                        <div class="adminStatusPill__value"><?php echo (int) ($orderStats['ready_count'] ?? 0); ?></div>
+                    </div>
                 </div>
             </article>
         </section>

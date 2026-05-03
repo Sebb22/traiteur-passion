@@ -26,22 +26,25 @@
     $subtotalCents     = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
     $discountCents     = max(0, (int) ($order['discount_cents'] ?? 0));
     $orderStatusKey    = (string) ($order['status'] ?? 'new');
-        $orderStatusLabel  = (string) ($statusOptions[$orderStatusKey] ?? ucfirst($orderStatusKey));
-        $previewSummary    = [
-            ['label' => 'Reference', 'value' => '#' . (int) ($order['id'] ?? 0)],
-            ['label' => 'Mode', 'value' => $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'],
-            ['label' => 'Date', 'value' => $formatDate($order['pickup_date'] ?? null)],
-            ['label' => 'Creneau', 'value' => (string) ($order['pickup_slot'] ?? '-')],
-            ['label' => 'Articles', 'value' => (string) ((int) ($order['item_count'] ?? 0))],
-            ['label' => 'Total', 'value' => $formatPrice($order['total_cents'] ?? 0)],
-            ['label' => 'Statut', 'value' => $orderStatusLabel],
-        ];
+    $orderStatusLabel  = (string) ($statusOptions[$orderStatusKey] ?? ucfirst($orderStatusKey));
+    $previewSummary    = [
+    ['label' => 'Reference', 'value' => '#' . (int) ($order['id'] ?? 0)],
+    ['label' => 'Mode', 'value' => $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'],
+    ['label' => 'Date', 'value' => $formatDate($order['pickup_date'] ?? null)],
+    ['label' => 'Creneau', 'value' => (string) ($order['pickup_slot'] ?? '-')],
+    ['label' => 'Articles', 'value' => (string) ((int) ($order['item_count'] ?? 0))],
+    ['label' => 'Total', 'value' => $formatPrice($order['total_cents'] ?? 0)],
+    ['label' => 'Statut', 'value' => $orderStatusLabel],
+    ];
     switch ($orderStatusKey) {
     case 'confirmed':
         $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est confirmee', (int) ($order['id'] ?? 0));
         break;
     case 'preparing':
         $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est en preparation', (int) ($order['id'] ?? 0));
+        break;
+    case 'ready':
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est prete', (int) ($order['id'] ?? 0));
         break;
     case 'completed':
         $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est finalisee', (int) ($order['id'] ?? 0));
@@ -53,7 +56,7 @@
         $defaultMailSubject = sprintf('Traiteur Passion - Suivi de votre commande #%d', (int) ($order['id'] ?? 0));
         break;
     }
-    $deliveryAddress   = trim(implode(', ', array_filter([
+    $deliveryAddress = trim(implode(', ', array_filter([
     trim((string) ($order['delivery_address'] ?? '')),
     trim((string) (($order['delivery_postal_code'] ?? '') . ' ' . ($order['delivery_city'] ?? ''))),
     ])));

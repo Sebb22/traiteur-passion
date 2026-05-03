@@ -459,6 +459,14 @@ export function initShopPage() {
             1,
             Number.parseInt(node.getAttribute("data-option-units") || "1", 10) || 1,
         );
+        const optionStockQuantity = (() => {
+            const rawValue = String(node.getAttribute("data-option-stock") || "").trim();
+            if (rawValue === "") {
+                return null;
+            }
+
+            return Math.max(0, Number.parseInt(rawValue, 10) || 0);
+        })();
 
         if (addButton instanceof HTMLButtonElement && !addButton.dataset.baseLabel) {
             addButton.dataset.baseLabel = (addButton.textContent || "Ajouter").trim();
@@ -476,6 +484,7 @@ export function initShopPage() {
             basePriceCents: priceCents,
             optionId: Number.parseInt(node.getAttribute("data-option-id") || "0", 10) || 0,
             optionLabel: node.getAttribute("data-option-label") || "",
+            optionStockQuantity,
             optionUnits,
             cartLabelSingular: node.getAttribute("data-cart-label-singular") || "article",
             cartLabelPlural: node.getAttribute("data-cart-label-plural") || "articles",
@@ -495,7 +504,7 @@ export function initShopPage() {
         Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
 
     const getCardEntry = (itemOrId) => {
-        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId?.id;
+        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId ?.id;
         return itemId ? cards.get(itemId) || null : null;
     };
 
@@ -504,7 +513,7 @@ export function initShopPage() {
     };
 
     const updateCardToggleLabel = (cardEntry, quantity = 0) => {
-        if (!cardEntry?.toggleButton) {
+        if (!cardEntry ?.toggleButton) {
             return;
         }
 
@@ -517,7 +526,7 @@ export function initShopPage() {
     };
 
     const setOptionsDrawerOpen = (cardEntry, open) => {
-        if (!cardEntry?.drawer || !cardEntry.toggleButton) {
+        if (!cardEntry ?.drawer || !cardEntry.toggleButton) {
             return;
         }
 
@@ -531,7 +540,7 @@ export function initShopPage() {
                     otherCardEntry.isOpen = false;
                     otherCardEntry.drawer.hidden = true;
                     otherCardEntry.cardNode.classList.remove("is-expanded");
-                    otherCardEntry.toggleButton?.setAttribute("aria-expanded", "false");
+                    otherCardEntry.toggleButton ?.setAttribute("aria-expanded", "false");
 
                     const otherQuantity = getCardItems(otherCardEntry.itemId).reduce(
                         (total, item) => total + getQuantity(item),
@@ -642,6 +651,27 @@ export function initShopPage() {
         return Math.max(0, itemLine.stockQuantity - getReservedUnitsForItem(itemId));
     };
 
+    const getReservedSelectionsForOption = (optionId, excludedLineKey = null) => {
+        if (!optionId) {
+            return 0;
+        }
+
+        let reservedSelections = 0;
+        items.forEach((item) => {
+            if (!item || item.optionId !== optionId) {
+                return;
+            }
+
+            if (excludedLineKey && item.lineKey === excludedLineKey) {
+                return;
+            }
+
+            reservedSelections += getRawQuantity(item);
+        });
+
+        return reservedSelections;
+    };
+
     const getAvailableOrderQuantity = (item) => {
         if (!item || !item.input) {
             return 0;
@@ -651,7 +681,15 @@ export function initShopPage() {
             0,
             item.stockQuantity - getReservedUnitsForItem(item.id, item.lineKey),
         );
-        return Math.max(0, Math.floor(availableUnits / getUnitMultiplier(item)));
+        let availableQuantity = Math.max(0, Math.floor(availableUnits / getUnitMultiplier(item)));
+
+        if (item.optionStockQuantity !== null) {
+            const reservedSelections = getReservedSelectionsForOption(item.optionId, item.lineKey);
+            const remainingOptionSelections = Math.max(0, item.optionStockQuantity - reservedSelections);
+            availableQuantity = Math.min(availableQuantity, remainingOptionSelections);
+        }
+
+        return availableQuantity;
     };
 
     const syncStockBadges = (itemId) => {
@@ -663,8 +701,7 @@ export function initShopPage() {
 
         const remainingUnits = getRemainingStockUnits(itemId);
         const soldOut = remainingUnits <= 0;
-        const lowStock =
-            !soldOut &&
+        const lowStock = !soldOut &&
             remainingUnits <= Math.max(0, Number.parseInt(itemLine.lowStockThreshold || 0, 10));
 
         badges.forEach((badge) => {
@@ -734,9 +771,9 @@ export function initShopPage() {
         if (item.purchaseHint instanceof HTMLElement) {
             const defaultText = item.purchaseHint.dataset.defaultText || "";
             const quantityLabel =
-                quantity > 1
-                    ? item.cartLabelPlural || "articles"
-                    : item.cartLabelSingular || "article";
+                quantity > 1 ?
+                item.cartLabelPlural || "articles" :
+                item.cartLabelSingular || "article";
             item.purchaseHint.textContent =
                 quantity > 0 ? `${quantity} ${quantityLabel} dans le panier` : defaultText;
         }
@@ -783,7 +820,7 @@ export function initShopPage() {
     const syncFulfillmentState = () => {
         const wantsDelivery = fulfillmentInputs.some(
             (input) =>
-                input instanceof HTMLInputElement && input.checked && input.value === "delivery",
+            input instanceof HTMLInputElement && input.checked && input.value === "delivery",
         );
 
         if (deliveryPanel instanceof HTMLElement) {
@@ -836,9 +873,9 @@ export function initShopPage() {
                 left.className = "shopSummary__lineMain";
 
                 const label = document.createElement("span");
-                label.textContent = item.optionLabel
-                    ? `${item.name} — ${item.optionLabel}`
-                    : item.name;
+                label.textContent = item.optionLabel ?
+                    `${item.name} — ${item.optionLabel}` :
+                    item.name;
 
                 const meta = document.createElement("small");
                 meta.textContent = `${quantity} × ${getEffectivePriceLabel(item)}`;
@@ -930,9 +967,9 @@ export function initShopPage() {
         if (summaryDiscount) {
             summaryDiscount.hidden = promoEvaluation.discountCents <= 0;
             summaryDiscount.textContent =
-                promoEvaluation.discountCents > 0
-                    ? `Remise -${formatPrice(promoEvaluation.discountCents)}`
-                    : "";
+                promoEvaluation.discountCents > 0 ?
+                `Remise -${formatPrice(promoEvaluation.discountCents)}` :
+                "";
         }
 
         if (summaryTotal) {
@@ -951,9 +988,9 @@ export function initShopPage() {
         }
 
         if (summary) {
-            summary.hidden = isDesktopToast()
-                ? totalCount === 0 && !isSummaryOpen
-                : totalCount === 0;
+            summary.hidden = isDesktopToast() ?
+                totalCount === 0 && !isSummaryOpen :
+                totalCount === 0;
         }
 
         if (summaryOverlay) {
@@ -985,9 +1022,9 @@ export function initShopPage() {
         if (goCheckoutButton) {
             goCheckoutButton.disabled = totalCount === 0;
             goCheckoutButton.textContent =
-                totalCount === 0
-                    ? "Continuer vers les informations"
-                    : `Continuer avec ${totalItems} ${totalItems === 1 ? "produit" : "produits"}`;
+                totalCount === 0 ?
+                "Continuer vers les informations" :
+                `Continuer avec ${totalItems} ${totalItems === 1 ? "produit" : "produits"}`;
         }
 
         if (summaryLines && totalCount === 0) {
@@ -1029,7 +1066,7 @@ export function initShopPage() {
         renderSummary();
     };
 
-    const refreshStock = async ({ silent = false } = {}) => {
+    const refreshStock = async({ silent = false } = {}) => {
         try {
             const response = await fetch(stockEndpoint, {
                 headers: {
@@ -1221,8 +1258,7 @@ export function initShopPage() {
 
                 summary.scrollTop = Math.max(0, Math.min(maxScrollTop, nextScrollTop));
                 event.preventDefault();
-            },
-            { passive: false },
+            }, { passive: false },
         );
     }
 
@@ -1240,8 +1276,7 @@ export function initShopPage() {
                 clearSummaryHideTimeout();
                 clearSummaryDragResetTimeout();
                 summary.style.willChange = "transform";
-            },
-            { passive: true },
+            }, { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -1260,8 +1295,7 @@ export function initShopPage() {
                 }
 
                 applySummaryDrag(deltaY);
-            },
-            { passive: true },
+            }, { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -1284,8 +1318,7 @@ export function initShopPage() {
                 summary.style.transition = "transform 220ms ease";
                 summary.style.transform = "translateY(0)";
                 scheduleSummaryDragReset();
-            },
-            { passive: true },
+            }, { passive: true },
         );
 
         summaryHandle.addEventListener(
@@ -1300,8 +1333,7 @@ export function initShopPage() {
                 summary.style.transition = "transform 220ms ease";
                 summary.style.transform = "translateY(0)";
                 scheduleSummaryDragReset();
-            },
-            { passive: true },
+            }, { passive: true },
         );
     }
 
@@ -1328,7 +1360,7 @@ export function initShopPage() {
 
     window.addEventListener("resize", syncSummaryDockBounds);
 
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", async(event) => {
         event.preventDefault();
         setFeedback("");
 
@@ -1369,22 +1401,22 @@ export function initShopPage() {
             const payload = await parseResponse(response);
 
             if (!response.ok) {
-                const conflictNames = Array.isArray(payload.conflicts)
-                    ? payload.conflicts
-                          .map((conflict) => {
-                              const name = conflict && conflict.name ? conflict.name : "Produit";
-                              const available =
-                                  Number.parseInt(conflict && conflict.available, 10) || 0;
-                              return `${name} (${available} dispo)`;
-                          })
-                          .join(", ")
-                    : "";
+                const conflictNames = Array.isArray(payload.conflicts) ?
+                    payload.conflicts
+                    .map((conflict) => {
+                        const name = conflict && conflict.name ? conflict.name : "Produit";
+                        const available =
+                            Number.parseInt(conflict && conflict.available, 10) || 0;
+                        return `${name} (${available} dispo)`;
+                    })
+                    .join(", ") :
+                    "";
 
                 setFeedback(
                     payload.error ||
-                        (conflictNames
-                            ? `Stock mis à jour: ${conflictNames}`
-                            : "Commande impossible pour le moment."),
+                    (conflictNames ?
+                        `Stock mis à jour: ${conflictNames}` :
+                        "Commande impossible pour le moment."),
                     "error",
                 );
 

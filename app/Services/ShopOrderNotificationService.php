@@ -411,15 +411,15 @@ final class ShopOrderNotificationService
     {
         return array_map(function (array $item): array {
             $priceLabel = trim((string) ($item['unit_price_label'] ?? ''));
-            $imageUrl   = trim((string) ($item['image_path'] ?? ''));
+            $imageUrl   = $this->emailImageUrl($item['image_path'] ?? null);
             $detail     = trim((string) ($item['item_description'] ?? ''));
 
             return [
-                'category' => (string) ($item['section_name_snapshot'] ?? ''),
-                'name'     => (string) ($item['item_name_snapshot'] ?? ''),
-                'price'    => $priceLabel !== '' ? $priceLabel : $this->formatPrice((int) ($item['unit_price_cents'] ?? 0)),
-                'quantity' => (string) max(0, (int) ($item['quantity'] ?? 0)),
-                'image_url' => $imageUrl !== '' ? $imageUrl : null,
+                'category'  => (string) ($item['section_name_snapshot'] ?? ''),
+                'name'      => (string) ($item['item_name_snapshot'] ?? ''),
+                'price'     => $priceLabel !== '' ? $priceLabel : $this->formatPrice((int) ($item['unit_price_cents'] ?? 0)),
+                'quantity'  => (string) max(0, (int) ($item['quantity'] ?? 0)),
+                'image_url' => $imageUrl,
                 'image_alt' => (string) (($item['image_alt'] ?? null) ?? ($item['item_name_snapshot'] ?? 'Produit')),
                 'detail'    => $detail,
             ];
@@ -535,6 +535,62 @@ final class ShopOrderNotificationService
     private function appUrl(): ?string
     {
         return Url::resolveBaseUrl((string) ($this->appConfig['url'] ?? ''));
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function emailImageUrl($value): ?string
+    {
+        $imagePath = trim((string) ($value ?? ''));
+        if ($imagePath === '') {
+            return null;
+        }
+
+        if (preg_match('#^(https?:)?//#i', $imagePath) === 1 || str_starts_with($imagePath, 'data:') || str_starts_with($imagePath, 'cid:')) {
+            return $imagePath;
+        }
+
+        $appUrl = $this->appUrl();
+        if ($appUrl !== null) {
+            if (str_starts_with($imagePath, '/')) {
+                return $appUrl . $imagePath;
+            }
+
+            return $appUrl . '/' . ltrim($imagePath, '/');
+        }
+
+        return $this->emailEmbeddedImage($imagePath);
+    }
+
+    private function emailEmbeddedImage(string $imagePath): ?string
+    {
+        $publicPath = $this->resolvePublicPath($imagePath);
+        if ($publicPath === null || ! is_file($publicPath) || ! is_readable($publicPath)) {
+            return null;
+        }
+
+        $imageData = @file_get_contents($publicPath);
+        if (! is_string($imageData) || $imageData === '') {
+            return null;
+        }
+
+        $mimeType = mime_content_type($publicPath);
+        if (! is_string($mimeType) || $mimeType === '') {
+            $mimeType = 'application/octet-stream';
+        }
+
+        return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+    }
+
+    private function resolvePublicPath(string $imagePath): ?string
+    {
+        $normalizedPath = ltrim($imagePath, '/');
+        if ($normalizedPath === '' || str_contains($normalizedPath, '..')) {
+            return null;
+        }
+
+        return dirname(__DIR__, 2) . '/public/' . $normalizedPath;
     }
 
     private function shopUrl(): ?string
@@ -656,6 +712,8 @@ final class ShopOrderNotificationService
                 return sprintf('%s - Votre commande #%d est confirmee', $appName, $orderId);
             case 'preparing':
                 return sprintf('%s - Votre commande #%d est en preparation', $appName, $orderId);
+            case 'ready':
+                return sprintf('%s - Votre commande #%d est prete', $appName, $orderId);
             case 'completed':
                 return sprintf('%s - Votre commande #%d est finalisee', $appName, $orderId);
             case 'cancelled':
@@ -672,6 +730,8 @@ final class ShopOrderNotificationService
                 return 'Votre commande est confirmee';
             case 'preparing':
                 return 'Votre commande est en preparation';
+            case 'ready':
+                return 'Votre commande est prete';
             case 'completed':
                 return 'Votre commande est finalisee';
             case 'cancelled':
@@ -688,6 +748,8 @@ final class ShopOrderNotificationService
                 return sprintf('Votre commande #%d a bien ete confirmee par notre equipe.', $orderId);
             case 'preparing':
                 return sprintf('Votre commande #%d est maintenant en preparation.', $orderId);
+            case 'ready':
+                return sprintf('Votre commande #%d est maintenant prete.', $orderId);
             case 'completed':
                 return sprintf('Votre commande #%d est maintenant finalisee.', $orderId);
             case 'cancelled':
@@ -704,6 +766,8 @@ final class ShopOrderNotificationService
                 return 'Commande confirmee';
             case 'preparing':
                 return 'Preparation en cours';
+            case 'ready':
+                return 'Commande prete';
             case 'completed':
                 return 'Commande finalisee';
             case 'cancelled':
@@ -720,6 +784,8 @@ final class ShopOrderNotificationService
                 return 'Votre commande a bien ete confirmee par notre equipe.';
             case 'preparing':
                 return 'Votre commande est maintenant en preparation.';
+            case 'ready':
+                return 'Votre commande est maintenant prete.';
             case 'completed':
                 return 'Votre commande est maintenant finalisee.';
             case 'cancelled':
@@ -736,6 +802,8 @@ final class ShopOrderNotificationService
                 return 'Nous conservons votre demande dans notre planning et vous recontactons si un ajustement logistique est necessaire. Vous pouvez aussi repondre directement a cet email si un detail doit etre confirme.';
             case 'preparing':
                 return 'Notre equipe avance maintenant sur la preparation et le bon deroulement du retrait ou de la livraison. Si un changement de derniere minute est necessaire, repondez directement a cet email.';
+            case 'ready':
+                return 'Votre commande est prete. Nous vous invitons a venir sur le creneau prevu, ou a nous repondre directement si un ajustement de retrait ou de livraison est necessaire.';
             case 'completed':
                 return 'Le dossier est considere comme boucle. Si vous avez besoin d\'un nouveau retrait ou d\'une nouvelle commande, vous pouvez nous recontacter librement.';
             case 'cancelled':
@@ -755,6 +823,10 @@ final class ShopOrderNotificationService
             return 'Merci pour votre confiance. Vous pouvez repondre a cet email si vous souhaitez preparer une prochaine commande.';
         }
 
+        if ($status === 'ready') {
+            return 'Conservez cette reference et repondez directement a cet email si vous devez nous prevenir d\'un retard ou d\'un ajustement de retrait.';
+        }
+
         return 'Conservez cette reference de commande. Vous pouvez repondre directement a cet email si un point doit etre precise avant le retrait ou la livraison.';
     }
 
@@ -765,6 +837,8 @@ final class ShopOrderNotificationService
                 return 'Votre commande est confirmee et integree dans notre suivi.';
             case 'preparing':
                 return 'Votre commande est entree dans le flux de preparation.';
+            case 'ready':
+                return 'Votre commande est terminee et attend maintenant son retrait ou sa remise.';
             case 'completed':
                 return 'Le cycle de votre commande est maintenant clos.';
             case 'cancelled':
@@ -782,6 +856,9 @@ final class ShopOrderNotificationService
                 break;
             case 'preparing':
                 $defaultMessage = 'Notre equipe est en train de preparer votre commande.';
+                break;
+            case 'ready':
+                $defaultMessage = 'Votre commande est prete et peut maintenant etre retiree ou remise selon l\'organisation prevue.';
                 break;
             case 'completed':
                 $defaultMessage = 'Votre commande est marquee comme finalisee.';

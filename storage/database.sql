@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS boutique_item_options (
     item_id INT NOT NULL,
     label VARCHAR(255) NOT NULL,
     quantity INT NOT NULL DEFAULT 1,
+    stock_quantity INT NULL DEFAULT NULL,
     price_cents INT NOT NULL DEFAULT 0,
     price_label VARCHAR(80) NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
@@ -194,7 +195,7 @@ CREATE TABLE IF NOT EXISTS boutique_orders (
     promo_label VARCHAR(120) NULL,
     discount_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
     discount_cents INT NOT NULL DEFAULT 0,
-    status ENUM('new', 'confirmed', 'preparing', 'completed', 'cancelled') NOT NULL DEFAULT 'new',
+    status ENUM('new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled') NOT NULL DEFAULT 'new',
     stock_restored_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -208,6 +209,7 @@ CREATE TABLE IF NOT EXISTS boutique_order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     item_id INT NULL,
+    option_id INT NULL,
     item_name_snapshot VARCHAR(255) NOT NULL,
     section_name_snapshot VARCHAR(120) NOT NULL,
     unit_price_cents INT NOT NULL DEFAULT 0,
@@ -218,8 +220,10 @@ CREATE TABLE IF NOT EXISTS boutique_order_items (
 
     FOREIGN KEY (order_id) REFERENCES boutique_orders(id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES boutique_items(id) ON DELETE SET NULL,
+    FOREIGN KEY (option_id) REFERENCES boutique_item_options(id) ON DELETE SET NULL,
     INDEX idx_boutique_order_items_order (order_id),
-    INDEX idx_boutique_order_items_item (item_id)
+    INDEX idx_boutique_order_items_item (item_id),
+    INDEX idx_boutique_order_items_option (option_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ====================================================
