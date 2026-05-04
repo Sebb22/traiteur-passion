@@ -40,12 +40,12 @@ final class ShopOrderSubmissionService
             ];
         }
 
-        $fulfillmentMethod = trim((string) ($post['fulfillment_method'] ?? self::FULFILLMENT_PICKUP));
+        $fulfillmentMethod = trim((string) ($post['fulfillment_method'] ?? ''));
         if (! in_array($fulfillmentMethod, [self::FULFILLMENT_PICKUP, self::FULFILLMENT_DELIVERY], true)) {
             return [
                 'success' => false,
                 'status'  => 400,
-                'error'   => 'Mode de réception invalide.',
+                'error'   => 'Choisissez Retrait ou Livraison avant de continuer.',
             ];
         }
 
@@ -70,6 +70,33 @@ final class ShopOrderSubmissionService
         $deliveryAddress    = $this->nullableTrim($post['delivery_address'] ?? null);
         $deliveryPostalCode = $this->nullableTrim($post['delivery_postal_code'] ?? null);
         $deliveryCity       = $this->nullableTrim($post['delivery_city'] ?? null);
+        $pickupSlot         = $this->nullableTrim($post['pickup_slot'] ?? null);
+
+        if ($fulfillmentMethod === self::FULFILLMENT_PICKUP) {
+            if ($this->isPickupClosedDay($pickupDate)) {
+                return [
+                    'success' => false,
+                    'status'  => 400,
+                    'error'   => 'Le retrait boutique est disponible du mardi au vendredi de 8h30 à 19h et le samedi de 8h30 à 15h30. Aucun retrait n’est proposé le dimanche et le lundi.',
+                ];
+            }
+
+            if ($pickupSlot === null) {
+                return [
+                    'success' => false,
+                    'status'  => 400,
+                    'error'   => 'Choisissez un créneau de retrait.',
+                ];
+            }
+
+            if (! in_array($pickupSlot, $this->allowedPickupSlotsForDate($pickupDate), true)) {
+                return [
+                    'success' => false,
+                    'status'  => 400,
+                    'error'   => 'Choisissez un créneau de retrait proposé pour cette date.',
+                ];
+            }
+        }
 
         if ($fulfillmentMethod === self::FULFILLMENT_DELIVERY) {
             if ($deliveryAddress === null || $deliveryPostalCode === null || $deliveryCity === null) {
@@ -129,7 +156,7 @@ final class ShopOrderSubmissionService
                 'phone'                => $this->nullableTrim($post['phone'] ?? null),
                 'fulfillment_method'   => $fulfillmentMethod,
                 'pickup_date'          => $pickupDate,
-                'pickup_slot'          => $this->nullableTrim($post['pickup_slot'] ?? null),
+                'pickup_slot'          => $pickupSlot,
                 'delivery_address'     => $deliveryAddress,
                 'delivery_postal_code' => $deliveryPostalCode,
                 'delivery_city'        => $deliveryCity,
@@ -154,5 +181,50 @@ final class ShopOrderSubmissionService
 
         $dt = \DateTime::createFromFormat('Y-m-d', $value);
         return $dt !== false && $dt->format('Y-m-d') === $value;
+    }
+
+    private function isPickupClosedDay(string $date): bool
+    {
+        $dayOfWeek = (int) date('N', strtotime($date));
+        return $dayOfWeek === 1 || $dayOfWeek === 7;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedPickupSlotsForDate(string $date): array
+    {
+        if ($this->isPickupClosedDay($date)) {
+            return [];
+        }
+
+        $dayOfWeek = (int) date('N', strtotime($date));
+        if ($dayOfWeek === 6) {
+            return $this->buildPickupSlots(8 * 60 + 30, 15 * 60 + 30);
+        }
+
+        return $this->buildPickupSlots(8 * 60 + 30, 19 * 60);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function buildPickupSlots(int $startMinutes, int $endMinutes): array
+    {
+        $slots = [];
+
+        for ($current = $startMinutes; $current + 30 <= $endMinutes; $current += 30) {
+            $slots[] = sprintf('%s - %s', $this->formatMinutes($current), $this->formatMinutes($current + 30));
+        }
+
+        return $slots;
+    }
+
+    private function formatMinutes(int $minutes): string
+    {
+        $hours = (int) floor($minutes / 60);
+        $mins  = $minutes % 60;
+
+        return sprintf('%02d:%02d', $hours, $mins);
     }
 }
