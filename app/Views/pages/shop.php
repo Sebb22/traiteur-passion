@@ -842,14 +842,14 @@
                                                 </div>
                                             </div>
                                         </article>
-                                        <label class="shopField" data-shop-appointment-field hidden>
+                                        <label class="shopField shopField--appointment" data-shop-appointment-field hidden>
                                             <span class="shopField__label">Date souhaitée</span>
-                                            <input class="shopInput" type="date" name="pickup_date"
+                                            <input class="shopInput shopInput--date" type="date" name="pickup_date"
                                                 min="<?php echo $e($firstAvailable); ?>" required data-shop-pickup-date>
                                         </label>
-                                        <label class="shopField" data-shop-appointment-field hidden>
+                                        <label class="shopField shopField--appointment" data-shop-appointment-field hidden>
                                             <span class="shopField__label">Créneau souhaité</span>
-                                            <input class="shopInput" type="text" name="pickup_slot"
+                                            <input class="shopInput shopInput--slot" type="text" name="pickup_slot"
                                                 placeholder="Choisissez d’abord une date" list="shopPickupSlots"
                                                 data-shop-pickup-slot autocomplete="off">
                                             <datalist id="shopPickupSlots" data-shop-pickup-slot-list></datalist>
