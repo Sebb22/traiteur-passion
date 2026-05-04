@@ -63,6 +63,7 @@ final class ShopController
         }
 
         $orderId            = (int) ($orderResult['order_id'] ?? 0);
+        $orderReference     = null;
         $notificationResult = [
             'enabled'         => false,
             'admin_notified'  => false,
@@ -72,6 +73,8 @@ final class ShopController
         if ($orderId > 0) {
             $orderData = (new ShopOrder())->getByIdWithItems($orderId);
             if (is_array($orderData)) {
+                $resolvedReference  = trim((string) ($orderData['order_reference'] ?? ''));
+                $orderReference     = $resolvedReference !== '' ? $resolvedReference : null;
                 $notificationResult = (new ShopOrderNotificationService())->dispatch($orderId, $orderData);
                 if (($notificationResult['errors'] ?? []) !== []) {
                     error_log('Shop order notification error(s): ' . implode(' | ', $notificationResult['errors']));
@@ -83,6 +86,7 @@ final class ShopController
             'success'             => true,
             'message'             => 'Votre commande a bien été enregistrée. Nous vous confirmerons rapidement sa préparation.',
             'id'                  => $orderResult['order_id'] ?? null,
+            'reference'           => $orderReference,
             'client_ack_sent'     => (bool) ($notificationResult['client_ack_sent'] ?? false),
             'email_notifications' => (bool) ($notificationResult['enabled'] ?? false),
             'stock'               => $this->safeStockSnapshot(),

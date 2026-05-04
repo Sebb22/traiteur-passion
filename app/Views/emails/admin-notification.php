@@ -1,6 +1,7 @@
 <?php
     /** @var string $requestLabel */
     /** @var int $contactId */
+    /** @var string|null $referenceValue */
     /** @var string $leadCopy */
     /** @var string $actionCopy */
     /** @var string $messageBlockTitle */
@@ -14,6 +15,12 @@
     /** @var string|null $ctaLabel */
 
     $e = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+
+    $resolvedReference = trim((string) ($referenceValue ?? ''));
+    if ($resolvedReference === '') {
+    $fallbackReference = trim((string) ($contactId ?? ''));
+    $resolvedReference = $fallbackReference === '' ? '-' : '#' . $fallbackReference;
+    }
 ?>
 <p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#4d433c;">
     <?php echo $e($leadCopy); ?>
@@ -27,7 +34,7 @@
                 style="margin:0 0 4px 0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8b6f47;font-weight:700;">
                 Référence</p>
             <p style="margin:0;font-size:26px;line-height:1.2;color:#231f20;font-weight:700;">
-                #<?php echo $e($contactId); ?></p>
+                <?php echo $e($resolvedReference); ?></p>
         </td>
     </tr>
 </table>

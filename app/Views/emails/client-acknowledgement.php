@@ -2,6 +2,7 @@
     /** @var string $requestLabel */
     /** @var string $clientName */
     /** @var int $contactId */
+    /** @var string|null $referenceValue */
     /** @var string|null $referenceLabel */
     /** @var string $introCopy */
     /** @var string $nextStepCopy */
@@ -17,6 +18,12 @@
     /** @var string|null $ctaUrl */
 
     $e = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+
+    $resolvedReference = trim((string) ($referenceValue ?? ''));
+    if ($resolvedReference === '') {
+    $fallbackReference = trim((string) ($contactId ?? ''));
+    $resolvedReference = $fallbackReference === '' ? '-' : '#' . $fallbackReference;
+    }
 ?>
 <p style="margin:0 0 16px 0;font-size:17px;line-height:1.7;color:#4d433c;">
     Bonjour <?php echo $e($clientName); ?>,
@@ -30,7 +37,7 @@
     <tr>
         <td style="padding:18px 20px;">
             <p style="margin:0 0 4px 0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8b6f47;font-weight:700;"><?php echo $e($referenceLabel ?? 'Référence de demande'); ?></p>
-            <p style="margin:0;font-size:26px;line-height:1.2;color:#231f20;font-weight:700;">#<?php echo $e($contactId); ?></p>
+            <p style="margin:0;font-size:26px;line-height:1.2;color:#231f20;font-weight:700;"><?php echo $e($resolvedReference); ?></p>
         </td>
     </tr>
 </table>
@@ -44,7 +51,7 @@
 
 <div style="margin:0 0 24px 0;padding:16px 18px;border:1px dashed #d4c5b4;border-radius:18px;background:#f8f2ea;">
     <p style="margin:0;font-size:14px;line-height:1.7;color:#4d433c;">
-        <strong style="color:#231f20;">Action utile :</strong> conservez la référence #<?php echo $e($contactId); ?> et répondez directement à cet email si vous devez ajuster la date, les quantités, le lieu ou une contrainte de service.
+        <strong style="color:#231f20;">Action utile :</strong> conservez la référence <?php echo $e($resolvedReference); ?> et répondez directement à cet email si vous devez ajuster la date, les quantités, le lieu ou une contrainte de service.
     </p>
 </div>
 

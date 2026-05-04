@@ -262,6 +262,34 @@ final class Contact
     }
 
     /**
+     * @return array<int,array<string,mixed>>
+     */
+    public function getByIdentity(?string $email, ?string $phone, int $limit = 50): array
+    {
+        [$whereSql, $params] = $this->buildIdentityClauses($email, $phone, 'cr');
+        if ($whereSql === '') {
+            return [];
+        }
+
+        $sql = "SELECT cr.*, COUNT(cmi.id) AS menu_items_count
+                FROM contact_requests cr
+                LEFT JOIN contact_menu_items cmi ON cmi.contact_id = cr.id
+                {$whereSql}
+                GROUP BY cr.id
+                ORDER BY cr.created_at DESC
+                LIMIT :limit";
+
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Delete a contact request
      */
     public function delete(int $id): bool
@@ -305,17 +333,54 @@ final class Contact
 
         $query = trim((string) ($filters['q'] ?? ''));
         if ($query !== '') {
-            $whereParts[] = '(cr.name LIKE :search
-                             OR cr.email LIKE :search
-                             OR cr.phone LIKE :search
-                             OR cr.type LIKE :search
-                             OR cr.location LIKE :search
-                             OR cr.message LIKE :search)';
-            $params[':search'] = '%' . $query . '%';
+            $searchValue  = '%' . $query . '%';
+            $searchFields = [
+                'name'     => 'cr.name',
+                'email'    => 'cr.email',
+                'phone'    => 'cr.phone',
+                'type'     => 'cr.type',
+                'location' => 'cr.location',
+                'message'  => 'cr.message',
+            ];
+            $searchParts = [];
+
+            foreach ($searchFields as $suffix => $column) {
+                $placeholder          = ':search_' . $suffix;
+                $searchParts[]        = $column . ' LIKE ' . $placeholder;
+                $params[$placeholder] = $searchValue;
+            }
+
+            $whereParts[] = '(' . implode(' OR ', $searchParts) . ')';
         }
 
         $whereSql = $whereParts !== [] ? 'WHERE ' . implode(' AND ', $whereParts) : '';
 
         return [$whereSql, $params];
+    }
+
+    /**
+     * @return array{0:string,1:array<string,string>}
+     */
+    private function buildIdentityClauses(?string $email, ?string $phone, string $alias = 'cr'): array
+    {
+        $whereParts = [];
+        $params     = [];
+
+        $email = strtolower(trim((string) $email));
+        if ($email !== '') {
+            $whereParts[]              = 'LOWER(' . $alias . '.email) = :identity_email';
+            $params[':identity_email'] = $email;
+        }
+
+        $phone = trim((string) $phone);
+        if ($phone !== '') {
+            $whereParts[]              = $alias . '.phone = :identity_phone';
+            $params[':identity_phone'] = $phone;
+        }
+
+        return [
+            $whereParts !== [] ? 'WHERE (' . implode(' OR ', $whereParts) . ')' : '',
+            $params,
+        ];
     }
 }

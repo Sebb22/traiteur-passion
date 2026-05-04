@@ -1444,7 +1444,9 @@ export function initShopPage() {
                 promoInput.value = "";
             }
             const successParts = [payload.message || "Votre commande a bien été enregistrée."];
-            if (payload.id) {
+            if (payload.reference) {
+                successParts.push(`Référence ${payload.reference}.`);
+            } else if (payload.id) {
                 successParts.push(`Référence #${payload.id}.`);
             }
             if (payload.client_ack_sent === true) {

@@ -41,7 +41,7 @@ final class ShopOrder
     /**
      * @param array<string,mixed> $customerData
      * @param list<array{item_id:int,quantity:int,option_id:int|null,option_label:string|null,option_units:int|null}> $selections
-     * @return array{success:bool,status:int,order_id?:int,error?:string,conflicts?:array<int,array<string,mixed>>}
+     * @return array{success:bool,status:int,order_id?:int,order_reference?:string,error?:string,conflicts?:array<int,array<string,mixed>>}
      */
     public function createOrder(array $customerData, array $selections): array
     {
@@ -233,7 +233,12 @@ final class ShopOrder
                 ];
             }
 
+            $orderReference = $this->hasOrderColumn('order_reference')
+                ? $this->generateOrderReference()
+                : null;
+
             $orderPayload = [
+                'order_reference'      => $orderReference,
                 'customer_name'        => trim((string) ($customerData['name'] ?? '')),
                 'customer_email'       => trim((string) ($customerData['email'] ?? '')),
                 'customer_phone'       => $this->nullableTrim($customerData['phone'] ?? null),
@@ -351,11 +356,17 @@ final class ShopOrder
 
             $this->db->commit();
 
-            return [
+            $result = [
                 'success'  => true,
                 'status'   => 200,
                 'order_id' => $orderId,
             ];
+
+            if ($orderReference !== null) {
+                $result['order_reference'] = $orderReference;
+            }
+
+            return $result;
         } catch (\Throwable $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
@@ -395,11 +406,13 @@ final class ShopOrder
         ];
     }
 
-    public function getRecentOrders(int $limit = 12): array
+    public function getRecentOrders(int $limit = 12, ?string $query = null): array
     {
         $discountSelect = $this->hasOrderColumn('discount_cents')
             ? 'COALESCE(bo.discount_cents, 0)'
             : '0';
+
+        [$whereSql, $params] = $this->buildAdminSearchClauses($query);
 
         $stmt = $this->db->prepare(
             "SELECT bo.*, COUNT(boi.id) AS line_count,
@@ -409,14 +422,32 @@ final class ShopOrder
                     COALESCE(SUM(boi.line_total_cents), 0) - {$discountSelect} AS total_cents
              FROM boutique_orders bo
              LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
+             {$whereSql}
              GROUP BY bo.id
              ORDER BY bo.created_at DESC
              LIMIT :limit",
         );
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();
+    }
+
+    public function countFilteredOrders(?string $query = null): int
+    {
+        [$whereSql, $params] = $this->buildAdminSearchClauses($query);
+
+        $stmt = $this->db->prepare(
+            "SELECT COUNT(*)
+             FROM boutique_orders bo
+             {$whereSql}",
+        );
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function getByIdWithItems(int $orderId): ?array
@@ -455,6 +486,42 @@ final class ShopOrder
         $order['items'] = $itemsStmt->fetchAll();
 
         return $order;
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    public function getByIdentity(?string $email, ?string $phone, int $limit = 50): array
+    {
+        $discountSelect = $this->hasOrderColumn('discount_cents')
+            ? 'COALESCE(bo.discount_cents, 0)'
+            : '0';
+
+        [$whereSql, $params] = $this->buildIdentityClauses($email, $phone);
+        if ($whereSql === '') {
+            return [];
+        }
+
+        $stmt = $this->db->prepare(
+            "SELECT bo.*, COUNT(boi.id) AS line_count,
+                    COALESCE(SUM(boi.quantity), 0) AS item_count,
+                    COALESCE(SUM(boi.line_total_cents), 0) AS subtotal_cents,
+                    {$discountSelect} AS discount_cents,
+                    COALESCE(SUM(boi.line_total_cents), 0) - {$discountSelect} AS total_cents
+             FROM boutique_orders bo
+             LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
+             {$whereSql}
+             GROUP BY bo.id
+             ORDER BY bo.created_at DESC
+             LIMIT :limit",
+        );
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
     }
 
     public function updateStatus(int $orderId, string $status): bool
@@ -573,6 +640,126 @@ final class ShopOrder
     {
         $value = trim((string) ($value ?? ''));
         return $value === '' ? null : $value;
+    }
+
+    /**
+     * @return array{0:string,1:array<string,string>}
+     */
+    private function buildAdminSearchClauses(?string $query): array
+    {
+        $query = trim((string) $query);
+        if ($query === '') {
+            return ['', []];
+        }
+
+        $searchValue  = '%' . $query . '%';
+        $searchFields = [
+            'customer_name'  => 'bo.customer_name',
+            'customer_email' => 'bo.customer_email',
+            'id'             => 'CAST(bo.id AS CHAR)',
+        ];
+
+        if ($this->hasOrderColumn('customer_phone')) {
+            $searchFields['customer_phone'] = 'bo.customer_phone';
+        }
+
+        if ($this->hasOrderColumn('pickup_slot')) {
+            $searchFields['pickup_slot'] = 'bo.pickup_slot';
+        }
+
+        if ($this->hasOrderColumn('delivery_address')) {
+            $searchFields['delivery_address'] = 'bo.delivery_address';
+        }
+
+        if ($this->hasOrderColumn('delivery_postal_code')) {
+            $searchFields['delivery_postal_code'] = 'bo.delivery_postal_code';
+        }
+
+        if ($this->hasOrderColumn('delivery_city')) {
+            $searchFields['delivery_city'] = 'bo.delivery_city';
+        }
+
+        if ($this->hasOrderColumn('message')) {
+            $searchFields['message'] = 'bo.message';
+        }
+
+        if ($this->hasOrderColumn('order_reference')) {
+            $searchFields['order_reference'] = 'bo.order_reference';
+        }
+
+        $searchParts = [];
+        $params      = [];
+
+        foreach ($searchFields as $suffix => $column) {
+            $placeholder          = ':search_' . $suffix;
+            $searchParts[]        = $column . ' LIKE ' . $placeholder;
+            $params[$placeholder] = $searchValue;
+        }
+
+        return [
+            'WHERE (' . implode(' OR ', $searchParts) . ')',
+            $params,
+        ];
+    }
+
+    /**
+     * @return array{0:string,1:array<string,string>}
+     */
+    private function buildIdentityClauses(?string $email, ?string $phone): array
+    {
+        $whereParts = [];
+        $params     = [];
+
+        $email = strtolower(trim((string) $email));
+        if ($email !== '') {
+            $whereParts[]              = 'LOWER(bo.customer_email) = :identity_email';
+            $params[':identity_email'] = $email;
+        }
+
+        $phone = trim((string) $phone);
+        if ($phone !== '' && $this->hasOrderColumn('customer_phone')) {
+            $whereParts[]              = 'bo.customer_phone = :identity_phone';
+            $params[':identity_phone'] = $phone;
+        }
+
+        return [
+            $whereParts !== [] ? 'WHERE (' . implode(' OR ', $whereParts) . ')' : '',
+            $params,
+        ];
+    }
+
+    private function generateOrderReference(): string
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $candidate = sprintf(
+                'TPB-%s-%s',
+                date('Ymd'),
+                strtoupper(substr(bin2hex(random_bytes(4)), 0, 8)),
+            );
+
+            if (! $this->orderReferenceExists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        throw new \RuntimeException('Impossible de generer une reference de commande unique.');
+    }
+
+    private function orderReferenceExists(string $reference): bool
+    {
+        if (! $this->hasOrderColumn('order_reference')) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT id
+             FROM boutique_orders
+             WHERE order_reference = :order_reference
+             LIMIT 1',
+        );
+        $stmt->execute(['order_reference' => $reference]);
+
+        return $stmt->fetch() !== false;
     }
 
     /**

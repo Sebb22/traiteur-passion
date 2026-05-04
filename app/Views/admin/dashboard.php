@@ -6,10 +6,15 @@
     $orderStatusLabels = is_array($orderStatusLabels ?? null) ? $orderStatusLabels : [];
     $shopStats         = is_array($shopStats ?? null) ? $shopStats : [];
     $recentContacts    = is_array($recentContacts ?? null) ? $recentContacts : [];
+    $contactResultsCount = (int) ($contactResultsCount ?? count($recentContacts));
+    $clientResults     = is_array($clientResults ?? null) ? $clientResults : [];
+    $clientResultsCount = (int) ($clientResultsCount ?? count($clientResults));
     $recentOrders      = is_array($recentOrders ?? null) ? $recentOrders : [];
+    $orderResultsCount = (int) ($orderResultsCount ?? count($recentOrders));
     $typeBreakdown     = is_array($typeBreakdown ?? null) ? $typeBreakdown : [];
     $shopLoadError     = is_string($shopLoadError ?? null) ? $shopLoadError : null;
     $shopPromo         = is_array($shopPromo ?? null) ? $shopPromo : [];
+    $dashboardSearch   = is_array($dashboardSearch ?? null) ? $dashboardSearch : ['query' => '', 'active' => false, 'total_results' => 0];
     $flash             = is_array($flash ?? null) ? $flash : null;
 
     $e = static function ($value): string {
@@ -37,6 +42,12 @@
     };
 
     $urgentTotal = (int) ($contactStats['new_count'] ?? 0) + (int) ($orderStats['new_count'] ?? 0);
+    $searchQuery = trim((string) ($dashboardSearch['query'] ?? ''));
+    $isSearchActive = ! empty($dashboardSearch['active']);
+    $searchScope = trim((string) ($dashboardSearch['scope'] ?? 'all'));
+    $showContactsResults = ! empty($dashboardSearch['show_contacts']);
+    $showOrderResults = ! empty($dashboardSearch['show_orders']);
+    $showClientResults = ! empty($dashboardSearch['show_clients']);
 
     $kpiCards = [
     [
@@ -177,18 +188,106 @@
         <div class="adminFlash adminFlash--error"><?php echo $e($shopLoadError); ?></div>
         <?php endif; ?>
 
+        <section class="adminCard adminCard--padded">
+            <div class="adminCard__head">
+                <div class="adminCard__title">Recherche admin</div>
+                <div class="adminCard__meta">
+                    <span class="adminHint"><?php echo $isSearchActive ? (int) ($dashboardSearch['total_results'] ?? 0) . ' resultat(s) sur le dashboard' : 'Retrouver rapidement une demande, un client ou une commande'; ?></span>
+                </div>
+            </div>
+
+            <form action="/admin" method="get" class="adminCatalogToolbar">
+                <label class="adminField adminField--filter">
+                    <span class="adminField__label">Recherche globale</span>
+                    <input class="adminInput" type="search" name="q" value="<?php echo $e($searchQuery); ?>"
+                        placeholder="Nom, email, telephone, lieu, message, ref commande...">
+                </label>
+
+                <label class="adminField adminField--filter">
+                    <span class="adminField__label">Perimetre</span>
+                    <select class="adminSelect" name="scope">
+                        <option value="all" <?php echo $searchScope === 'all' ? 'selected' : ''; ?>>Tout</option>
+                        <option value="contacts" <?php echo $searchScope === 'contacts' ? 'selected' : ''; ?>>Demandes / devis</option>
+                        <option value="orders" <?php echo $searchScope === 'orders' ? 'selected' : ''; ?>>Commandes</option>
+                        <option value="clients" <?php echo $searchScope === 'clients' ? 'selected' : ''; ?>>Clients</option>
+                    </select>
+                </label>
+
+                <div class="adminInlineActions adminInlineActions--filters">
+                    <button type="submit" class="adminBtn adminBtn--primary">Rechercher</button>
+                    <?php if ($isSearchActive): ?>
+                    <a href="/admin" class="adminBtn">Effacer</a>
+                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>" class="adminBtn">Voir les demandes</a>
+                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>#orders" class="adminBtn">Voir les commandes</a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </section>
+
         <div class="adminDashboardGrid adminDashboardGrid--triage">
             <div class="adminDashboardStack">
+                <?php if ($showClientResults): ?>
                 <section class="adminCard adminCard--table">
                     <div class="adminCard__head">
-                        <div class="adminCard__title">Demandes recentes a qualifier</div>
+                        <div class="adminCard__title">Clients correspondants</div>
                         <div class="adminCard__meta">
-                            <span class="adminHint">Les dernieres demandes qui demandent une lecture rapide</span>
+                            <span class="adminHint"><?php echo $clientResultsCount; ?> resultat(s) cotes clients consolides</span>
+                        </div>
+                    </div>
+
+                    <?php if ($clientResults === []): ?>
+                    <div class="adminEmptyState">Aucun client consolide pour cette recherche.</div>
+                    <?php else: ?>
+                    <div class="adminMiniList adminMiniList--actions">
+                        <?php foreach ($clientResults as $client): ?>
+                        <div class="adminMiniList__item">
+                            <div>
+                                <div class="adminMiniList__title">
+                                    <a href="<?php echo $e($client['client_link'] ?? '/admin'); ?>" class="adminLink"><?php echo $e($client['name'] ?? 'Client'); ?></a>
+                                    <?php if (! empty($client['order_reference'])): ?>
+                                    <span class="adminBadge adminBadge--quoted"><?php echo $e($client['order_reference']); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="adminMiniList__meta">
+                                    <?php echo $e(($client['email'] ?? '') !== '' ? $client['email'] : 'Email non renseigne'); ?>
+                                    • <?php echo $e(($client['phone'] ?? '') !== '' ? $client['phone'] : 'Telephone non renseigne'); ?>
+                                    • <?php echo $e(($client['location'] ?? '') !== '' ? $client['location'] : 'Lieu non renseigne'); ?>
+                                </div>
+                            </div>
+
+                            <div class="adminMiniList__aside">
+                                <?php echo (int) ($client['contacts_count'] ?? 0); ?> demande(s) • <?php echo (int) ($client['orders_count'] ?? 0); ?> commande(s)<br>
+                                Derniere activite <?php echo $formatDate($client['last_activity'] ?? null, 'd/m/Y H:i'); ?>
+                                <div class="adminMiniList__actions">
+                                    <?php if (! empty($client['client_link'])): ?>
+                                    <a href="<?php echo $e($client['client_link']); ?>" class="adminBtn adminBtn--sm">Voir fiche client</a>
+                                    <?php endif; ?>
+                                    <?php if (! empty($client['contact_link'])): ?>
+                                    <a href="<?php echo $e($client['contact_link']); ?>" class="adminBtn adminBtn--sm">Voir demande</a>
+                                    <?php endif; ?>
+                                    <?php if (! empty($client['order_link'])): ?>
+                                    <a href="<?php echo $e($client['order_link']); ?>" class="adminBtn adminBtn--sm">Voir commande</a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </section>
+                <?php endif; ?>
+
+                <?php if ($showContactsResults): ?>
+                <section class="adminCard adminCard--table">
+                    <div class="adminCard__head">
+                        <div class="adminCard__title"><?php echo $isSearchActive ? 'Demandes et devis correspondants' : 'Demandes recentes a qualifier'; ?></div>
+                        <div class="adminCard__meta">
+                            <span class="adminHint"><?php echo $isSearchActive ? $contactResultsCount . ' resultat(s) cote demandes / devis' : 'Les dernieres demandes qui demandent une lecture rapide'; ?></span>
                         </div>
                     </div>
 
                     <?php if ($recentContacts === []): ?>
-                    <div class="adminEmptyState">Aucune demande enregistre pour le moment.</div>
+                    <div class="adminEmptyState"><?php echo $isSearchActive ? 'Aucun resultat cote demandes / devis pour cette recherche.' : 'Aucune demande enregistre pour le moment.'; ?></div>
                     <?php else: ?>
                     <div class="adminMiniList adminMiniList--actions">
                         <?php foreach ($recentContacts as $contact): ?>
@@ -221,19 +320,21 @@
                     </div>
                     <?php endif; ?>
                 </section>
+                <?php endif; ?>
 
+                <?php if ($showOrderResults): ?>
                 <section class="adminCard adminCard--table" id="orders">
                     <div class="adminCard__head">
-                        <div class="adminCard__title">Commandes boutique recentes</div>
+                        <div class="adminCard__title"><?php echo $isSearchActive ? 'Commandes boutique correspondantes' : 'Commandes boutique recentes'; ?></div>
                         <div class="adminCard__meta">
-                            <span class="adminHint"><?php echo (int) ($orderStats['total'] ?? 0); ?> commande(s) dans le flux boutique</span>
+                            <span class="adminHint"><?php echo $isSearchActive ? $orderResultsCount . ' resultat(s) cote commandes boutique' : (int) ($orderStats['total'] ?? 0) . ' commande(s) dans le flux boutique'; ?></span>
                         </div>
                     </div>
 
                     <?php if ($shopLoadError !== null): ?>
                     <div class="adminEmptyState"><?php echo $e($shopLoadError); ?></div>
                     <?php elseif ($recentOrders === []): ?>
-                    <div class="adminEmptyState">Aucune commande boutique pour le moment.</div>
+                    <div class="adminEmptyState"><?php echo $isSearchActive ? 'Aucun resultat cote commandes boutique pour cette recherche.' : 'Aucune commande boutique pour le moment.'; ?></div>
                     <?php else: ?>
                     <div class="adminMiniList adminMiniList--actions">
                         <?php foreach ($recentOrders as $order): ?>
@@ -241,12 +342,16 @@
                             $orderDiscountCents = max(0, (int) ($order['discount_cents'] ?? 0));
                             $orderSubtotalCents = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
                             $orderPromoCode     = trim((string) ($order['promo_code'] ?? ''));
+                            $orderReference     = trim((string) ($order['order_reference'] ?? ''));
+                            if ($orderReference === '') {
+                                $orderReference = '#' . (int) ($order['id'] ?? 0);
+                            }
                         ?>
                         <div class="adminMiniList__item">
                             <div>
                                 <div class="adminMiniList__title">
                                     <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminLink">
-                                        #<?php echo (int) ($order['id'] ?? 0); ?> · <?php echo $e($order['customer_name'] ?? 'Commande'); ?>
+                                        <?php echo $e($orderReference); ?> · <?php echo $e($order['customer_name'] ?? 'Commande'); ?>
                                     </a>
                                     <span class="adminBadge adminBadge--<?php echo $e($order['status'] ?? 'new'); ?>">
                                         <?php echo $e($orderStatusLabels[(string) ($order['status'] ?? 'new')] ?? (string) ($order['status'] ?? 'new')); ?>
@@ -277,6 +382,7 @@
                     </div>
                     <?php endif; ?>
                 </section>
+                <?php endif; ?>
             </div>
 
             <div class="adminDashboardStack">

@@ -29,6 +29,7 @@ $router->post('/admin/logout', 'AuthController@logout');
 // Admin routes
 $router->get('/admin', 'AdminController@dashboard');
 $router->get('/admin/dashboard', 'AdminController@dashboard');
+$router->get('/admin/clients', 'AdminController@clientDetail');
 $router->post('/admin/dashboard/shop-promo', 'AdminController@updateDashboardShopPromo');
 $router->get('/admin/blog', 'AdminController@blog');
 $router->post('/admin/blog/create', 'AdminController@createBlogPost');

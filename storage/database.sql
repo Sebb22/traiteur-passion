@@ -181,6 +181,7 @@ CREATE TABLE IF NOT EXISTS boutique_item_options (
 
 CREATE TABLE IF NOT EXISTS boutique_orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    order_reference VARCHAR(32) NOT NULL,
     customer_name VARCHAR(255) NOT NULL,
     customer_email VARCHAR(255) NOT NULL,
     customer_phone VARCHAR(50) NULL,
@@ -200,6 +201,7 @@ CREATE TABLE IF NOT EXISTS boutique_orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+    UNIQUE KEY uq_boutique_orders_reference (order_reference),
     INDEX idx_boutique_orders_status (status),
     INDEX idx_boutique_orders_created (created_at),
     INDEX idx_boutique_orders_pickup (pickup_date)

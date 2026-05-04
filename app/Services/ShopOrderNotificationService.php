@@ -103,14 +103,16 @@ final class ShopOrderNotificationService
             throw new \RuntimeException('MAIL_ADMIN_TO est vide ou invalide.');
         }
 
-        $summaryFields = $this->summaryFields($orderId, $orderData);
-        $orderItems    = $this->orderItemsViewData($orderData['items'] ?? []);
-        $theme         = $this->emailTheme('admin');
-        $message       = $this->messageOrFallback($orderData['message'] ?? null);
+        $orderReference = $this->orderReference($orderId, $orderData);
+        $summaryFields  = $this->summaryFields($orderId, $orderData);
+        $orderItems     = $this->orderItemsViewData($orderData['items'] ?? []);
+        $theme          = $this->emailTheme('admin');
+        $message        = $this->messageOrFallback($orderData['message'] ?? null);
 
         $htmlBody = $this->renderEmailTemplate('admin-notification', [
             'requestLabel'        => 'commande boutique',
             'contactId'           => $orderId,
+            'referenceValue'      => $orderReference,
             'leadCopy'            => 'Une nouvelle commande a été validée depuis la boutique en ligne et attend votre prise en charge.',
             'actionCopy'          => 'Vérifiez le retrait demandé, les quantités retenues et confirmez si une livraison peut être proposée dans un rayon de 20 km dès 15 € de commande.',
             'messageBlockTitle'   => 'Message complémentaire',
@@ -123,8 +125,8 @@ final class ShopOrderNotificationService
             'adminDetailUrl'      => $this->adminOrdersUrl(),
             'ctaLabel'            => 'Voir les commandes boutique',
         ], [
-            'title'            => sprintf('Nouvelle commande boutique #%d', $orderId),
-            'preheader'        => sprintf('La commande boutique #%d vient d’être enregistrée sur le site.', $orderId),
+            'title'            => sprintf('Nouvelle commande boutique %s', $orderReference),
+            'preheader'        => sprintf('La commande boutique %s vient d’être enregistrée sur le site.', $orderReference),
             'eyebrow'          => 'Notification admin',
             'heroBadge'        => 'Commande boutique',
             'heroSummary'      => 'Une commande client confirmée par panier vient d’entrer dans le flux de préparation.',
@@ -143,8 +145,8 @@ final class ShopOrderNotificationService
         ]);
 
         $textBody = sprintf(
-            "Nouvelle commande boutique #%d\n\n%s\n%s\nMessage complémentaire\n%s",
-            $orderId,
+            "Nouvelle commande boutique %s\n\n%s\n%s\nMessage complémentaire\n%s",
+            $orderReference,
             $this->buildSummaryText($summaryFields),
             $this->renderOrderItemsText($orderItems),
             $message,
@@ -152,7 +154,7 @@ final class ShopOrderNotificationService
 
         $this->mailer->send(
             $recipients,
-            sprintf('[%s] Nouvelle commande boutique #%d', $this->appName(), $orderId),
+            sprintf('[%s] Nouvelle commande boutique %s', $this->appName(), $orderReference),
             $htmlBody,
             $textBody,
             [
@@ -172,15 +174,17 @@ final class ShopOrderNotificationService
             throw new \RuntimeException('Adresse client invalide.');
         }
 
-        $summaryFields = $this->summaryFields($orderId, $orderData);
-        $orderItems    = $this->orderItemsViewData($orderData['items'] ?? []);
-        $theme         = $this->emailTheme('client');
-        $message       = $this->messageOrFallback($orderData['message'] ?? null);
+        $orderReference = $this->orderReference($orderId, $orderData);
+        $summaryFields  = $this->summaryFields($orderId, $orderData);
+        $orderItems     = $this->orderItemsViewData($orderData['items'] ?? []);
+        $theme          = $this->emailTheme('client');
+        $message        = $this->messageOrFallback($orderData['message'] ?? null);
 
         $htmlBody = $this->renderEmailTemplate('client-acknowledgement', [
             'requestLabel'        => 'commande boutique',
             'clientName'          => $this->valueOrFallback($orderData['customer_name'] ?? null),
             'contactId'           => $orderId,
+            'referenceValue'      => $orderReference,
             'referenceLabel'      => 'Référence de commande',
             'introCopy'           => 'Votre commande a bien été enregistrée. Notre équipe vérifie maintenant le retrait demandé, l’ordre de préparation et la possibilité éventuelle de livraison.',
             'nextStepCopy'        => 'Nous revenons vers vous rapidement pour confirmer la bonne prise en charge de votre commande, les détails de retrait et, si votre zone le permet, une livraison dans un rayon de 20 km dès 15 € de commande.',
@@ -195,8 +199,8 @@ final class ShopOrderNotificationService
             'ctaLabel'            => 'Revenir à la boutique',
             'ctaUrl'              => $this->shopUrl(),
         ], [
-            'title'            => sprintf('Commande boutique #%d bien reçue', $orderId),
-            'preheader'        => sprintf('Votre commande boutique #%d a bien été prise en compte par %s.', $orderId, $this->appName()),
+            'title'            => sprintf('Commande boutique %s bien reçue', $orderReference),
+            'preheader'        => sprintf('Votre commande boutique %s a bien été prise en compte par %s.', $orderReference, $this->appName()),
             'eyebrow'          => 'Accusé de réception',
             'heroBadge'        => 'Commande boutique',
             'heroSummary'      => 'Votre commande est bien enregistrée. Nous la reprenons maintenant pour confirmer sa préparation, son retrait et, si possible, sa livraison.',
@@ -229,7 +233,7 @@ final class ShopOrderNotificationService
                 'email' => $clientEmail,
                 'name'  => (string) ($orderData['customer_name'] ?? ''),
             ]],
-            sprintf('%s - Nous avons bien reçu votre commande #%d', $this->appName(), $orderId),
+            sprintf('%s - Nous avons bien reçu votre commande %s', $this->appName(), $orderReference),
             $htmlBody,
             $textBody,
             $this->firstAdminRecipient(),
@@ -252,19 +256,21 @@ final class ShopOrderNotificationService
             throw new \RuntimeException('Adresse client invalide.');
         }
 
+        $orderReference    = $this->orderReference($orderId, $orderData);
         $statusLabel       = ShopOrder::STATUS_LABELS[$nextStatus] ?? ucfirst($nextStatus);
         $summaryFields     = $this->summaryFieldsWithStatus($orderId, $orderData, $previousStatus, $nextStatus);
         $orderItems        = $this->orderItemsViewData($orderData['items'] ?? []);
         $theme             = $this->emailTheme('client');
         $statusMessage     = $this->statusUpdateMessage($nextStatus, $customMessage);
         $statusMessageHtml = nl2br($this->escape($statusMessage));
-        $defaultSubject    = $this->statusUpdateSubject($orderId, $nextStatus);
+        $defaultSubject    = $this->statusUpdateSubject($orderReference, $nextStatus);
         $subject           = $this->customSubjectOrFallback($customSubject, $defaultSubject);
 
         $htmlBody = $this->renderEmailTemplate('client-acknowledgement', [
             'requestLabel'        => 'commande boutique',
             'clientName'          => $this->valueOrFallback($orderData['customer_name'] ?? null),
             'contactId'           => $orderId,
+            'referenceValue'      => $orderReference,
             'referenceLabel'      => 'Reference de commande',
             'introCopy'           => $this->statusUpdateIntroCopy($nextStatus),
             'nextStepCopy'        => $this->statusUpdateNextStepCopy($nextStatus),
@@ -280,7 +286,7 @@ final class ShopOrderNotificationService
             'ctaUrl'              => $this->shopUrl(),
         ], [
             'title'            => $this->statusUpdateTitle($nextStatus),
-            'preheader'        => $this->statusUpdatePreheader($orderId, $nextStatus),
+            'preheader'        => $this->statusUpdatePreheader($orderReference, $nextStatus),
             'eyebrow'          => 'Suivi client',
             'heroBadge'        => $this->statusUpdateBadge($nextStatus),
             'heroSummary'      => $this->statusUpdateHeroSummary($nextStatus),
@@ -356,7 +362,7 @@ final class ShopOrderNotificationService
     private function summaryFields(int $orderId, array $orderData): array
     {
         $fields = [
-            ['label' => 'Référence', 'value' => '#' . $orderId],
+            ['label' => 'Référence', 'value' => $this->orderReference($orderId, $orderData)],
             ['label' => 'Client', 'value' => (string) ($orderData['customer_name'] ?? '')],
             ['label' => 'Email', 'value' => (string) ($orderData['customer_email'] ?? '')],
             ['label' => 'Téléphone', 'value' => $this->valueOrFallback($orderData['customer_phone'] ?? null)],
@@ -703,23 +709,29 @@ final class ShopOrderNotificationService
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
-    private function statusUpdateSubject(int $orderId, string $status): string
+    private function orderReference(int $orderId, array $orderData): string
+    {
+        $orderReference = trim((string) ($orderData['order_reference'] ?? ''));
+        return $orderReference !== '' ? $orderReference : '#' . $orderId;
+    }
+
+    private function statusUpdateSubject(string $orderReference, string $status): string
     {
         $appName = $this->appName();
 
         switch ($status) {
             case 'confirmed':
-                return sprintf('%s - Votre commande #%d est confirmee', $appName, $orderId);
+                return sprintf('%s - Votre commande %s est confirmee', $appName, $orderReference);
             case 'preparing':
-                return sprintf('%s - Votre commande #%d est en preparation', $appName, $orderId);
+                return sprintf('%s - Votre commande %s est en preparation', $appName, $orderReference);
             case 'ready':
-                return sprintf('%s - Votre commande #%d est prete', $appName, $orderId);
+                return sprintf('%s - Votre commande %s est prete', $appName, $orderReference);
             case 'completed':
-                return sprintf('%s - Votre commande #%d est finalisee', $appName, $orderId);
+                return sprintf('%s - Votre commande %s est finalisee', $appName, $orderReference);
             case 'cancelled':
-                return sprintf('%s - Votre commande #%d a ete annulee', $appName, $orderId);
+                return sprintf('%s - Votre commande %s a ete annulee', $appName, $orderReference);
             default:
-                return sprintf('%s - Suivi de votre commande #%d', $appName, $orderId);
+                return sprintf('%s - Suivi de votre commande %s', $appName, $orderReference);
         }
     }
 
@@ -741,21 +753,21 @@ final class ShopOrderNotificationService
         }
     }
 
-    private function statusUpdatePreheader(int $orderId, string $status): string
+    private function statusUpdatePreheader(string $orderReference, string $status): string
     {
         switch ($status) {
             case 'confirmed':
-                return sprintf('Votre commande #%d a bien ete confirmee par notre equipe.', $orderId);
+                return sprintf('Votre commande %s a bien ete confirmee par notre equipe.', $orderReference);
             case 'preparing':
-                return sprintf('Votre commande #%d est maintenant en preparation.', $orderId);
+                return sprintf('Votre commande %s est maintenant en preparation.', $orderReference);
             case 'ready':
-                return sprintf('Votre commande #%d est maintenant prete.', $orderId);
+                return sprintf('Votre commande %s est maintenant prete.', $orderReference);
             case 'completed':
-                return sprintf('Votre commande #%d est maintenant finalisee.', $orderId);
+                return sprintf('Votre commande %s est maintenant finalisee.', $orderReference);
             case 'cancelled':
-                return sprintf('Votre commande #%d a ete annulee.', $orderId);
+                return sprintf('Votre commande %s a ete annulee.', $orderReference);
             default:
-                return sprintf('Voici le dernier point de suivi pour votre commande #%d.', $orderId);
+                return sprintf('Voici le dernier point de suivi pour votre commande %s.', $orderReference);
         }
     }
 

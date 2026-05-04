@@ -147,12 +147,12 @@ const ORDER_COPY = {
         default: "Suivi de votre commande",
     },
     statusSubjects: {
-        confirmed: "Votre commande #{{reference}} est confirmee",
-        preparing: "Votre commande #{{reference}} est en preparation",
-        ready: "Votre commande #{{reference}} est prete",
-        completed: "Votre commande #{{reference}} est finalisee",
-        cancelled: "Votre commande #{{reference}} a ete annulee",
-        default: "Suivi de votre commande #{{reference}}",
+        confirmed: "Votre commande {{reference}} est confirmee",
+        preparing: "Votre commande {{reference}} est en preparation",
+        ready: "Votre commande {{reference}} est prete",
+        completed: "Votre commande {{reference}} est finalisee",
+        cancelled: "Votre commande {{reference}} a ete annulee",
+        default: "Suivi de votre commande {{reference}}",
     },
     statusIntros: {
         confirmed: "Votre commande a bien ete confirmee par notre equipe.",

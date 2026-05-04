@@ -8,6 +8,7 @@
     $recentOrders       = isset($recentOrders) && is_array($recentOrders) ? $recentOrders : [];
     $orderLoadError     = isset($orderLoadError) && is_string($orderLoadError) ? $orderLoadError : null;
     $filteredCount      = (int) ($filteredCount ?? count($contacts));
+    $ordersCount        = (int) ($ordersCount ?? count($recentOrders));
     $flash              = isset($flash) && is_array($flash) ? $flash : null;
 
     $e = static function ($value): string {
@@ -106,17 +107,17 @@
         <section class="adminCatalogUtilityGrid" aria-label="Outils demandes, devis et commandes">
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Retrouver rapidement une demande</div>
+                    <div class="adminCard__title">Filtrer l'ecran de suivi</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint"><?php echo $filteredCount; ?> resultat(s) affiché(s)</span>
+                        <span class="adminHint"><?php echo $filteredCount; ?> demande(s) / devis et <?php echo $ordersCount; ?> commande(s) affiché(s) sur cette page</span>
                     </div>
                 </div>
 
                 <form action="/admin/contacts" method="get" class="adminCatalogToolbar">
                     <label class="adminField adminField--filter">
-                        <span class="adminField__label">Recherche</span>
+                        <span class="adminField__label">Recherche dans cet ecran</span>
                         <input class="adminInput" type="search" name="q" value="<?php echo $e($searchQuery); ?>"
-                            placeholder="Nom, email, telephone, lieu, message...">
+                            placeholder="Nom, email, telephone, lieu, message, ref commande...">
                     </label>
 
                     <label class="adminField adminField--filter">
@@ -212,7 +213,7 @@
             <div class="adminCard__head">
                 <div class="adminCard__title">Commandes boutique récentes</div>
                 <div class="adminCard__meta">
-                    <span class="adminHint"><?php echo (int) ($orderStats['total'] ?? 0); ?> commande(s) enregistrée(s)</span>
+                    <span class="adminHint"><?php echo $ordersCount; ?> commande(s) correspondant au filtre<?php echo $searchQuery !== '' ? ' pour cette recherche' : ''; ?></span>
                 </div>
             </div>
 
@@ -238,12 +239,16 @@
                             $orderDiscountCents = max(0, (int) ($order['discount_cents'] ?? 0));
                             $orderSubtotalCents = max(0, (int) ($order['subtotal_cents'] ?? $order['total_cents'] ?? 0));
                             $orderPromoCode     = trim((string) ($order['promo_code'] ?? ''));
+                            $orderReference     = trim((string) ($order['order_reference'] ?? ''));
+                            if ($orderReference === '') {
+                                $orderReference = '#' . (int) ($order['id'] ?? 0);
+                            }
                         ?>
                         <tr>
                             <td>
                                 <strong>
                                     <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminLink">
-                                        #<?php echo (int) ($order['id'] ?? 0); ?> · <?php echo $e($order['customer_name'] ?? ''); ?>
+                                        <?php echo $e($orderReference); ?> · <?php echo $e($order['customer_name'] ?? ''); ?>
                                     </a>
                                 </strong><br>
                                 <a href="mailto:<?php echo $e($order['customer_email'] ?? ''); ?>" class="adminLink">

@@ -27,8 +27,12 @@
     $discountCents     = max(0, (int) ($order['discount_cents'] ?? 0));
     $orderStatusKey    = (string) ($order['status'] ?? 'new');
     $orderStatusLabel  = (string) ($statusOptions[$orderStatusKey] ?? ucfirst($orderStatusKey));
-    $previewSummary    = [
-    ['label' => 'Reference', 'value' => '#' . (int) ($order['id'] ?? 0)],
+    $orderReference    = trim((string) ($order['order_reference'] ?? ''));
+    if ($orderReference === '') {
+    $orderReference = '#' . (int) ($order['id'] ?? 0);
+    }
+    $previewSummary = [
+    ['label' => 'Reference', 'value' => $orderReference],
     ['label' => 'Mode', 'value' => $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'],
     ['label' => 'Date', 'value' => $formatDate($order['pickup_date'] ?? null)],
     ['label' => 'Creneau', 'value' => (string) ($order['pickup_slot'] ?? '-')],
@@ -38,22 +42,22 @@
     ];
     switch ($orderStatusKey) {
     case 'confirmed':
-        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est confirmee', (int) ($order['id'] ?? 0));
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande %s est confirmee', $orderReference);
         break;
     case 'preparing':
-        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est en preparation', (int) ($order['id'] ?? 0));
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande %s est en preparation', $orderReference);
         break;
     case 'ready':
-        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est prete', (int) ($order['id'] ?? 0));
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande %s est prete', $orderReference);
         break;
     case 'completed':
-        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d est finalisee', (int) ($order['id'] ?? 0));
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande %s est finalisee', $orderReference);
         break;
     case 'cancelled':
-        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande #%d a ete annulee', (int) ($order['id'] ?? 0));
+        $defaultMailSubject = sprintf('Traiteur Passion - Votre commande %s a ete annulee', $orderReference);
         break;
     default:
-        $defaultMailSubject = sprintf('Traiteur Passion - Suivi de votre commande #%d', (int) ($order['id'] ?? 0));
+        $defaultMailSubject = sprintf('Traiteur Passion - Suivi de votre commande %s', $orderReference);
         break;
     }
     $deliveryAddress = trim(implode(', ', array_filter([
@@ -67,7 +71,7 @@
         <div class="adminSplit__mediaOverlay"></div>
 
         <div class="adminMediaTitle">
-            <h1 class="adminMediaTitle__h1">Commande #<?php echo (int) ($order['id'] ?? 0); ?></h1>
+            <h1 class="adminMediaTitle__h1">Commande <?php echo $e($orderReference); ?></h1>
             <p class="adminMediaTitle__sub">Boutique • detail du panier & suivi</p>
         </div>
     </aside>
@@ -112,7 +116,7 @@
                     <div class="adminInfoGrid">
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Référence</span>
-                            <span class="adminInfoItem__value">#<?php echo (int) ($order['id'] ?? 0); ?></span>
+                            <span class="adminInfoItem__value"><?php echo $e($orderReference); ?></span>
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Mode</span>
@@ -287,7 +291,7 @@
                             </label>
                             <div class="adminMailPreview" data-mail-preview-root
                                 data-mail-kind="order"
-                                data-reference="<?php echo (int) ($order['id'] ?? 0); ?>"
+                                data-reference="<?php echo $e($orderReference); ?>"
                                 data-client-name="<?php echo $e($order['customer_name'] ?? 'Client'); ?>"
                                 data-status-labels="<?php echo $e((string) json_encode($statusOptions, JSON_UNESCAPED_UNICODE)); ?>">
                                 <div class="adminMailPreview__eyebrow">Apercu du mail client</div>

@@ -101,15 +101,23 @@ final class AdminController
     {
         AdminAuth::requireAuth();
 
+        $searchQuery    = trim((string) ($_GET['q'] ?? ''));
+        $searchScope    = $this->sanitizeDashboardSearchScope((string) ($_GET['scope'] ?? 'all'));
+        $dashboardQuery = $searchQuery !== '' ? ['q' => $searchQuery, 'status' => ''] : ['status' => '', 'q' => ''];
         $contactModel   = new Contact();
         $blogModel      = new Blog();
         $menuModel      = new Menu();
         $contactStats   = $contactModel->getAdminSummary();
         $blogStats      = $blogModel->getAdminSummary();
         $catalogStats   = $menuModel->getAdminSummary();
-        $recentContacts = $contactModel->getRecentWithMenuFlag(8);
-        $typeBreakdown  = $contactModel->getTypeBreakdown(6);
-        $orderStats     = [
+        $recentContacts = $searchQuery !== ''
+            ? $contactModel->getFiltered($dashboardQuery, 8)
+            : $contactModel->getRecentWithMenuFlag(8);
+        $contactResultsCount = $searchQuery !== ''
+            ? $contactModel->countFiltered($dashboardQuery)
+            : count($recentContacts);
+        $typeBreakdown = $contactModel->getTypeBreakdown(6);
+        $orderStats    = [
             'total'           => 0,
             'new_count'       => 0,
             'confirmed_count' => 0,
@@ -118,8 +126,11 @@ final class AdminController
             'completed_count' => 0,
             'cancelled_count' => 0,
         ];
-        $recentOrders = [];
-        $shopStats    = [
+        $recentOrders       = [];
+        $orderResultsCount  = 0;
+        $clientResults      = [];
+        $clientResultsCount = 0;
+        $shopStats          = [
             'total_sections'  => 0,
             'active_sections' => 0,
             'total_items'     => 0,
@@ -131,30 +142,66 @@ final class AdminController
         $shopLoadError = null;
 
         try {
-            $shopModel    = new Shop();
-            $orderModel   = new ShopOrder();
-            $shopStats    = $shopModel->getAdminSummary();
-            $orderStats   = $orderModel->getAdminSummary();
-            $recentOrders = $orderModel->getRecentOrders(5);
+            $shopModel         = new Shop();
+            $orderModel        = new ShopOrder();
+            $shopStats         = $shopModel->getAdminSummary();
+            $orderStats        = $orderModel->getAdminSummary();
+            $recentOrders      = $orderModel->getRecentOrders($searchQuery !== '' ? 8 : 5, $searchQuery !== '' ? $searchQuery : null);
+            $orderResultsCount = $searchQuery !== ''
+                ? $orderModel->countFilteredOrders($searchQuery)
+                : count($recentOrders);
         } catch (\Throwable $e) {
             error_log('Dashboard shop load error: ' . $e->getMessage());
             $shopLoadError = 'Les donnees boutique sont temporairement indisponibles.';
         }
 
+        if ($searchQuery !== '') {
+            $clientResults      = $this->buildClientSearchResults($recentContacts, $recentOrders);
+            $clientResultsCount = count($clientResults);
+        }
+
+        $showContactsResults = $searchQuery === '' || in_array($searchScope, ['all', 'contacts'], true);
+        $showOrderResults    = $searchQuery === '' || in_array($searchScope, ['all', 'orders'], true);
+        $showClientResults   = $searchQuery !== '' && in_array($searchScope, ['all', 'clients'], true);
+
+        $visibleSearchResults = 0;
+        if ($showContactsResults) {
+            $visibleSearchResults += $contactResultsCount;
+        }
+        if ($showOrderResults) {
+            $visibleSearchResults += $orderResultsCount;
+        }
+        if ($showClientResults) {
+            $visibleSearchResults += $clientResultsCount;
+        }
+
         View::render('admin/dashboard', [
-            'title'             => 'Administration — Dashboard',
-            'contactStats'      => $contactStats,
-            'blogStats'         => $blogStats,
-            'catalogStats'      => $catalogStats,
-            'recentContacts'    => $recentContacts,
-            'typeBreakdown'     => $typeBreakdown,
-            'orderStats'        => $orderStats,
-            'orderStatusLabels' => ShopOrder::STATUS_LABELS,
-            'recentOrders'      => $recentOrders,
-            'shopStats'         => $shopStats,
-            'shopPromo'         => $shopPromo,
-            'shopLoadError'     => $shopLoadError,
-            'flash'             => $this->pullFlash(),
+            'title'               => 'Administration — Dashboard',
+            'contactStats'        => $contactStats,
+            'blogStats'           => $blogStats,
+            'catalogStats'        => $catalogStats,
+            'recentContacts'      => $recentContacts,
+            'contactResultsCount' => $contactResultsCount,
+            'clientResults'       => $clientResults,
+            'clientResultsCount'  => $clientResultsCount,
+            'typeBreakdown'       => $typeBreakdown,
+            'orderStats'          => $orderStats,
+            'orderStatusLabels'   => ShopOrder::STATUS_LABELS,
+            'recentOrders'        => $recentOrders,
+            'orderResultsCount'   => $orderResultsCount,
+            'shopStats'           => $shopStats,
+            'shopPromo'           => $shopPromo,
+            'shopLoadError'       => $shopLoadError,
+            'dashboardSearch'     => [
+                'query'         => $searchQuery,
+                'active'        => $searchQuery !== '',
+                'scope'         => $searchScope,
+                'total_results' => $visibleSearchResults,
+                'show_contacts' => $showContactsResults,
+                'show_orders'   => $showOrderResults,
+                'show_clients'  => $showClientResults,
+            ],
+            'flash'               => $this->pullFlash(),
         ]);
     }
 
@@ -581,6 +628,76 @@ final class AdminController
         ]);
     }
 
+    public function clientDetail(): void
+    {
+        AdminAuth::requireAuth();
+
+        $email = trim((string) ($_GET['email'] ?? ''));
+        $phone = trim((string) ($_GET['phone'] ?? ''));
+        $view  = $this->sanitizeClientDetailView((string) ($_GET['view'] ?? 'all'));
+
+        $contactModel = new Contact();
+        $orderModel   = new ShopOrder();
+        $contacts     = $contactModel->getByIdentity($email, $phone, 50);
+        $orders       = $orderModel->getByIdentity($email, $phone, 50);
+
+        if ($email === '' && $phone === '') {
+            HttpError::notFound([
+                'title'           => '404 — Client introuvable',
+                'eyebrow'         => 'Client introuvable',
+                'headline'        => 'Aucune identité client fournie.',
+                'message'         => 'La fiche client agrégée nécessite au moins un email ou un téléphone pour regrouper les échanges.',
+                'primaryAction'   => [
+                    'href'  => '/admin',
+                    'label' => 'Retour au dashboard',
+                ],
+                'secondaryAction' => [
+                    'href'  => '/admin/contacts',
+                    'label' => 'Voir les demandes',
+                ],
+            ]);
+            return;
+        }
+
+        if ($contacts === [] && $orders === []) {
+            HttpError::notFound([
+                'title'           => '404 — Client introuvable',
+                'eyebrow'         => 'Client introuvable',
+                'headline'        => 'Aucune fiche client agrégée ne correspond à cette identité.',
+                'message'         => 'L’email ou le téléphone fourni ne correspond à aucune demande ni commande connue.',
+                'primaryAction'   => [
+                    'href'  => '/admin',
+                    'label' => 'Retour au dashboard',
+                ],
+                'secondaryAction' => [
+                    'href'  => '/admin/contacts',
+                    'label' => 'Voir les demandes',
+                ],
+            ]);
+            return;
+        }
+
+        $clientProfile = $this->buildClientProfile($email, $phone, $contacts, $orders);
+        $timeline      = $this->buildClientTimeline($contacts, $orders);
+        $timeline      = $this->filterClientTimeline($timeline, $view);
+
+        View::render('admin/client-detail', [
+            'title'         => 'Administration — Fiche client',
+            'client'        => $clientProfile,
+            'contacts'      => $contacts,
+            'orders'        => $orders,
+            'timeline'      => $timeline,
+            'clientView'    => [
+                'active'        => $view,
+                'show_contacts' => in_array($view, ['all', 'contacts'], true),
+                'show_orders'   => in_array($view, ['all', 'orders'], true),
+                'is_recent'     => $view === 'recent',
+            ],
+            'orderStatuses' => ShopOrder::STATUS_LABELS,
+            'flash'         => $this->pullFlash(),
+        ]);
+    }
+
     public function updateCatalogSection(string $id): void
     {
         AdminAuth::requireAuth();
@@ -849,12 +966,14 @@ final class AdminController
             'cancelled_count' => 0,
         ];
         $recentOrders   = [];
+        $ordersCount    = 0;
         $orderLoadError = null;
 
         try {
             $orderModel   = new ShopOrder();
             $orderStats   = $orderModel->getAdminSummary();
-            $recentOrders = $orderModel->getRecentOrders(12);
+            $recentOrders = $orderModel->getRecentOrders(12, $filters['q']);
+            $ordersCount  = $orderModel->countFilteredOrders($filters['q']);
         } catch (\Throwable $e) {
             error_log('Admin contacts order load error: ' . $e->getMessage());
             $orderLoadError = 'Les commandes boutique sont temporairement indisponibles sur cet écran.';
@@ -866,6 +985,7 @@ final class AdminController
             'stats'              => $stats,
             'orderStats'         => $orderStats,
             'recentOrders'       => $recentOrders,
+            'ordersCount'        => $ordersCount,
             'orderLoadError'     => $orderLoadError,
             'filteredCount'      => $filteredCount,
             'filters'            => $filters,
@@ -1073,6 +1193,342 @@ final class AdminController
     private function sanitizeContactStatusFilter(string $status): string
     {
         return isset(Contact::STATUS_LABELS[$status]) ? $status : '';
+    }
+
+    private function sanitizeDashboardSearchScope(string $scope): string
+    {
+        return in_array($scope, ['all', 'contacts', 'orders', 'clients'], true) ? $scope : 'all';
+    }
+
+    private function sanitizeClientDetailView(string $view): string
+    {
+        return in_array($view, ['all', 'contacts', 'orders', 'recent'], true) ? $view : 'all';
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $contacts
+     * @param array<int,array<string,mixed>> $orders
+     * @return array<int,array<string,mixed>>
+     */
+    private function buildClientSearchResults(array $contacts, array $orders): array
+    {
+        $clients = [];
+
+        foreach ($contacts as $contact) {
+            $email      = trim((string) ($contact['email'] ?? ''));
+            $phone      = trim((string) ($contact['phone'] ?? ''));
+            $clientKey  = $this->normalizeClientSearchKey($email, $phone, 'contact-' . (int) ($contact['id'] ?? 0));
+            $createdAt  = trim((string) ($contact['created_at'] ?? ''));
+            $clientName = trim((string) ($contact['name'] ?? ''));
+
+            if (! isset($clients[$clientKey])) {
+                $clients[$clientKey] = [
+                    'name'            => $clientName !== '' ? $clientName : 'Client',
+                    'email'           => $email,
+                    'phone'           => $phone,
+                    'location'        => trim((string) ($contact['location'] ?? '')),
+                    'last_activity'   => $createdAt,
+                    'contacts_count'  => 0,
+                    'orders_count'    => 0,
+                    'client_link'     => null,
+                    'contact_link'    => null,
+                    'order_link'      => null,
+                    'order_reference' => '',
+                ];
+            }
+
+            $clients[$clientKey]['contacts_count']++;
+            if ($clientName !== '' && strlen($clientName) > strlen((string) ($clients[$clientKey]['name'] ?? ''))) {
+                $clients[$clientKey]['name'] = $clientName;
+            }
+            if ($email !== '' && (string) ($clients[$clientKey]['email'] ?? '') === '') {
+                $clients[$clientKey]['email'] = $email;
+            }
+            if ($phone !== '' && (string) ($clients[$clientKey]['phone'] ?? '') === '') {
+                $clients[$clientKey]['phone'] = $phone;
+            }
+            if ((string) ($clients[$clientKey]['location'] ?? '') === '') {
+                $clients[$clientKey]['location'] = trim((string) ($contact['location'] ?? ''));
+            }
+            if ($createdAt !== '' && strcmp($createdAt, (string) ($clients[$clientKey]['last_activity'] ?? '')) > 0) {
+                $clients[$clientKey]['last_activity'] = $createdAt;
+            }
+            if ($clients[$clientKey]['contact_link'] === null && (int) ($contact['id'] ?? 0) > 0) {
+                $clients[$clientKey]['contact_link'] = '/admin/contacts/' . (int) ($contact['id'] ?? 0);
+            }
+            if ($clients[$clientKey]['client_link'] === null) {
+                $clients[$clientKey]['client_link'] = $this->buildAdminClientDetailUrl(
+                    (string) ($clients[$clientKey]['email'] ?? ''),
+                    (string) ($clients[$clientKey]['phone'] ?? ''),
+                );
+            }
+        }
+
+        foreach ($orders as $order) {
+            $email          = trim((string) ($order['customer_email'] ?? ''));
+            $phone          = trim((string) ($order['customer_phone'] ?? ''));
+            $clientKey      = $this->normalizeClientSearchKey($email, $phone, 'order-' . (int) ($order['id'] ?? 0));
+            $createdAt      = trim((string) ($order['created_at'] ?? ''));
+            $clientName     = trim((string) ($order['customer_name'] ?? ''));
+            $orderReference = trim((string) ($order['order_reference'] ?? ''));
+            $location       = trim(implode(', ', array_filter([
+                trim((string) ($order['delivery_city'] ?? '')),
+                trim((string) ($order['delivery_postal_code'] ?? '')),
+            ])));
+
+            if (! isset($clients[$clientKey])) {
+                $clients[$clientKey] = [
+                    'name'            => $clientName !== '' ? $clientName : 'Client',
+                    'email'           => $email,
+                    'phone'           => $phone,
+                    'location'        => $location,
+                    'last_activity'   => $createdAt,
+                    'contacts_count'  => 0,
+                    'orders_count'    => 0,
+                    'client_link'     => null,
+                    'contact_link'    => null,
+                    'order_link'      => null,
+                    'order_reference' => '',
+                ];
+            }
+
+            $clients[$clientKey]['orders_count']++;
+            if ($clientName !== '' && strlen($clientName) > strlen((string) ($clients[$clientKey]['name'] ?? ''))) {
+                $clients[$clientKey]['name'] = $clientName;
+            }
+            if ($email !== '' && (string) ($clients[$clientKey]['email'] ?? '') === '') {
+                $clients[$clientKey]['email'] = $email;
+            }
+            if ($phone !== '' && (string) ($clients[$clientKey]['phone'] ?? '') === '') {
+                $clients[$clientKey]['phone'] = $phone;
+            }
+            if ((string) ($clients[$clientKey]['location'] ?? '') === '') {
+                $clients[$clientKey]['location'] = $location;
+            }
+            if ($createdAt !== '' && strcmp($createdAt, (string) ($clients[$clientKey]['last_activity'] ?? '')) > 0) {
+                $clients[$clientKey]['last_activity'] = $createdAt;
+            }
+            if ($clients[$clientKey]['order_link'] === null && (int) ($order['id'] ?? 0) > 0) {
+                $clients[$clientKey]['order_link'] = '/admin/boutique/orders/' . (int) ($order['id'] ?? 0);
+            }
+            if ((string) ($clients[$clientKey]['order_reference'] ?? '') === '' && $orderReference !== '') {
+                $clients[$clientKey]['order_reference'] = $orderReference;
+            }
+            if ($clients[$clientKey]['client_link'] === null) {
+                $clients[$clientKey]['client_link'] = $this->buildAdminClientDetailUrl(
+                    (string) ($clients[$clientKey]['email'] ?? ''),
+                    (string) ($clients[$clientKey]['phone'] ?? ''),
+                );
+            }
+        }
+
+        usort($clients, static function (array $left, array $right): int {
+            return strcmp((string) ($right['last_activity'] ?? ''), (string) ($left['last_activity'] ?? ''));
+        });
+
+        return array_values($clients);
+    }
+
+    private function normalizeClientSearchKey(string $email, string $phone, string $fallback): string
+    {
+        $normalizedEmail = strtolower(trim($email));
+        if ($normalizedEmail !== '') {
+            return 'email:' . $normalizedEmail;
+        }
+
+        $normalizedPhone = preg_replace('/\D+/', '', $phone) ?? '';
+        if ($normalizedPhone !== '') {
+            return 'phone:' . $normalizedPhone;
+        }
+
+        return $fallback;
+    }
+
+    private function buildAdminClientDetailUrl(string $email, string $phone): string
+    {
+        $params = array_filter([
+            'email' => trim($email),
+            'phone' => trim($phone),
+        ], static fn(string $value): bool => $value !== '');
+
+        return '/admin/clients' . ($params !== [] ? '?' . http_build_query($params) : '');
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $contacts
+     * @param array<int,array<string,mixed>> $orders
+     * @return array<string,mixed>
+     */
+    private function buildClientProfile(string $email, string $phone, array $contacts, array $orders): array
+    {
+        $name         = '';
+        $location     = '';
+        $lastActivity = '';
+        $orderCount   = count($orders);
+        $contactCount = count($contacts);
+        $orderTotal   = 0;
+
+        foreach ($contacts as $contact) {
+            $candidateName = trim((string) ($contact['name'] ?? ''));
+            if (strlen($candidateName) > strlen($name)) {
+                $name = $candidateName;
+            }
+
+            if ($location === '') {
+                $location = trim((string) ($contact['location'] ?? ''));
+            }
+
+            $createdAt = trim((string) ($contact['created_at'] ?? ''));
+            if ($createdAt !== '' && strcmp($createdAt, $lastActivity) > 0) {
+                $lastActivity = $createdAt;
+            }
+        }
+
+        foreach ($orders as $order) {
+            $candidateName = trim((string) ($order['customer_name'] ?? ''));
+            if (strlen($candidateName) > strlen($name)) {
+                $name = $candidateName;
+            }
+
+            if ($location === '') {
+                $location = trim(implode(', ', array_filter([
+                    trim((string) ($order['delivery_city'] ?? '')),
+                    trim((string) ($order['delivery_postal_code'] ?? '')),
+                ])));
+            }
+
+            $createdAt = trim((string) ($order['created_at'] ?? ''));
+            if ($createdAt !== '' && strcmp($createdAt, $lastActivity) > 0) {
+                $lastActivity = $createdAt;
+            }
+
+            $orderTotal += (int) ($order['total_cents'] ?? 0);
+        }
+
+        $latestContact   = $contacts[0] ?? null;
+        $latestOrder     = $orders[0] ?? null;
+        $normalizedPhone = preg_replace('/\D+/', '', $phone) ?? '';
+
+        return [
+            'name'            => $name !== '' ? $name : 'Client',
+            'email'           => $email,
+            'phone'           => $phone,
+            'location'        => $location,
+            'last_activity'   => $lastActivity,
+            'contacts_count'  => $contactCount,
+            'orders_count'    => $orderCount,
+            'orders_total'    => $orderTotal,
+            'primary_contact' => $contacts[0]['id'] ?? null,
+            'primary_order'   => $orders[0]['id'] ?? null,
+            'latest_contact'  => is_array($latestContact) ? [
+                'id'         => (int) ($latestContact['id'] ?? 0),
+                'status'     => (string) ($latestContact['status'] ?? 'new'),
+                'type'       => trim((string) ($latestContact['type'] ?? '')),
+                'date'       => trim((string) ($latestContact['date'] ?? '')),
+                'created_at' => trim((string) ($latestContact['created_at'] ?? '')),
+                'link'       => '/admin/contacts/' . (int) ($latestContact['id'] ?? 0),
+            ] : null,
+            'latest_order'    => is_array($latestOrder) ? [
+                'id'          => (int) ($latestOrder['id'] ?? 0),
+                'reference'   => trim((string) ($latestOrder['order_reference'] ?? '')),
+                'status'      => (string) ($latestOrder['status'] ?? 'new'),
+                'pickup_date' => trim((string) ($latestOrder['pickup_date'] ?? '')),
+                'created_at'  => trim((string) ($latestOrder['created_at'] ?? '')),
+                'total_cents' => (int) ($latestOrder['total_cents'] ?? 0),
+                'fulfillment' => trim((string) ($latestOrder['fulfillment_method'] ?? 'pickup')),
+                'link'        => '/admin/boutique/orders/' . (int) ($latestOrder['id'] ?? 0),
+            ] : null,
+            'actions'         => [
+                'mailto'           => $email !== '' ? 'mailto:' . rawurlencode($email) : null,
+                'tel'              => $normalizedPhone !== '' ? 'tel:' . $normalizedPhone : null,
+                'dashboard_search' => '/admin' . (($email !== '' || $phone !== '') ? '?' . http_build_query(['q' => $email !== '' ? $email : $phone, 'scope' => 'all']) : ''),
+                'contact_search'   => '/admin/contacts' . (($email !== '' || $phone !== '') ? '?' . http_build_query(['q' => $email !== '' ? $email : $phone]) : ''),
+                'latest_contact'   => is_array($latestContact) ? '/admin/contacts/' . (int) ($latestContact['id'] ?? 0) : null,
+                'latest_order'     => is_array($latestOrder) ? '/admin/boutique/orders/' . (int) ($latestOrder['id'] ?? 0) : null,
+            ],
+        ];
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $contacts
+     * @param array<int,array<string,mixed>> $orders
+     * @return array<int,array<string,mixed>>
+     */
+    private function buildClientTimeline(array $contacts, array $orders): array
+    {
+        $timeline = [];
+
+        foreach ($contacts as $contact) {
+            $createdAt  = trim((string) ($contact['created_at'] ?? ''));
+            $contactId  = (int) ($contact['id'] ?? 0);
+            $timeline[] = [
+                'kind'         => 'contact',
+                'sort_at'      => $createdAt,
+                'title'        => trim((string) ($contact['name'] ?? 'Demande')),
+                'badge'        => 'Demande / devis',
+                'status_label' => Contact::STATUS_LABELS[(string) ($contact['status'] ?? 'new')] ?? ucfirst((string) ($contact['status'] ?? 'new')),
+                'meta'         => implode(' • ', array_filter([
+                    trim((string) ($contact['type'] ?? '')),
+                    trim((string) ($contact['location'] ?? '')),
+                    trim((string) ($contact['date'] ?? '')) !== '' ? date('d/m/Y', strtotime((string) ($contact['date'] ?? ''))) : '',
+                ])),
+                'summary'      => trim((string) ($contact['message'] ?? '')),
+                'link'         => $contactId > 0 ? '/admin/contacts/' . $contactId : '/admin/contacts',
+                'link_label'   => 'Ouvrir la demande',
+            ];
+        }
+
+        foreach ($orders as $order) {
+            $createdAt      = trim((string) ($order['created_at'] ?? ''));
+            $orderId        = (int) ($order['id'] ?? 0);
+            $orderReference = trim((string) ($order['order_reference'] ?? ''));
+            if ($orderReference === '') {
+                $orderReference = '#' . $orderId;
+            }
+
+            $timeline[] = [
+                'kind'         => 'order',
+                'sort_at'      => $createdAt,
+                'title'        => $orderReference,
+                'badge'        => 'Commande boutique',
+                'status_label' => ShopOrder::STATUS_LABELS[(string) ($order['status'] ?? 'new')] ?? ucfirst((string) ($order['status'] ?? 'new')),
+                'meta'         => implode(' • ', array_filter([
+                    trim((string) (($order['fulfillment_method'] ?? 'pickup') === 'delivery' ? 'Livraison' : 'Retrait')),
+                    trim((string) ($order['pickup_date'] ?? '')) !== '' ? date('d/m/Y', strtotime((string) ($order['pickup_date'] ?? ''))) : '',
+                    number_format(max(0, (int) ($order['total_cents'] ?? 0)) / 100, 2, ',', ' ') . ' €',
+                ])),
+                'summary'      => trim((string) ($order['message'] ?? '')),
+                'link'         => $orderId > 0 ? '/admin/boutique/orders/' . $orderId : '/admin/boutique#orders',
+                'link_label'   => 'Ouvrir la commande',
+            ];
+        }
+
+        usort($timeline, static function (array $left, array $right): int {
+            return strcmp((string) ($right['sort_at'] ?? ''), (string) ($left['sort_at'] ?? ''));
+        });
+
+        return $timeline;
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $timeline
+     * @return array<int,array<string,mixed>>
+     */
+    private function filterClientTimeline(array $timeline, string $view): array
+    {
+        if ($view === 'contacts') {
+            return array_values(array_filter($timeline, static fn(array $event): bool => (string) ($event['kind'] ?? '') === 'contact'));
+        }
+
+        if ($view === 'orders') {
+            return array_values(array_filter($timeline, static fn(array $event): bool => (string) ($event['kind'] ?? '') === 'order'));
+        }
+
+        if ($view === 'recent') {
+            return array_slice($timeline, 0, 8);
+        }
+
+        return $timeline;
     }
 
     private function shouldNotifyClient(array $input): bool
