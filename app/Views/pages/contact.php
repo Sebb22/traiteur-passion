@@ -10,20 +10,20 @@
     $accordionSummary       = 'Choisir dans la carte évènementielle';
     $accordionContext       = 'Cette sélection sert à préparer votre devis. Notre équipe vous recontacte systématiquement pour confirmer le format, la livraison et les derniers détails.';
     $contactIcon            = static function (string $name): string {
-        static $icons = null;
+    static $icons = null;
 
-        if ($icons === null) {
-            $icons = [
-                'method'   => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5 8 4-8 4-8-4z" fill="currentColor" opacity=".12"/><path d="m12 5 8 4-8 4-8-4z"/><path d="m6 13 6 3 6-3"/><path d="m6 16 6 3 6-3"/></svg>',
-                'reactive' => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="currentColor" opacity=".12"/><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/></svg>',
-                'location' => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z" fill="currentColor" opacity=".12"/><path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>',
-                'phone'    => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.4 5.8c.6-.6 1.6-.6 2.2 0l1.4 1.4c.5.5.6 1.2.3 1.8l-.8 1.4c1 1.8 2.4 3.2 4.2 4.2l1.4-.8c.6-.3 1.4-.2 1.8.3l1.4 1.4c.6.6.6 1.6 0 2.2l-.8.8c-.7.7-1.8 1-2.8.8-3.2-.8-6.2-3.7-7.9-7-.4-.9-.2-2 .5-2.7z" fill="currentColor" opacity=".12"/><path d="M8.4 5.8c.6-.6 1.6-.6 2.2 0l1.4 1.4c.5.5.6 1.2.3 1.8l-.8 1.4c1 1.8 2.4 3.2 4.2 4.2l1.4-.8c.6-.3 1.4-.2 1.8.3l1.4 1.4c.6.6.6 1.6 0 2.2l-.8.8c-.7.7-1.8 1-2.8.8-3.2-.8-6.2-3.7-7.9-7-.4-.9-.2-2 .5-2.7z"/></svg>',
-                'email'    => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="6.5" width="16" height="11" rx="2.5" fill="currentColor" opacity=".12"/><rect x="4" y="6.5" width="16" height="11" rx="2.5"/><path d="m6.8 9.2 5.2 4 5.2-4"/></svg>',
-                'clock'    => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="currentColor" opacity=".12"/><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/></svg>',
-            ];
-        }
+    if ($icons === null) {
+        $icons = [
+            'method'   => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5 8 4-8 4-8-4z" fill="currentColor" opacity=".12"/><path d="m12 5 8 4-8 4-8-4z"/><path d="m6 13 6 3 6-3"/><path d="m6 16 6 3 6-3"/></svg>',
+            'reactive' => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="currentColor" opacity=".12"/><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/></svg>',
+            'location' => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z" fill="currentColor" opacity=".12"/><path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>',
+            'phone'    => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.4 5.8c.6-.6 1.6-.6 2.2 0l1.4 1.4c.5.5.6 1.2.3 1.8l-.8 1.4c1 1.8 2.4 3.2 4.2 4.2l1.4-.8c.6-.3 1.4-.2 1.8.3l1.4 1.4c.6.6.6 1.6 0 2.2l-.8.8c-.7.7-1.8 1-2.8.8-3.2-.8-6.2-3.7-7.9-7-.4-.9-.2-2 .5-2.7z" fill="currentColor" opacity=".12"/><path d="M8.4 5.8c.6-.6 1.6-.6 2.2 0l1.4 1.4c.5.5.6 1.2.3 1.8l-.8 1.4c1 1.8 2.4 3.2 4.2 4.2l1.4-.8c.6-.3 1.4-.2 1.8.3l1.4 1.4c.6.6.6 1.6 0 2.2l-.8.8c-.7.7-1.8 1-2.8.8-3.2-.8-6.2-3.7-7.9-7-.4-.9-.2-2 .5-2.7z"/></svg>',
+            'email'    => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="6.5" width="16" height="11" rx="2.5" fill="currentColor" opacity=".12"/><rect x="4" y="6.5" width="16" height="11" rx="2.5"/><path d="m6.8 9.2 5.2 4 5.2-4"/></svg>',
+            'clock'    => '<svg class="contactIconGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="currentColor" opacity=".12"/><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/></svg>',
+        ];
+    }
 
-        return $icons[$name] ?? $icons['location'];
+    return $icons[$name] ?? $icons['location'];
     };
 ?>
 

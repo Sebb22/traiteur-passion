@@ -138,21 +138,24 @@
                 <div class="adminOverviewHero__content">
                     <div class="adminOverviewHero__eyebrow">Poste de pilotage</div>
                     <h1 class="adminTitle">Vue prioritaire du jour</h1>
-                    <p class="adminSubtitle">Reperez d'abord les nouvelles demandes et commandes, puis ouvrez les modules de gestion seulement quand le dossier demande plus de detail.</p>
+                    <p class="adminSubtitle">Reperez d'abord les nouvelles demandes et commandes, puis ouvrez les
+                        modules de gestion seulement quand le dossier demande plus de detail.</p>
                 </div>
 
                 <div class="adminOverviewHero__summary">
                     <div class="adminOverviewHero__summaryLabel">Urgences du jour</div>
                     <div class="adminOverviewHero__summaryValue"><?php echo $urgentTotal; ?></div>
                     <div class="adminOverviewHero__summaryMeta">
-                        <?php echo (int) ($contactStats['new_count'] ?? 0); ?> demande(s) a qualifier • <?php echo (int) ($orderStats['new_count'] ?? 0); ?> commande(s) a confirmer
+                        <?php echo (int) ($contactStats['new_count'] ?? 0); ?> demande(s) a qualifier •
+                        <?php echo (int) ($orderStats['new_count'] ?? 0); ?> commande(s) a confirmer
                     </div>
                 </div>
             </div>
 
             <div class="adminPanelHead__actions adminPanelHead__actions--dashboard">
                 <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
-                    <a href="/admin/contacts?status=new" class="adminBtn adminBtn--primary">Ouvrir les nouvelles demandes</a>
+                    <a href="/admin/contacts?status=new" class="adminBtn adminBtn--primary">Ouvrir les nouvelles
+                        demandes</a>
                     <a href="/admin/contacts#orders" class="adminBtn">Ouvrir les commandes</a>
                 </div>
                 <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
@@ -192,7 +195,8 @@
             <div class="adminCard__head">
                 <div class="adminCard__title">Recherche admin</div>
                 <div class="adminCard__meta">
-                    <span class="adminHint"><?php echo $isSearchActive ? (int) ($dashboardSearch['total_results'] ?? 0) . ' resultat(s) sur le dashboard' : 'Retrouver rapidement une demande, un client ou une commande'; ?></span>
+                    <span
+                        class="adminHint"><?php echo $isSearchActive ? (int) ($dashboardSearch['total_results'] ?? 0) . ' resultat(s) sur le dashboard' : 'Retrouver rapidement une demande, un client ou une commande'; ?></span>
                 </div>
             </div>
 
@@ -207,9 +211,12 @@
                     <span class="adminField__label">Perimetre</span>
                     <select class="adminSelect" name="scope">
                         <option value="all" <?php echo $searchScope === 'all' ? 'selected' : ''; ?>>Tout</option>
-                        <option value="contacts" <?php echo $searchScope === 'contacts' ? 'selected' : ''; ?>>Demandes / devis</option>
-                        <option value="orders" <?php echo $searchScope === 'orders' ? 'selected' : ''; ?>>Commandes</option>
-                        <option value="clients" <?php echo $searchScope === 'clients' ? 'selected' : ''; ?>>Clients</option>
+                        <option value="contacts" <?php echo $searchScope === 'contacts' ? 'selected' : ''; ?>>Demandes /
+                            devis</option>
+                        <option value="orders" <?php echo $searchScope === 'orders' ? 'selected' : ''; ?>>Commandes
+                        </option>
+                        <option value="clients" <?php echo $searchScope === 'clients' ? 'selected' : ''; ?>>Clients
+                        </option>
                     </select>
                 </label>
 
@@ -217,8 +224,10 @@
                     <button type="submit" class="adminBtn adminBtn--primary">Rechercher</button>
                     <?php if ($isSearchActive): ?>
                     <a href="/admin" class="adminBtn">Effacer</a>
-                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>" class="adminBtn">Voir les demandes</a>
-                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>#orders" class="adminBtn">Voir les commandes</a>
+                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>"
+                        class="adminBtn">Voir les demandes</a>
+                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>#orders"
+                        class="adminBtn">Voir les commandes</a>
                     <?php endif; ?>
                 </div>
             </form>
@@ -231,7 +240,8 @@
                     <div class="adminCard__head">
                         <div class="adminCard__title">Clients correspondants</div>
                         <div class="adminCard__meta">
-                            <span class="adminHint"><?php echo $clientResultsCount; ?> resultat(s) cotes clients consolides</span>
+                            <span class="adminHint"><?php echo $clientResultsCount; ?> resultat(s) cotes clients
+                                consolides</span>
                         </div>
                     </div>
 
@@ -243,30 +253,39 @@
                         <div class="adminMiniList__item">
                             <div>
                                 <div class="adminMiniList__title">
-                                    <a href="<?php echo $e($client['client_link'] ?? '/admin'); ?>" class="adminLink"><?php echo $e($client['name'] ?? 'Client'); ?></a>
+                                    <a href="<?php echo $e($client['client_link'] ?? '/admin'); ?>"
+                                        class="adminLink"><?php echo $e($client['name'] ?? 'Client'); ?></a>
                                     <?php if (! empty($client['order_reference'])): ?>
-                                    <span class="adminBadge adminBadge--quoted"><?php echo $e($client['order_reference']); ?></span>
+                                    <span
+                                        class="adminBadge adminBadge--quoted"><?php echo $e($client['order_reference']); ?></span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="adminMiniList__meta">
                                     <?php echo $e(($client['email'] ?? '') !== '' ? $client['email'] : 'Email non renseigne'); ?>
-                                    • <?php echo $e(($client['phone'] ?? '') !== '' ? $client['phone'] : 'Telephone non renseigne'); ?>
-                                    • <?php echo $e(($client['location'] ?? '') !== '' ? $client['location'] : 'Lieu non renseigne'); ?>
+                                    •
+                                    <?php echo $e(($client['phone'] ?? '') !== '' ? $client['phone'] : 'Telephone non renseigne'); ?>
+                                    •
+                                    <?php echo $e(($client['location'] ?? '') !== '' ? $client['location'] : 'Lieu non renseigne'); ?>
                                 </div>
                             </div>
 
                             <div class="adminMiniList__aside">
-                                <?php echo (int) ($client['contacts_count'] ?? 0); ?> demande(s) • <?php echo (int) ($client['orders_count'] ?? 0); ?> commande(s)<br>
-                                Derniere activite <?php echo $formatDate($client['last_activity'] ?? null, 'd/m/Y H:i'); ?>
+                                <?php echo (int) ($client['contacts_count'] ?? 0); ?> demande(s) •
+                                <?php echo (int) ($client['orders_count'] ?? 0); ?> commande(s)<br>
+                                Derniere activite
+                                <?php echo $formatDate($client['last_activity'] ?? null, 'd/m/Y H:i'); ?>
                                 <div class="adminMiniList__actions">
                                     <?php if (! empty($client['client_link'])): ?>
-                                    <a href="<?php echo $e($client['client_link']); ?>" class="adminBtn adminBtn--sm">Voir fiche client</a>
+                                    <a href="<?php echo $e($client['client_link']); ?>"
+                                        class="adminBtn adminBtn--sm">Voir fiche client</a>
                                     <?php endif; ?>
                                     <?php if (! empty($client['contact_link'])): ?>
-                                    <a href="<?php echo $e($client['contact_link']); ?>" class="adminBtn adminBtn--sm">Voir demande</a>
+                                    <a href="<?php echo $e($client['contact_link']); ?>"
+                                        class="adminBtn adminBtn--sm">Voir demande</a>
                                     <?php endif; ?>
                                     <?php if (! empty($client['order_link'])): ?>
-                                    <a href="<?php echo $e($client['order_link']); ?>" class="adminBtn adminBtn--sm">Voir commande</a>
+                                    <a href="<?php echo $e($client['order_link']); ?>"
+                                        class="adminBtn adminBtn--sm">Voir commande</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -280,21 +299,27 @@
                 <?php if ($showContactsResults): ?>
                 <section class="adminCard adminCard--table">
                     <div class="adminCard__head">
-                        <div class="adminCard__title"><?php echo $isSearchActive ? 'Demandes et devis correspondants' : 'Demandes recentes a qualifier'; ?></div>
+                        <div class="adminCard__title">
+                            <?php echo $isSearchActive ? 'Demandes et devis correspondants' : 'Demandes recentes a qualifier'; ?>
+                        </div>
                         <div class="adminCard__meta">
-                            <span class="adminHint"><?php echo $isSearchActive ? $contactResultsCount . ' resultat(s) cote demandes / devis' : 'Les dernieres demandes qui demandent une lecture rapide'; ?></span>
+                            <span
+                                class="adminHint"><?php echo $isSearchActive ? $contactResultsCount . ' resultat(s) cote demandes / devis' : 'Les dernieres demandes qui demandent une lecture rapide'; ?></span>
                         </div>
                     </div>
 
                     <?php if ($recentContacts === []): ?>
-                    <div class="adminEmptyState"><?php echo $isSearchActive ? 'Aucun resultat cote demandes / devis pour cette recherche.' : 'Aucune demande enregistre pour le moment.'; ?></div>
+                    <div class="adminEmptyState">
+                        <?php echo $isSearchActive ? 'Aucun resultat cote demandes / devis pour cette recherche.' : 'Aucune demande enregistre pour le moment.'; ?>
+                    </div>
                     <?php else: ?>
                     <div class="adminMiniList adminMiniList--actions">
                         <?php foreach ($recentContacts as $contact): ?>
                         <div class="adminMiniList__item">
                             <div>
                                 <div class="adminMiniList__title">
-                                    <a href="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>" class="adminLink">
+                                    <a href="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>"
+                                        class="adminLink">
                                         <?php echo $e($contact['name'] ?? 'Demande'); ?>
                                     </a>
                                     <span class="adminBadge adminBadge--<?php echo $e($contact['status'] ?? 'new'); ?>">
@@ -312,7 +337,8 @@
                                 <?php echo (int) ($contact['menu_items_count'] ?? 0); ?> selection(s) carte<br>
                                 Creee le <?php echo $formatDate($contact['created_at'] ?? null, 'd/m/Y H:i'); ?>
                                 <div class="adminMiniList__actions">
-                                    <a href="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>" class="adminBtn adminBtn--sm">Ouvrir</a>
+                                    <a href="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>"
+                                        class="adminBtn adminBtn--sm">Ouvrir</a>
                                 </div>
                             </div>
                         </div>
@@ -325,16 +351,21 @@
                 <?php if ($showOrderResults): ?>
                 <section class="adminCard adminCard--table" id="orders">
                     <div class="adminCard__head">
-                        <div class="adminCard__title"><?php echo $isSearchActive ? 'Commandes boutique correspondantes' : 'Commandes boutique recentes'; ?></div>
+                        <div class="adminCard__title">
+                            <?php echo $isSearchActive ? 'Commandes boutique correspondantes' : 'Commandes boutique recentes'; ?>
+                        </div>
                         <div class="adminCard__meta">
-                            <span class="adminHint"><?php echo $isSearchActive ? $orderResultsCount . ' resultat(s) cote commandes boutique' : (int) ($orderStats['total'] ?? 0) . ' commande(s) dans le flux boutique'; ?></span>
+                            <span
+                                class="adminHint"><?php echo $isSearchActive ? $orderResultsCount . ' resultat(s) cote commandes boutique' : (int) ($orderStats['total'] ?? 0) . ' commande(s) dans le flux boutique'; ?></span>
                         </div>
                     </div>
 
                     <?php if ($shopLoadError !== null): ?>
                     <div class="adminEmptyState"><?php echo $e($shopLoadError); ?></div>
                     <?php elseif ($recentOrders === []): ?>
-                    <div class="adminEmptyState"><?php echo $isSearchActive ? 'Aucun resultat cote commandes boutique pour cette recherche.' : 'Aucune commande boutique pour le moment.'; ?></div>
+                    <div class="adminEmptyState">
+                        <?php echo $isSearchActive ? 'Aucun resultat cote commandes boutique pour cette recherche.' : 'Aucune commande boutique pour le moment.'; ?>
+                    </div>
                     <?php else: ?>
                     <div class="adminMiniList adminMiniList--actions">
                         <?php foreach ($recentOrders as $order): ?>
@@ -350,8 +381,10 @@
                         <div class="adminMiniList__item">
                             <div>
                                 <div class="adminMiniList__title">
-                                    <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminLink">
-                                        <?php echo $e($orderReference); ?> · <?php echo $e($order['customer_name'] ?? 'Commande'); ?>
+                                    <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>"
+                                        class="adminLink">
+                                        <?php echo $e($orderReference); ?> ·
+                                        <?php echo $e($order['customer_name'] ?? 'Commande'); ?>
                                     </a>
                                     <span class="adminBadge adminBadge--<?php echo $e($order['status'] ?? 'new'); ?>">
                                         <?php echo $e($orderStatusLabels[(string) ($order['status'] ?? 'new')] ?? (string) ($order['status'] ?? 'new')); ?>
@@ -359,7 +392,8 @@
                                 </div>
                                 <div class="adminMiniList__meta">
                                     <?php echo $e($order['customer_email'] ?? '-'); ?>
-                                    • <?php echo $e(($order['fulfillment_method'] ?? 'pickup') === 'delivery' ? 'Livraison' : 'Retrait'); ?>
+                                    •
+                                    <?php echo $e(($order['fulfillment_method'] ?? 'pickup') === 'delivery' ? 'Livraison' : 'Retrait'); ?>
                                     • <?php echo $formatDate($order['pickup_date'] ?? null); ?>
                                 </div>
                             </div>
@@ -369,12 +403,15 @@
                                 Total <?php echo $e($formatPrice($order['total_cents'] ?? 0)); ?>
                                 <?php if ($orderDiscountCents > 0): ?><br>
                                 <span class="adminPromoState">
-                                    Promo <?php echo $e($orderPromoCode !== '' ? $orderPromoCode : 'appliquee'); ?> · -<?php echo $e($formatPrice($orderDiscountCents)); ?>
+                                    Promo <?php echo $e($orderPromoCode !== '' ? $orderPromoCode : 'appliquee'); ?> ·
+                                    -<?php echo $e($formatPrice($orderDiscountCents)); ?>
                                 </span><br>
-                                <span class="adminHint">Sous-total <?php echo $e($formatPrice($orderSubtotalCents)); ?></span>
+                                <span class="adminHint">Sous-total
+                                    <?php echo $e($formatPrice($orderSubtotalCents)); ?></span>
                                 <?php endif; ?>
                                 <div class="adminMiniList__actions">
-                                    <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminBtn adminBtn--sm">Voir commande</a>
+                                    <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>"
+                                        class="adminBtn adminBtn--sm">Voir commande</a>
                                 </div>
                             </div>
                         </div>
@@ -395,13 +432,16 @@
                     </div>
 
                     <div class="adminDashboardPromoStatus">
-                        <span class="adminBadge adminBadge--<?php echo $e($promoStatus === 'active' ? 'completed' : ($promoStatus === 'scheduled' ? 'quoted' : 'new')); ?>">
+                        <span
+                            class="adminBadge adminBadge--<?php echo $e($promoStatus === 'active' ? 'completed' : ($promoStatus === 'scheduled' ? 'quoted' : 'new')); ?>">
                             <?php echo $e($promoStatusLabels[$promoStatus] ?? 'Inactive'); ?>
                         </span>
                         <div class="adminDashboardPromoMeta">
                             <strong><?php echo $e($shopPromo['title'] ?? 'Offre de lancement'); ?></strong>
-                            <span>Code <?php echo $e($shopPromo['promo_code'] ?? '-'); ?> • -<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>%</span>
-                            <span>Du <?php echo $formatDate($shopPromo['starts_at'] ?? null, 'd/m/Y H:i'); ?> au <?php echo $formatDate($shopPromo['ends_at'] ?? null, 'd/m/Y H:i'); ?></span>
+                            <span>Code <?php echo $e($shopPromo['promo_code'] ?? '-'); ?> •
+                                -<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>%</span>
+                            <span>Du <?php echo $formatDate($shopPromo['starts_at'] ?? null, 'd/m/Y H:i'); ?> au
+                                <?php echo $formatDate($shopPromo['ends_at'] ?? null, 'd/m/Y H:i'); ?></span>
                         </div>
                     </div>
 
@@ -451,7 +491,8 @@
                         </div>
 
                         <div class="adminInlineActions">
-                            <button type="submit" class="adminBtn adminBtn--primary">Enregistrer la promo boutique</button>
+                            <button type="submit" class="adminBtn adminBtn--primary">Enregistrer la promo
+                                boutique</button>
                         </div>
                     </form>
                 </section>
@@ -460,7 +501,8 @@
                     <div class="adminCard__head">
                         <div class="adminCard__title">Etat du business</div>
                         <div class="adminCard__meta">
-                            <span class="adminHint">Indicateurs compacts pour verifier le contenu, le catalogue et le stock</span>
+                            <span class="adminHint">Indicateurs compacts pour verifier le contenu, le catalogue et le
+                                stock</span>
                         </div>
                     </div>
 
@@ -486,19 +528,23 @@
                     <div class="adminDashboardStatus">
                         <div class="adminStatusPill">
                             <div class="adminStatusPill__label">En cours</div>
-                            <div class="adminStatusPill__value"><?php echo (int) ($contactStats['in_progress_count'] ?? 0); ?></div>
+                            <div class="adminStatusPill__value">
+                                <?php echo (int) ($contactStats['in_progress_count'] ?? 0); ?></div>
                         </div>
                         <div class="adminStatusPill">
                             <div class="adminStatusPill__label">Devis envoyes</div>
-                            <div class="adminStatusPill__value"><?php echo (int) ($contactStats['quoted_count'] ?? 0); ?></div>
+                            <div class="adminStatusPill__value">
+                                <?php echo (int) ($contactStats['quoted_count'] ?? 0); ?></div>
                         </div>
                         <div class="adminStatusPill">
                             <div class="adminStatusPill__label">Finalisees</div>
-                            <div class="adminStatusPill__value"><?php echo (int) ($contactStats['completed_count'] ?? 0); ?></div>
+                            <div class="adminStatusPill__value">
+                                <?php echo (int) ($contactStats['completed_count'] ?? 0); ?></div>
                         </div>
                         <div class="adminStatusPill">
                             <div class="adminStatusPill__label">Avec selection</div>
-                            <div class="adminStatusPill__value"><?php echo (int) ($contactStats['with_menu_items'] ?? 0); ?></div>
+                            <div class="adminStatusPill__value">
+                                <?php echo (int) ($contactStats['with_menu_items'] ?? 0); ?></div>
                         </div>
                     </div>
                 </section>
@@ -537,9 +583,11 @@
                         <?php foreach ($typeBreakdown as $typeRow): ?>
                         <?php $width = $maxTypeCount > 0 ? ((int) ($typeRow['total'] ?? 0) / $maxTypeCount) * 100 : 0; ?>
                         <div class="adminTypeRow">
-                            <div class="adminTypeRow__label"><?php echo $e($typeRow['label'] ?? 'Non renseigne'); ?></div>
+                            <div class="adminTypeRow__label"><?php echo $e($typeRow['label'] ?? 'Non renseigne'); ?>
+                            </div>
                             <div class="adminTypeRow__bar">
-                                <div class="adminTypeRow__fill" style="width: <?php echo number_format($width, 2, '.', ''); ?>%;"></div>
+                                <div class="adminTypeRow__fill"
+                                    style="width: <?php echo number_format($width, 2, '.', ''); ?>%;"></div>
                             </div>
                             <div class="adminTypeRow__value"><?php echo (int) ($typeRow['total'] ?? 0); ?></div>
                         </div>
