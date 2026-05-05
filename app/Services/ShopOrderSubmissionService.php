@@ -7,6 +7,11 @@ final class ShopOrderSubmissionService
 {
     private const FULFILLMENT_PICKUP   = 'pickup';
     private const FULFILLMENT_DELIVERY = 'delivery';
+    private const PICKUP_SLOT_INTERVAL_MINUTES = 30;
+    private const PICKUP_LEAD_TIME_MINUTES     = 120;
+    private const PICKUP_WEEKDAY_START_MINUTES = 8 * 60 + 30;
+    private const PICKUP_WEEKDAY_END_MINUTES   = 19 * 60;
+    private const PICKUP_SATURDAY_END_MINUTES  = 15 * 60 + 30;
 
     /**
      * @return array{success:bool,status:int,error?:string,customerData?:array<string,mixed>,selections?:list<array{item_id:int,quantity:int,option_id:int|null,option_label:string|null,option_units:int|null}>}
@@ -58,7 +63,8 @@ final class ShopOrderSubmissionService
             ];
         }
 
-        $today = date('Y-m-d');
+        $now   = new \DateTimeImmutable('now');
+        $today = $now->format('Y-m-d');
         if ($pickupDate < $today) {
             return [
                 'success' => false,
@@ -89,11 +95,20 @@ final class ShopOrderSubmissionService
                 ];
             }
 
-            if (! in_array($pickupSlot, $this->allowedPickupSlotsForDate($pickupDate), true)) {
+            $allowedSlots = $this->allowedPickupSlotsForDate($pickupDate, $now);
+            if ($allowedSlots === []) {
                 return [
                     'success' => false,
                     'status'  => 400,
-                    'error'   => 'Choisissez un créneau de retrait proposé pour cette date.',
+                    'error'   => 'Aucun créneau de retrait n’est encore disponible pour cette date. Le retrait boutique est possible à partir de 2h après validation de la commande.',
+                ];
+            }
+
+            if (! in_array($pickupSlot, $allowedSlots, true)) {
+                return [
+                    'success' => false,
+                    'status'  => 400,
+                    'error'   => 'Choisissez un créneau de retrait proposé pour cette date. Le retrait boutique est possible à partir de 2h après validation de la commande.',
                 ];
             }
         }
@@ -167,6 +182,20 @@ final class ShopOrderSubmissionService
         ];
     }
 
+    public function firstAvailablePickupDate(): string
+    {
+        $reference = new \DateTimeImmutable('now');
+
+        for ($offset = 0; $offset < 14; $offset++) {
+            $date = $reference->modify(sprintf('+%d day', $offset))->format('Y-m-d');
+            if ($this->allowedPickupSlotsForDate($date, $reference) !== []) {
+                return $date;
+            }
+        }
+
+        return $reference->format('Y-m-d');
+    }
+
     private function nullableTrim($value): ?string
     {
         $value = trim((string) ($value ?? ''));
@@ -192,18 +221,37 @@ final class ShopOrderSubmissionService
     /**
      * @return list<string>
      */
-    private function allowedPickupSlotsForDate(string $date): array
+    private function allowedPickupSlotsForDate(string $date, ?\DateTimeImmutable $reference = null): array
     {
         if ($this->isPickupClosedDay($date)) {
             return [];
         }
 
-        $dayOfWeek = (int) date('N', strtotime($date));
-        if ($dayOfWeek === 6) {
-            return $this->buildPickupSlots(8 * 60 + 30, 15 * 60 + 30);
+        [$startMinutes, $endMinutes] = $this->pickupWindowForDate($date);
+
+        $reference ??= new \DateTimeImmutable('now');
+        if ($date === $reference->format('Y-m-d')) {
+            $minimumStart = $this->roundUpMinutes(
+                $this->minutesFromDateTime($reference) + self::PICKUP_LEAD_TIME_MINUTES,
+                self::PICKUP_SLOT_INTERVAL_MINUTES,
+            );
+            $startMinutes = max($startMinutes, $minimumStart);
         }
 
-        return $this->buildPickupSlots(8 * 60 + 30, 19 * 60);
+        return $this->buildPickupSlots($startMinutes, $endMinutes);
+    }
+
+    /**
+     * @return array{0:int,1:int}
+     */
+    private function pickupWindowForDate(string $date): array
+    {
+        $dayOfWeek = (int) date('N', strtotime($date));
+        if ($dayOfWeek === 6) {
+            return [self::PICKUP_WEEKDAY_START_MINUTES, self::PICKUP_SATURDAY_END_MINUTES];
+        }
+
+        return [self::PICKUP_WEEKDAY_START_MINUTES, self::PICKUP_WEEKDAY_END_MINUTES];
     }
 
     /**
@@ -213,11 +261,25 @@ final class ShopOrderSubmissionService
     {
         $slots = [];
 
-        for ($current = $startMinutes; $current + 30 <= $endMinutes; $current += 30) {
+        for ($current = $startMinutes; $current + self::PICKUP_SLOT_INTERVAL_MINUTES <= $endMinutes; $current += self::PICKUP_SLOT_INTERVAL_MINUTES) {
             $slots[] = sprintf('%s - %s', $this->formatMinutes($current), $this->formatMinutes($current + 30));
         }
 
         return $slots;
+    }
+
+    private function minutesFromDateTime(\DateTimeImmutable $dateTime): int
+    {
+        return ((int) $dateTime->format('G') * 60) + (int) $dateTime->format('i');
+    }
+
+    private function roundUpMinutes(int $minutes, int $step): int
+    {
+        if ($step <= 0) {
+            return $minutes;
+        }
+
+        return (int) (ceil($minutes / $step) * $step);
     }
 
     private function formatMinutes(int $minutes): string

@@ -1,7 +1,8 @@
 <?php
-    $sections  = isset($sections) && is_array($sections) ? $sections : [];
-    $loadError = isset($loadError) && is_string($loadError) ? $loadError : null;
-    $shopPromo = isset($shopPromo) && is_array($shopPromo) ? $shopPromo : null;
+    $pickupSubmissionService = new \App\Services\ShopOrderSubmissionService();
+    $sections                = isset($sections) && is_array($sections) ? $sections : [];
+    $loadError               = isset($loadError) && is_string($loadError) ? $loadError : null;
+    $shopPromo               = isset($shopPromo) && is_array($shopPromo) ? $shopPromo : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -107,8 +108,9 @@
     $visibleProductsCount += count(is_array($section['items'] ?? null) ? $section['items'] : []);
     }
 
-    $firstAvailable       = date('Y-m-d');
-    $pickupHoursSummary   = 'Retrait boutique: mardi au vendredi 8:30 - 19:00, samedi 8:30 - 15:30. Fermé dimanche et lundi.';
+    $today                = date('Y-m-d');
+    $firstAvailable       = $pickupSubmissionService->firstAvailablePickupDate();
+    $pickupHoursSummary   = 'Retrait boutique: mardi au vendredi 8:30 - 19:00, samedi 8:30 - 15:30. Retrait possible à partir de 2h après validation. Fermé dimanche et lundi.';
     $pickupAddressLine    = '631 rue de Compiègne';
     $pickupPostalCode     = '60162';
     $pickupCity           = 'Vignemont';
@@ -118,7 +120,7 @@
 ?>
 
 <main class="siteMain siteContainer">
-    <section class="menuSplit shopSplit" data-wheel-redirect data-wheel-target=".menuSplit__right">
+    <section class="menuSplit shopSplit" data-wheel-redirect data-wheel-target=".shopPanel">
         <div class="menuSplit__left" aria-label="Visuel de la boutique en ligne">
             <div class="menuHero shopHero">
                 <img class="menuHero__img" src="/uploads/pages/shop/images/shopIllu-1200.webp" alt=""
@@ -785,7 +787,8 @@
                                 <div class="shopCheckoutPanel">
                                     <div class="shopCheckoutPanel__head">
                                         <h4>2. Retrait ou livraison</h4>
-                                        <p>Choisissez un créneau souhaité. La livraison reste proposée selon votre
+                                        <p>Choisissez un créneau souhaité. Le retrait est possible à partir de 2h
+                                            après validation du panier. La livraison reste proposée selon votre
                                             adresse.</p>
                                     </div>
 
@@ -798,7 +801,7 @@
                                                         data-shop-fulfillment required>
                                                     <span class="shopFulfillmentChoice__body">
                                                         <strong>Retrait</strong>
-                                                        <small>Créneau confirmé avec vous</small>
+                                                        <small>Retrait possible dès 2h</small>
                                                     </span>
                                                 </label>
                                                 <label class="shopFulfillmentChoice">
@@ -817,7 +820,7 @@
                                                 <div class="shopPickupInfo__section shopPickupInfo__section--place">
                                                     <strong class="shopPickupInfo__label">Lieu de retrait</strong>
                                                     <p class="shopPickupInfo__address"><?php echo $e($pickupAddressLine); ?><br><?php echo $e($pickupPostalCode . ' ' . $pickupCity); ?></p>
-                                                    <p class="shopPickupInfo__text">Le retrait s’effectue à cette adresse, sur créneau confirmé avec vous après enregistrement de la demande.</p>
+                                                    <p class="shopPickupInfo__text">Le retrait s’effectue à cette adresse, sur créneau proposé à partir de 2h après validation de la commande.</p>
                                                     <a class="btn btn--ghost shopPickupInfo__action" href="<?php echo $e($pickupMapsUrl); ?>" target="_blank" rel="noopener noreferrer">
                                                         Voir l’itinéraire
                                                     </a>
@@ -838,14 +841,16 @@
                                                             <span class="shopPickupInfo__time">Fermé</span>
                                                         </div>
                                                     </div>
-                                                    <p class="shopPickupInfo__text shopPickupInfo__text--muted">Samedi susceptible d’ajustement selon les prestations en cours.</p>
+                                                    <p class="shopPickupInfo__text shopPickupInfo__text--muted">Le jour même, seuls les créneaux respectant un délai minimum de 2h sont proposés. Samedi susceptible d’ajustement selon les prestations en cours.</p>
                                                 </div>
                                             </div>
                                         </article>
                                         <label class="shopField shopField--appointment" data-shop-appointment-field hidden>
                                             <span class="shopField__label">Date souhaitée</span>
                                             <input class="shopInput shopInput--date" type="date" name="pickup_date"
-                                                min="<?php echo $e($firstAvailable); ?>" required data-shop-pickup-date>
+                                                min="<?php echo $e($today); ?>" required data-shop-pickup-date
+                                                data-shop-default-min="<?php echo $e($today); ?>"
+                                                data-shop-pickup-min="<?php echo $e($firstAvailable); ?>">
                                         </label>
                                         <label class="shopField shopField--appointment" data-shop-appointment-field hidden>
                                             <span class="shopField__label">Créneau souhaité</span>
@@ -854,7 +859,7 @@
                                                 data-shop-pickup-slot autocomplete="off">
                                             <datalist id="shopPickupSlots" data-shop-pickup-slot-list></datalist>
                                             <small class="shopField__hint" data-shop-pickup-slot-hint>
-                                                Créneaux de retrait disponibles du mardi au vendredi de 8:30 à 19:00 et le samedi de 8:30 à 15:30.
+                                                Créneaux de retrait disponibles du mardi au vendredi de 8:30 à 19:00 et le samedi de 8:30 à 15:30, avec un délai minimum de 2h après validation.
                                             </small>
                                         </label>
                                         <div class="shopDeliveryFields shopFieldGrid shopField--full"

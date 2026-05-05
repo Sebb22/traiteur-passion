@@ -14,7 +14,14 @@
         height: 100dvh;
         overflow: hidden;
         padding: 18px 18px 18px 0;
+    }
+    .shopPanel {
+        height: 100%;
+        overflow-x: hidden;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scroll-behavior: auto;
     }
 }
 
@@ -2344,6 +2351,16 @@ body.shop-summary-open {
 @media (min-width: 981px) {
     .shopPanel {
         padding-bottom: 116px;
+    }
+    @media (min-width: 1320px) {
+        .shopPanel {
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            scroll-behavior: auto;
+        }
     }
     .shopSummaryDock {
         position: fixed;
