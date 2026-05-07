@@ -24,7 +24,7 @@ export function initAdminCatalog() {
 
         initReorderableList({
             list: sectionList,
-            nodeSelector: "[data-section-id]",
+            nodeSelector: "details[data-section-id]",
             idAttribute: "data-section-id",
             input: sectionOrderInput,
             form: sectionOrderForm,
@@ -43,7 +43,7 @@ export function initAdminCatalog() {
 
         initReorderableList({
             list: itemList,
-            nodeSelector: "[data-item-id]",
+            nodeSelector: "details[data-item-id]",
             idAttribute: "data-item-id",
             input,
             form,
@@ -62,7 +62,7 @@ export function initAdminCatalog() {
 
         initReorderableList({
             list: optionList,
-            nodeSelector: "[data-option-id]",
+            nodeSelector: "tr[data-option-id]",
             idAttribute: "data-option-id",
             input,
             form,
@@ -72,6 +72,8 @@ export function initAdminCatalog() {
 
     initCatalogImageUploadUX();
 }
+
+const SORTABLE_LIST_SELECTOR = "[data-section-sortable], [data-item-sortable], [data-option-sortable]";
 
 function initReorderableList({ list, nodeSelector, idAttribute, input, form, scope }) {
     if (!(list instanceof HTMLElement) || !(input instanceof HTMLInputElement) || !(form instanceof HTMLFormElement)) {
@@ -181,8 +183,9 @@ function initReorderableList({ list, nodeSelector, idAttribute, input, form, sco
     }
 
     getNodes().forEach((node) => {
-        const handles = Array.from(node.querySelectorAll("[data-drag-handle]"));
-        const moveButtons = Array.from(node.querySelectorAll("[data-reorder-move]"));
+        const belongsToCurrentList = (element) => element.closest(SORTABLE_LIST_SELECTOR) === list;
+        const handles = Array.from(node.querySelectorAll("[data-drag-handle]")).filter(belongsToCurrentList);
+        const moveButtons = Array.from(node.querySelectorAll("[data-reorder-move]")).filter(belongsToCurrentList);
         const summary = node.querySelector("summary");
 
         if (summary instanceof HTMLElement) {
@@ -636,7 +639,7 @@ function initCatalogImageUploadUX() {
         });
 
         fileInput.addEventListener("change", () => {
-            const file = fileInput.files ?.[0];
+            const file = fileInput.files ? .[0];
             if (!file) {
                 sourceImage = null;
                 sourceFile = null;
