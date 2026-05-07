@@ -4,6 +4,7 @@ import { initHeaderScroll } from "./partials/header/headerScroll";
 import { initHeaderToggle } from "./partials/header/headerToggle";
 import { initVideoHero } from "./home/videoHero";
 import { initAboutSlider } from "./about/initAboutSlider";
+import { initAboutStats } from "./about/initAboutStats";
 import { initContactForm } from "./contact/contactForm";
 import { initMenuTabs } from "./menu/menuTabs";
 import { initMenuOrder } from "./menu/menuOrder";
@@ -24,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initHeaderToggle();
     initVideoHero();
     initAboutSlider();
+    initAboutStats();
     initContactForm();
     initMenuTabs();
     initMenuOrder();

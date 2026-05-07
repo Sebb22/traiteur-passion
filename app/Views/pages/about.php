@@ -120,19 +120,19 @@
                 <section class="aboutCard aboutCard--stats" id="engagements" aria-label="Chiffres clés">
                     <h2 class="aboutCard__title">En 2025, Traiteur Passion, c’est…</h2>
 
-                    <div class="aboutStats" role="list" aria-label="Chiffres clés">
+                    <div class="aboutStats" role="list" aria-label="Chiffres clés" data-about-stats>
                         <article class="aboutStat" role="listitem" aria-label="Mariages réalisés">
-                            <span class="aboutStat__num">308</span>
+                            <span class="aboutStat__num" data-counter-target="308">308</span>
                             <span class="aboutStat__label">Plateaux repas livrés</span>
                         </article>
 
                         <article class="aboutStat" role="listitem" aria-label="Événements professionnels réalisés">
-                            <span class="aboutStat__num">1255</span>
+                            <span class="aboutStat__num" data-counter-target="1255">1255</span>
                             <span class="aboutStat__label">Dégustations de poêlons</span>
                         </article>
 
                         <article class="aboutStat" role="listitem" aria-label="Personnes servies par an">
-                            <span class="aboutStat__num">11 035</span>
+                            <span class="aboutStat__num" data-counter-target="11035">11 035</span>
                             <span class="aboutStat__label">Pièces cocktails réalisées au labo </span>
                         </article>
                     </div>
@@ -238,13 +238,7 @@
                     </div>
                 </section>
 
-                <!-- CTA (card) -->
-                <section class="aboutCard aboutCard--contact" id="contact" aria-label="Demander un devis">
-                    <h2 class="aboutCard__title">On imagine votre événement ?</h2>
-                    <p class="aboutCard__text">
-                        Dites-nous le format, le lieu, vos envies (et vos contraintes alimentaires si besoin) — on vous
-                        propose une formule claire.
-                    </p>
+                <section class="aboutLocationSection" id="localisation" aria-label="Où nous trouver">
                     <?php
                         $locationCardVariant     = 'compact';
                         $locationCardTitle       = 'Où nous trouver';
@@ -253,6 +247,15 @@
                         $locationCardClass       = 'aboutLocationCard';
                         require dirname(__DIR__) . '/partials/location-card.php';
                     ?>
+                </section>
+
+                <!-- CTA (card) -->
+                <section class="aboutCard aboutCard--contact" id="contact" aria-label="Demander un devis">
+                    <h2 class="aboutCard__title">On imagine votre événement ?</h2>
+                    <p class="aboutCard__text">
+                        Dites-nous le format, le lieu, vos envies (et vos contraintes alimentaires si besoin) — on vous
+                        propose une formule claire.
+                    </p>
                     <a class="btn btn--primary" href="/contact">Demander un devis</a>
                 </section>
 

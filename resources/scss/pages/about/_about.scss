@@ -9,8 +9,8 @@
 
 .menuSplit--about {
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 18px;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(0, 1fr);
+    gap: 28px;
     align-items: stretch;
     min-height: 100vh;
 }
@@ -73,20 +73,16 @@
 .menuPanel--about {
     height: 100%;
     border-radius: 26px;
-    padding: 16px;
+    padding: 24px;
     overflow: visible;
     background: rgba(10, 10, 10, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
     display: grid;
-    gap: 14px;
+    gap: 22px;
     align-content: start;
-    /* ✅ SINGLE SOURCE OF TRUTH */
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas:
-        "tabs     tabs" "intro    galerie" "intro    galerie" "reviews  reviews" "stats    stats" /* ✅ FULL WIDTH */
-        "histoire histoire" /* ✅ (option) full width aussi, plus clean */
-        "team     team" "contact  contact" "footer   footer";
+    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+    grid-template-areas: "intro    intro" "galerie  stats" "reviews  reviews" "histoire histoire" "team     team" "location location" "contact  contact" "footer   footer";
 }
 
 /* zones */
@@ -119,8 +115,18 @@
     grid-area: team;
 }
 
+.aboutLocationSection {
+    grid-area: location;
+}
+
 .aboutCard--contact {
     grid-area: contact;
+}
+
+.aboutCard--contact {
+    display: grid;
+    gap: 18px;
+    align-content: start;
 }
 
 .menuFooter {
@@ -165,7 +171,7 @@
 .aboutCard,
 .menuSection--about {
     border-radius: 22px;
-    padding: 16px;
+    padding: 20px;
     margin: 0;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -193,20 +199,22 @@
     font-size: clamp(24px, 2.6vw, 34px);
     text-transform: uppercase;
     font-weight: 400;
-    margin: 0 0 10px;
+    margin: 0 0 14px;
     opacity: 0.95;
 }
 
 .aboutCard__text {
-    margin: 0 0 14px;
+    margin: 0 0 18px;
     opacity: 0.82;
     max-width: 70ch;
+    line-height: 1.72;
 }
 
 .aboutActions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
+    margin-top: 6px;
 }
 
 .aboutCard--intro {
@@ -220,17 +228,17 @@
 }
 
 .aboutIntroStory {
-    margin: 16px 0 0;
+    margin: 20px 0 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
 }
 
 .aboutIntroCard {
     display: grid;
-    gap: 8px;
+    gap: 10px;
     align-content: start;
-    padding: 16px 16px 18px;
+    padding: 18px 18px 20px;
     border-radius: 18px;
     border: 1px solid rgba(239, 231, 210, 0.1);
     background:
@@ -286,7 +294,7 @@
 .aboutRatingsRow {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
+    gap: 16px;
     align-items: stretch;
 }
 
@@ -363,6 +371,7 @@
     line-height: 1.55;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    line-clamp: 4;
     -webkit-line-clamp: 4;
     /* ✅ stable heights */
     overflow: hidden;
@@ -382,41 +391,139 @@
 ========================================================= */
 
 .aboutStats {
-    margin-top: 12px;
+    margin-top: 16px;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 14px;
 }
 
 .aboutStat {
     border-radius: 16px;
-    padding: 14px 12px;
+    padding: 18px 18px 20px;
     background:
-        radial-gradient(120% 120% at 50% 0%, rgba(181, 155, 104, 0.08), transparent 40%),
+        radial-gradient(140% 150% at 0% 0%, rgba(181, 155, 104, 0.16), transparent 44%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
         rgba(0, 0, 0, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: grid;
-    gap: 10px;
-    align-content: start;
+    gap: 14px;
+    align-content: space-between;
     min-width: 0;
+    min-height: 168px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 14px 28px rgba(0, 0, 0, 0.14);
+    transition:
+        transform 480ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 480ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 480ms ease,
+        background 480ms ease;
+}
+
+.aboutStat::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 46%,
+        transparent 100%
+    );
+    opacity: 0;
+    transform: translateX(-18%);
+    transition:
+        opacity 520ms ease,
+        transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+.aboutStat {
+    position: relative;
+    overflow: hidden;
 }
 
 .aboutStat__num {
-    font-size: clamp(28px, 3vw, 44px);
-    line-height: 1;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: "Forum", serif;
+    font-size: clamp(40px, 4vw, 58px);
+    line-height: 0.95;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     color: rgba(239, 231, 210, 0.95);
 }
 
 .aboutStat__label {
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    max-width: 16ch;
+    font-size: 12px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(239, 231, 210, 0.78);
-    line-height: 1.25;
+    line-height: 1.45;
     overflow-wrap: anywhere;
-    /* ✅ sécurité anti casse weird */
+}
+
+.aboutStat.is-counter-visible {
+    transform: translateY(-2px);
+    border-color: rgba(216, 170, 103, 0.22);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 18px 34px rgba(0, 0, 0, 0.18);
+}
+
+.aboutStat.is-counter-visible::after {
+    opacity: 1;
+    transform: translateX(24%);
+}
+
+.aboutStat.is-counter-visible .aboutStat__num {
+    text-shadow: 0 8px 24px rgba(216, 170, 103, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aboutStat,
+    .aboutStat::after {
+        transition: none;
+    }
+    .aboutStat.is-counter-visible {
+        transform: none;
+    }
+}
+
+.aboutLocationCard {
+    margin: 2px 0 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 18px;
+}
+
+.aboutLocationCard .locationCard__content {
+    gap: 12px;
+}
+
+.aboutLocationCard .locationCard__facts {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.aboutLocationCard .locationCard__fact dd {
+    overflow-wrap: anywhere;
+}
+
+.aboutLocationCard .locationCard__map,
+.aboutLocationCard .locationCard__mapPreview,
+.aboutLocationCard .locationCard__map iframe {
+    min-height: 240px;
+}
+
+.aboutLocationCard .locationCard__mapPreview {
+    padding: 14px;
+    align-items: end;
+}
+
+.aboutLocationCard .locationCard__mapOverlay {
+    max-width: none;
+    width: 100%;
+    padding: 14px;
 }
 
 .aboutCard__text--muted {
@@ -435,12 +542,12 @@
     margin: 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 12px;
 }
 
 .aboutFacts__item {
     border-radius: 18px;
-    padding: 14px;
+    padding: 16px;
     background:
         radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.05), transparent 42%),
         rgba(0, 0, 0, 0.18);
@@ -466,22 +573,22 @@
 ========================================================= */
 
 .aboutTeam {
-    margin-top: 14px;
+    margin-top: 18px;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
 }
 
 .aboutTeamMember {
     border-radius: 18px;
-    padding: 16px;
+    padding: 18px;
     min-width: 0;
     background:
         radial-gradient(120% 120% at 0% 0%, rgba(181, 155, 104, 0.08), transparent 52%),
         rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: grid;
-    gap: 10px;
+    gap: 12px;
     align-content: start;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
@@ -649,7 +756,7 @@
         border-radius: 22px;
         padding: 12px;
         grid-template-columns: 1fr;
-        grid-template-areas: "tabs" "intro" "galerie" "reviews" "stats" "histoire" "team" "contact" "footer";
+        grid-template-areas: "intro" "galerie" "reviews" "stats" "histoire" "team" "location" "contact" "footer";
     }
     .menuTabs--about {
         flex-wrap: nowrap;
@@ -746,6 +853,7 @@
         grid-template-columns: 1fr;
     }
     .aboutReview__text {
+        line-clamp: 5;
         -webkit-line-clamp: 5;
     }
 }
