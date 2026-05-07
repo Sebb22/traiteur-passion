@@ -120,7 +120,8 @@
 ?>
 
 <main class="siteMain siteContainer">
-    <section class="menuSplit shopSplit" data-wheel-redirect data-wheel-target=".shopPanel">
+    <section class="menuSplit shopSplit" data-wheel-redirect data-wheel-target=".shopPanel"
+        data-wheel-breakpoint="(min-width: 1280px) and (max-width: 1640px)">
         <div class="menuSplit__left" aria-label="Visuel de la boutique en ligne">
             <div class="menuHero shopHero">
                 <img class="menuHero__img" src="/uploads/pages/shop/images/shopIllu-1200.webp" alt=""

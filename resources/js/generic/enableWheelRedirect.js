@@ -27,6 +27,8 @@ export function enableWheelRedirect({
 
     roots.forEach((root) => {
         const targetSelector = root.getAttribute("data-wheel-target") || targetDefault;
+        const rootBreakpoint = root.getAttribute("data-wheel-breakpoint") || breakpoint;
+        const rootMediaQuery = window.matchMedia(rootBreakpoint);
 
         if (!targetSelector) return;
 
@@ -39,7 +41,7 @@ export function enableWheelRedirect({
         if (!target) return;
 
         const onWheel = (e) => {
-            if (!mq.matches) return;
+            if (!rootMediaQuery.matches) return;
             if (shouldIgnore(e)) return;
 
             // Quand la molette est deja dans le conteneur scrollable, on garde le scroll natif.

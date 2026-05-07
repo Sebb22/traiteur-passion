@@ -168,6 +168,7 @@ export function initShopPage() {
     const promoInput = form.querySelector("[data-shop-promo-input]");
     const promoApplyButton = form.querySelector("[data-shop-promo-apply]");
     const promoState = form.querySelector("[data-shop-promo-state]");
+    const pageBody = document.body;
     let isSummaryOpen = false;
     let isSummaryPinned = false;
     let hideSummaryTimeout = null;
@@ -176,9 +177,7 @@ export function initShopPage() {
     let touchStartY = 0;
     let touchCurrentY = 0;
     let isDraggingSummary = false;
-    const desktopToastMedia = window.matchMedia(
-        "(min-width: 1320px) and (hover: hover) and (pointer: fine)",
-    );
+    const desktopToastMedia = window.matchMedia("(min-width: 1320px)");
     const desktopQuickAddMedia = window.matchMedia("(min-width: 981px)");
     const summarySheetMedia = window.matchMedia("(max-width: 980px)");
     const compactDrawerMedia = window.matchMedia("(max-width: 980px)");
@@ -199,6 +198,15 @@ export function initShopPage() {
     const isDesktopQuickAdd = () => desktopQuickAddMedia.matches;
     const isSummarySheet = () => summarySheetMedia.matches;
     const isCompactDrawerViewport = () => compactDrawerMedia.matches;
+
+    const syncUltrawideScrollMode = () => {
+        if (!(pageBody instanceof HTMLBodyElement)) {
+            return;
+        }
+
+        const enableNativeScroll = window.innerWidth >= 1641;
+        pageBody.classList.toggle("page--shop-scroll-native", enableNativeScroll);
+    };
 
     const getSelectedFulfillmentMethod = () => {
         const selected = fulfillmentInputs.find(
@@ -284,8 +292,7 @@ export function initShopPage() {
                 hint: slots.length > 0 ?
                     leadTimeStartMinutes !== null ?
                     `Samedi: premier retrait possible à ${formatPickupTime(startMinutes)} minimum, soit 2h après validation.` :
-                    "Samedi: créneaux proposés de 08:30 à 15:30. Retrait possible à partir de 2h après validation." :
-                    "Plus aucun créneau de retrait n’est disponible aujourd’hui avec le délai minimum de 2h. Choisissez une autre date.",
+                    "Samedi: créneaux proposés de 08:30 à 15:30. Retrait possible à partir de 2h après validation." : "Plus aucun créneau de retrait n’est disponible aujourd’hui avec le délai minimum de 2h. Choisissez une autre date.",
                 slots,
             };
         }
@@ -295,8 +302,7 @@ export function initShopPage() {
             hint: slots.length > 0 ?
                 leadTimeStartMinutes !== null ?
                 `Aujourd’hui, premier retrait possible à ${formatPickupTime(startMinutes)} minimum, soit 2h après validation.` :
-                "Du mardi au vendredi: créneaux proposés de 08:30 à 19:00. Retrait possible à partir de 2h après validation." :
-                "Plus aucun créneau de retrait n’est disponible aujourd’hui avec le délai minimum de 2h. Choisissez une autre date.",
+                "Du mardi au vendredi: créneaux proposés de 08:30 à 19:00. Retrait possible à partir de 2h après validation." : "Plus aucun créneau de retrait n’est disponible aujourd’hui avec le délai minimum de 2h. Choisissez une autre date.",
             slots,
         };
     };
@@ -779,7 +785,7 @@ export function initShopPage() {
         Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
 
     const getCardEntry = (itemOrId) => {
-        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId?.id;
+        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId ?.id;
         return itemId ? cards.get(itemId) || null : null;
     };
 
@@ -788,7 +794,7 @@ export function initShopPage() {
     };
 
     const updateCardToggleLabel = (cardEntry, quantity = 0) => {
-        if (!cardEntry?.toggleButton) {
+        if (!cardEntry ?.toggleButton) {
             return;
         }
 
@@ -801,7 +807,7 @@ export function initShopPage() {
     };
 
     const setOptionsDrawerOpen = (cardEntry, open) => {
-        if (!cardEntry?.drawer || !cardEntry.toggleButton) {
+        if (!cardEntry ?.drawer || !cardEntry.toggleButton) {
             return;
         }
 
@@ -815,7 +821,7 @@ export function initShopPage() {
                     otherCardEntry.isOpen = false;
                     otherCardEntry.drawer.hidden = true;
                     otherCardEntry.cardNode.classList.remove("is-expanded");
-                    otherCardEntry.toggleButton?.setAttribute("aria-expanded", "false");
+                    otherCardEntry.toggleButton ?.setAttribute("aria-expanded", "false");
 
                     const otherQuantity = getCardItems(otherCardEntry.itemId).reduce(
                         (total, item) => total + getQuantity(item),
@@ -1624,6 +1630,7 @@ export function initShopPage() {
     }
 
     unbindDesktopToastMedia = bindMediaQueryChange(desktopToastMedia, () => {
+        syncUltrawideScrollMode();
         clearSummaryHideTimeout();
         clearSummaryPromptTimeout();
         isSummaryPinned = false;
@@ -1636,6 +1643,7 @@ export function initShopPage() {
     });
 
     unbindDesktopQuickAddMedia = bindMediaQueryChange(desktopQuickAddMedia, () => {
+        syncUltrawideScrollMode();
         renderSummary();
     });
 
@@ -1645,12 +1653,14 @@ export function initShopPage() {
     });
 
     window.addEventListener("beforeunload", () => {
+        pageBody.classList.remove("page--shop-scroll-native");
         unbindDesktopToastMedia();
         unbindDesktopQuickAddMedia();
         unbindSummarySheetMedia();
     });
 
     window.addEventListener("resize", syncSummaryDockBounds);
+    window.addEventListener("resize", syncUltrawideScrollMode);
 
     if (pickupDateInput instanceof HTMLInputElement) {
         pickupDateInput.addEventListener("change", syncPickupScheduleState);
@@ -1784,6 +1794,7 @@ export function initShopPage() {
         }
         syncCardState(cardEntry.itemId);
     });
+    syncUltrawideScrollMode();
     syncSummaryDockBounds();
     refreshStock({ silent: true });
     window.setInterval(() => refreshStock({ silent: true }), 15000);

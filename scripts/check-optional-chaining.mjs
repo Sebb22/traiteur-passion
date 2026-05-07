@@ -3,7 +3,8 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const JS_DIR = path.join(ROOT, "resources", "js");
-const BROKEN_PATTERN = /\?\s+\./g;
+const BROKEN_OPTIONAL_CHAINING_PATTERN = /\?\s+\./g;
+const BROKEN_NULLISH_COALESCING_PATTERN = /\?\s+\?/g;
 
 function walk(dir, out = []) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -30,10 +31,14 @@ function findBrokenOptionalChaining(filePath) {
     const matches = [];
 
     for (let i = 0; i < lines.length; i += 1) {
-        if (BROKEN_PATTERN.test(lines[i])) {
+        if (
+            BROKEN_OPTIONAL_CHAINING_PATTERN.test(lines[i]) ||
+            BROKEN_NULLISH_COALESCING_PATTERN.test(lines[i])
+        ) {
             matches.push({ line: i + 1, text: lines[i].trim() });
         }
-        BROKEN_PATTERN.lastIndex = 0;
+        BROKEN_OPTIONAL_CHAINING_PATTERN.lastIndex = 0;
+        BROKEN_NULLISH_COALESCING_PATTERN.lastIndex = 0;
     }
 
     return matches;
@@ -58,7 +63,7 @@ for (const file of jsFiles) {
 }
 
 if (issues.length) {
-    console.error("\n❌ Broken optional chaining detected (`? .` instead of `?.`)\n");
+    console.error("\n❌ Broken optional chaining or nullish coalescing detected (`? .`/`? ?` instead of `?.`/`??`)\n");
     for (const issue of issues) {
         console.error(`- ${issue}`);
     }

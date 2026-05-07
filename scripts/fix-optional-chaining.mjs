@@ -3,7 +3,8 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const JS_DIR = path.join(ROOT, "resources", "js");
-const BROKEN_PATTERN = /\?\s+\./g;
+const BROKEN_OPTIONAL_CHAINING_PATTERN = /\?\s+\./g;
+const BROKEN_NULLISH_COALESCING_PATTERN = /\?\s+\?/g;
 
 function walk(dir, out = []) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -34,7 +35,9 @@ let changedCount = 0;
 
 for (const file of files) {
     const original = fs.readFileSync(file, "utf8");
-    const fixed = original.replace(BROKEN_PATTERN, "?.");
+    const fixed = original
+        .replace(BROKEN_OPTIONAL_CHAINING_PATTERN, "?.")
+        .replace(BROKEN_NULLISH_COALESCING_PATTERN, "??");
 
     if (fixed !== original) {
         fs.writeFileSync(file, fixed, "utf8");

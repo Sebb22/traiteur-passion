@@ -25,6 +25,45 @@
     }
 }
 
+body.page--shop.page--shop-scroll-native {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+body.page--shop.page--shop-scroll-native .siteMain {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+}
+
+body.page--shop.page--shop-scroll-native .shopSplit {
+    height: auto;
+    min-height: 100dvh;
+    align-content: start;
+}
+
+body.page--shop.page--shop-scroll-native .shopSplit .menuSplit__left {
+    position: sticky;
+    top: 0;
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+body.page--shop.page--shop-scroll-native .shopSplit .menuSplit__right {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+}
+
+body.page--shop.page--shop-scroll-native .shopPanel {
+    height: auto;
+    min-height: calc(100dvh - 36px);
+    overflow: visible;
+}
+
 @media (min-width: 981px) and (max-width: 1279px) and (orientation: landscape) {
     body.page--shop {
         height: auto;
@@ -101,84 +140,6 @@
     }
     .shopSummaryDock.is-open .shopSummary {
         visibility: visible;
-    }
-}
-
-@media (min-width: 1280px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
-    body.page--shop {
-        height: auto;
-        min-height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    body.page--shop .siteMain {
-        height: auto;
-        min-height: 0;
-        overflow: visible;
-    }
-    .shopSplit {
-        height: auto;
-        min-height: 0;
-        grid-template-columns: 1fr;
-        align-content: start;
-    }
-    .shopSplit .menuSplit__left,
-    .shopSplit .menuSplit__right,
-    .shopPanel {
-        height: auto;
-        min-height: 0;
-        overflow: visible;
-    }
-    .shopSplit .menuSplit__left {
-        position: relative;
-        top: auto;
-        min-height: 44vh;
-        height: 44vh;
-        overflow: hidden;
-    }
-    .shopSplit .menuSplit__right {
-        overflow-y: visible;
-        overflow-x: hidden;
-        padding: 0 18px 18px;
-        touch-action: pan-y;
-    }
-    .shopSummaryDock {
-        position: static;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        width: 100%;
-        margin-top: 18px;
-        pointer-events: auto;
-        z-index: auto;
-    }
-    .shopSummaryOverlay {
-        display: none !important;
-    }
-    .shopSummaryTab {
-        width: 100%;
-        max-width: none;
-    }
-    .shopSummary {
-        position: static;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        width: 100%;
-        max-width: none;
-        max-height: none;
-        margin-top: 12px;
-        overflow: visible;
-        transform: none;
-        backdrop-filter: none;
-    }
-    .shopSummaryDock:not(.is-open) .shopSummary {
-        visibility: hidden;
-        pointer-events: none;
-    }
-    .shopSummaryDock.is-open .shopSummary {
-        visibility: visible;
-        pointer-events: auto;
     }
 }
 
