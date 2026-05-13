@@ -366,6 +366,8 @@ export function initShopPage() {
             return;
         }
 
+        const selectedValue = pickupSlotSelect.value.trim();
+
         clearElementChildren(pickupSlotSelect);
 
         const placeholderOption = document.createElement("option");
@@ -379,6 +381,10 @@ export function initShopPage() {
             option.textContent = slot;
             pickupSlotSelect.append(option);
         });
+
+        if (selectedValue !== "" && slots.includes(selectedValue)) {
+            pickupSlotSelect.value = selectedValue;
+        }
     };
 
     const validatePickupSlotValue = () => {
@@ -860,7 +866,7 @@ export function initShopPage() {
         Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
 
     const getCardEntry = (itemOrId) => {
-        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId?.id;
+        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId ?.id;
         return itemId ? cards.get(itemId) || null : null;
     };
 
@@ -869,7 +875,7 @@ export function initShopPage() {
     };
 
     const updateCardToggleLabel = (cardEntry, quantity = 0) => {
-        if (!cardEntry?.toggleButton) {
+        if (!cardEntry ?.toggleButton) {
             return;
         }
 
@@ -882,7 +888,7 @@ export function initShopPage() {
     };
 
     const setOptionsDrawerOpen = (cardEntry, open) => {
-        if (!cardEntry?.drawer || !cardEntry.toggleButton) {
+        if (!cardEntry ?.drawer || !cardEntry.toggleButton) {
             return;
         }
 
@@ -896,7 +902,7 @@ export function initShopPage() {
                     otherCardEntry.isOpen = false;
                     otherCardEntry.drawer.hidden = true;
                     otherCardEntry.cardNode.classList.remove("is-expanded");
-                    otherCardEntry.toggleButton?.setAttribute("aria-expanded", "false");
+                    otherCardEntry.toggleButton ?.setAttribute("aria-expanded", "false");
 
                     const otherQuantity = getCardItems(otherCardEntry.itemId).reduce(
                         (total, item) => total + getQuantity(item),
