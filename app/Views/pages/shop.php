@@ -859,6 +859,9 @@
                                                 placeholder="Choisissez d’abord une date" list="shopPickupSlots"
                                                 data-shop-pickup-slot autocomplete="off">
                                             <datalist id="shopPickupSlots" data-shop-pickup-slot-list></datalist>
+                                            <select class="shopInput shopInput--slot shopInput--slotSelect" data-shop-pickup-slot-select hidden disabled>
+                                                <option value="">Choisissez d’abord une date</option>
+                                            </select>
                                             <small class="shopField__hint" data-shop-pickup-slot-hint>
                                                 Créneaux de retrait disponibles du mardi au vendredi de 8:30 à 19:00 et le samedi de 8:30 à 15:30, avec un délai minimum de 2h après validation.
                                             </small>

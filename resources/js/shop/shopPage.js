@@ -156,6 +156,7 @@ export function initShopPage() {
     const pickupDateInput = form.querySelector("[data-shop-pickup-date]");
     const pickupSlotInput = form.querySelector("[data-shop-pickup-slot]");
     const pickupSlotList = form.querySelector("[data-shop-pickup-slot-list]");
+    const pickupSlotSelect = form.querySelector("[data-shop-pickup-slot-select]");
     const pickupSlotHint = form.querySelector("[data-shop-pickup-slot-hint]");
     const cardNodes = Array.from(form.querySelectorAll("[data-shop-item-card]"));
     const lineNodes = Array.from(form.querySelectorAll("[data-shop-order-line]"));
@@ -313,6 +314,40 @@ export function initShopPage() {
         }
     };
 
+    const setPickupSlotValue = (value) => {
+        const normalizedValue = String(value || "").trim();
+
+        if (pickupSlotInput instanceof HTMLInputElement) {
+            pickupSlotInput.value = normalizedValue;
+        }
+
+        if (pickupSlotSelect instanceof HTMLSelectElement) {
+            pickupSlotSelect.value = normalizedValue;
+        }
+    };
+
+    const setPickupSlotValidity = (message) => {
+        if (pickupSlotInput instanceof HTMLInputElement) {
+            pickupSlotInput.setCustomValidity("");
+        }
+
+        if (pickupSlotSelect instanceof HTMLSelectElement) {
+            pickupSlotSelect.setCustomValidity("");
+        }
+
+        const activeControl =
+            getSelectedFulfillmentMethod() === "pickup" && pickupSlotSelect instanceof HTMLSelectElement ?
+            pickupSlotSelect :
+            pickupSlotInput;
+
+        if (
+            (activeControl instanceof HTMLInputElement || activeControl instanceof HTMLSelectElement) &&
+            typeof activeControl.setCustomValidity === "function"
+        ) {
+            activeControl.setCustomValidity(message);
+        }
+    };
+
     const syncPickupSlotOptions = (slots) => {
         if (!(pickupSlotList instanceof HTMLDataListElement)) {
             return;
@@ -326,6 +361,26 @@ export function initShopPage() {
         });
     };
 
+    const syncPickupSlotSelectOptions = (slots, placeholder) => {
+        if (!(pickupSlotSelect instanceof HTMLSelectElement)) {
+            return;
+        }
+
+        clearElementChildren(pickupSlotSelect);
+
+        const placeholderOption = document.createElement("option");
+        placeholderOption.value = "";
+        placeholderOption.textContent = placeholder;
+        pickupSlotSelect.append(placeholderOption);
+
+        slots.forEach((slot) => {
+            const option = document.createElement("option");
+            option.value = slot;
+            option.textContent = slot;
+            pickupSlotSelect.append(option);
+        });
+    };
+
     const validatePickupSlotValue = () => {
         if (!(pickupSlotInput instanceof HTMLInputElement)) {
             return true;
@@ -334,33 +389,37 @@ export function initShopPage() {
         const selectedMethod = getSelectedFulfillmentMethod();
 
         if (selectedMethod !== "pickup") {
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
             return true;
         }
 
         const schedule = getPickupSchedule(
             pickupDateInput instanceof HTMLInputElement ? pickupDateInput.value : "",
         );
-        const value = pickupSlotInput.value.trim();
+        const rawValue =
+            pickupSlotSelect instanceof HTMLSelectElement ? pickupSlotSelect.value : pickupSlotInput.value;
+        const value = rawValue.trim();
+
+        setPickupSlotValue(value);
 
         if (!schedule || schedule.closed) {
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
             return false;
         }
 
         if (value === "") {
-            pickupSlotInput.setCustomValidity("Choisissez un créneau de retrait.");
+            setPickupSlotValidity("Choisissez un créneau de retrait.");
             return false;
         }
 
         if (!schedule.slots.includes(value)) {
-            pickupSlotInput.setCustomValidity(
+            setPickupSlotValidity(
                 "Choisissez un créneau proposé pour cette date de retrait.",
             );
             return false;
         }
 
-        pickupSlotInput.setCustomValidity("");
+        setPickupSlotValidity("");
         return true;
     };
 
@@ -392,14 +451,23 @@ export function initShopPage() {
         }
 
         pickupSlotInput.disabled = selectedMethod === "";
-        pickupSlotInput.required = pickupSelected;
+        pickupSlotInput.required = deliverySelected;
+        pickupSlotInput.hidden = pickupSelected;
+
+        if (pickupSlotSelect instanceof HTMLSelectElement) {
+            pickupSlotSelect.hidden = !pickupSelected;
+            pickupSlotSelect.disabled = !pickupSelected;
+            pickupSlotSelect.required = pickupSelected;
+        }
 
         if (selectedMethod === "") {
             if (pickupDateInput instanceof HTMLInputElement) {
                 pickupDateInput.setCustomValidity("");
             }
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
+            setPickupSlotValue("");
             syncPickupSlotOptions([]);
+            syncPickupSlotSelectOptions([], "Choisissez d’abord un mode");
             pickupSlotInput.placeholder = "Choisissez d’abord un mode";
             setPickupHint("Sélectionnez d’abord Retrait ou Livraison.");
             return;
@@ -409,8 +477,9 @@ export function initShopPage() {
             if (pickupDateInput instanceof HTMLInputElement) {
                 pickupDateInput.setCustomValidity("");
             }
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
             syncPickupSlotOptions([]);
+            syncPickupSlotSelectOptions([], "Créneau libre de livraison");
             pickupSlotInput.placeholder = "Ex: entre 11:00 et 12:00";
             setPickupHint("Indiquez si besoin un créneau de livraison souhaité.");
             return;
@@ -424,8 +493,10 @@ export function initShopPage() {
             if (pickupDateInput instanceof HTMLInputElement) {
                 pickupDateInput.setCustomValidity("");
             }
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
+            setPickupSlotValue("");
             syncPickupSlotOptions([]);
+            syncPickupSlotSelectOptions([], "Choisissez d’abord une date");
             pickupSlotInput.placeholder = "Choisissez d’abord une date";
             setPickupHint(
                 "Créneaux de retrait disponibles du mardi au vendredi de 8:30 à 19:00 et le samedi de 8:30 à 15:30, avec un délai minimum de 2h après validation.",
@@ -435,6 +506,7 @@ export function initShopPage() {
 
         setPickupHint(schedule.hint);
         syncPickupSlotOptions(schedule.slots);
+        syncPickupSlotSelectOptions(schedule.slots, "Choisissez un créneau de retrait");
 
         if (schedule.closed) {
             if (pickupDateInput instanceof HTMLInputElement) {
@@ -442,9 +514,9 @@ export function initShopPage() {
                     "Le retrait boutique est fermé le dimanche et le lundi.",
                 );
             }
-            pickupSlotInput.value = "";
+            setPickupSlotValue("");
             pickupSlotInput.placeholder = "Retrait fermé le dimanche et le lundi";
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
             return;
         }
 
@@ -454,9 +526,10 @@ export function initShopPage() {
                     "Aucun créneau de retrait n’est disponible pour cette date avec le délai minimum de 2h.",
                 );
             }
-            pickupSlotInput.value = "";
+            setPickupSlotValue("");
             pickupSlotInput.placeholder = "Choisissez une autre date";
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
+            syncPickupSlotSelectOptions([], "Choisissez une autre date");
             return;
         }
 
@@ -465,8 +538,10 @@ export function initShopPage() {
         }
 
         pickupSlotInput.placeholder = "Ex: 11:00 - 11:30";
-        if (pickupSlotInput.value && !schedule.slots.includes(pickupSlotInput.value.trim())) {
-            pickupSlotInput.value = "";
+        const currentPickupValue =
+            pickupSlotSelect instanceof HTMLSelectElement ? pickupSlotSelect.value : pickupSlotInput.value;
+        if (currentPickupValue && !schedule.slots.includes(currentPickupValue.trim())) {
+            setPickupSlotValue("");
         }
         validatePickupSlotValue();
     };
@@ -785,7 +860,7 @@ export function initShopPage() {
         Math.max(1, Number.parseInt(item.optionUnits || 1, 10) || 1);
 
     const getCardEntry = (itemOrId) => {
-        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId ?.id;
+        const itemId = typeof itemOrId === "number" ? itemOrId : itemOrId?.id;
         return itemId ? cards.get(itemId) || null : null;
     };
 
@@ -794,7 +869,7 @@ export function initShopPage() {
     };
 
     const updateCardToggleLabel = (cardEntry, quantity = 0) => {
-        if (!cardEntry ?.toggleButton) {
+        if (!cardEntry?.toggleButton) {
             return;
         }
 
@@ -807,7 +882,7 @@ export function initShopPage() {
     };
 
     const setOptionsDrawerOpen = (cardEntry, open) => {
-        if (!cardEntry ?.drawer || !cardEntry.toggleButton) {
+        if (!cardEntry?.drawer || !cardEntry.toggleButton) {
             return;
         }
 
@@ -821,7 +896,7 @@ export function initShopPage() {
                     otherCardEntry.isOpen = false;
                     otherCardEntry.drawer.hidden = true;
                     otherCardEntry.cardNode.classList.remove("is-expanded");
-                    otherCardEntry.toggleButton ?.setAttribute("aria-expanded", "false");
+                    otherCardEntry.toggleButton?.setAttribute("aria-expanded", "false");
 
                     const otherQuantity = getCardItems(otherCardEntry.itemId).reduce(
                         (total, item) => total + getQuantity(item),
@@ -1670,7 +1745,18 @@ export function initShopPage() {
     if (pickupSlotInput instanceof HTMLInputElement) {
         pickupSlotInput.addEventListener("change", validatePickupSlotValue);
         pickupSlotInput.addEventListener("input", () => {
-            pickupSlotInput.setCustomValidity("");
+            setPickupSlotValidity("");
+        });
+    }
+
+    if (pickupSlotSelect instanceof HTMLSelectElement) {
+        pickupSlotSelect.addEventListener("change", () => {
+            setPickupSlotValue(pickupSlotSelect.value);
+            validatePickupSlotValue();
+        });
+        pickupSlotSelect.addEventListener("input", () => {
+            setPickupSlotValue(pickupSlotSelect.value);
+            setPickupSlotValidity("");
         });
     }
 
