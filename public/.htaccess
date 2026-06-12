@@ -1,4 +1,12 @@
 RewriteEngine On
+
+# Block currently identified spam sources before routing to PHP.
+RewriteCond %{REMOTE_ADDR} ^45\.141\.148\.148$ [OR]
+RewriteCond %{REMOTE_ADDR} ^198\.46\.154\.22$ [OR]
+RewriteCond %{REMOTE_ADDR} ^198\.46\.154\.21$ [OR]
+RewriteCond %{REMOTE_ADDR} ^31\.40\.204\.244$
+RewriteRule ^ - [F,L]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]

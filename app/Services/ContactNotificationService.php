@@ -512,8 +512,30 @@ final class ContactNotificationService
             ['label' => 'Nombre de personnes', 'value' => $this->valueOrFallback($contactData['people'] ?? null)],
             ['label' => 'Date de l’événement', 'value' => $this->formatDate($contactData['date'] ?? null)],
             ['label' => 'Lieu', 'value' => $this->valueOrFallback($contactData['location'] ?? null)],
+            ['label' => 'Adresse client', 'value' => $this->customerAddressLabel($contactData)],
             ['label' => 'Type d’événement', 'value' => $this->valueOrFallback($contactData['type'] ?? null)],
         ];
+    }
+
+    /**
+     * @param array<string,mixed> $contactData
+     */
+    private function customerAddressLabel(array $contactData): string
+    {
+        $parts = array_filter([
+            $this->nullableString($contactData['customer_address'] ?? null),
+            trim(sprintf(
+                '%s %s',
+                $this->nullableString($contactData['customer_postal_code'] ?? null) ?? '',
+                $this->nullableString($contactData['customer_city'] ?? null) ?? '',
+            )),
+        ]);
+
+        if ($parts === []) {
+            return '-';
+        }
+
+        return implode(', ', $parts);
     }
 
     /**
@@ -963,6 +985,15 @@ final class ContactNotificationService
     {
         $stringValue = trim((string) ($value ?? ''));
         return $stringValue === '' ? '-' : $stringValue;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function nullableString($value): ?string
+    {
+        $stringValue = trim((string) ($value ?? ''));
+        return $stringValue === '' ? null : $stringValue;
     }
 
     /**

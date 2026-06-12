@@ -22,12 +22,17 @@
     $mailRequestKind    = $menuSelectionCount > 0 ? 'quote' : 'contact';
     $contactStatusKey   = (string) ($contact['status'] ?? 'new');
     $contactStatusLabel = (string) ($statusOptions[$contactStatusKey] ?? ucfirst($contactStatusKey));
-    $previewSummary     = [
+    $customerAddress    = trim(implode(', ', array_filter([
+    trim((string) ($contact['customer_address'] ?? '')),
+    trim((string) (($contact['customer_postal_code'] ?? '') . ' ' . ($contact['customer_city'] ?? ''))),
+    ])));
+    $previewSummary = [
     ['label' => 'Reference', 'value' => '#' . (int) ($contact['id'] ?? 0)],
     ['label' => 'Type', 'value' => (string) ($contact['type'] ?? '-')],
     ['label' => 'Date', 'value' => $formatDate($contact['date'] ?? null)],
     ['label' => 'Personnes', 'value' => (string) ($contact['people'] ?? '-')],
     ['label' => 'Lieu', 'value' => (string) ($contact['location'] ?? '-')],
+    ['label' => 'Adresse client', 'value' => $customerAddress !== '' ? $customerAddress : '-'],
     ['label' => 'Statut', 'value' => $contactStatusLabel],
     ];
     if ($mailRequestKind === 'quote') {
@@ -169,6 +174,10 @@
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Lieu</span>
                             <span class="adminInfoItem__value"><?php echo $e($contact['location'] ?? '-'); ?></span>
+                        </div>
+                        <div class="adminInfoItem">
+                            <span class="adminInfoItem__label">Adresse client</span>
+                            <span class="adminInfoItem__value"><?php echo $e($customerAddress !== '' ? $customerAddress : '-'); ?></span>
                         </div>
                     </div>
                 </section>

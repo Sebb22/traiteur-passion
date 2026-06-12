@@ -320,8 +320,12 @@
                 <?php else: ?>
                 <?php foreach ($contacts as $contact): ?>
                 <?php
-                    $contactId = (int) ($contact['id'] ?? 0);
-                    $statusKey = (string) ($contact['status'] ?? 'new');
+                    $contactId       = (int) ($contact['id'] ?? 0);
+                    $statusKey       = (string) ($contact['status'] ?? 'new');
+                    $customerAddress = trim(implode(', ', array_filter([
+                        trim((string) ($contact['customer_address'] ?? '')),
+                        trim((string) (($contact['customer_postal_code'] ?? '') . ' ' . ($contact['customer_city'] ?? ''))),
+                    ])));
                 ?>
                 <article class="adminRequestCard" role="listitem">
                     <div class="adminRequestCard__head">
@@ -356,6 +360,10 @@
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Type</span>
                             <span class="adminInfoItem__value"><?php echo $e($contact['type'] ?? '-'); ?></span>
+                        </div>
+                        <div class="adminInfoItem">
+                            <span class="adminInfoItem__label">Adresse client</span>
+                            <span class="adminInfoItem__value"><?php echo $e($customerAddress !== '' ? $customerAddress : '-'); ?></span>
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Personnes</span>

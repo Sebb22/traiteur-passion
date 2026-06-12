@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Models\Shop;
 use App\Models\ShopOrder;
+use App\Services\PublicFormProtectionService;
 use App\Services\ShopOrderNotificationService;
 use App\Services\ShopOrderSubmissionService;
 use App\Services\ShopPromoService;
@@ -34,11 +35,20 @@ final class ShopController
             'sections'        => $sections,
             'loadError'       => $loadError,
             'shopPromo'       => $shopPromo,
+            'formProtection'  => (new PublicFormProtectionService())->issue('shop'),
         ]);
     }
 
     public function store(): void
     {
+        $formProtectionResult = (new PublicFormProtectionService())->verify('shop', $_POST, $_SERVER);
+        if (($formProtectionResult['success'] ?? false) !== true) {
+            $this->json((int) ($formProtectionResult['status'] ?? 422), [
+                'error' => $formProtectionResult['error'] ?? 'Requête invalide',
+            ]);
+            return;
+        }
+
         $result = (new ShopOrderSubmissionService())->parse($_POST, $_SERVER['REQUEST_METHOD'] ?? 'GET');
         if (($result['success'] ?? false) !== true) {
             $this->json((int) ($result['status'] ?? 400), [

@@ -8,6 +8,7 @@ use App\Models\Contact;
 use App\Models\Menu;
 use App\Services\ContactNotificationService;
 use App\Services\ContactSubmissionService;
+use App\Services\PublicFormProtectionService;
 
 final class ContactController
 {
@@ -26,8 +27,9 @@ final class ContactController
         }
 
         View::render('pages/contact', [
-            'title'    => 'Traiteur Passion — Contact',
-            'sections' => $sections,
+            'title'          => 'Traiteur Passion — Contact',
+            'sections'       => $sections,
+            'formProtection' => (new PublicFormProtectionService())->issue('contact'),
         ]);
     }
 
@@ -36,6 +38,14 @@ final class ContactController
      */
     public function store(): void
     {
+        $formProtectionResult = (new PublicFormProtectionService())->verify('contact', $_POST, $_SERVER);
+        if (($formProtectionResult['success'] ?? false) !== true) {
+            $this->json((int) ($formProtectionResult['status'] ?? 422), [
+                'error' => $formProtectionResult['error'] ?? 'Requête invalide',
+            ]);
+            return;
+        }
+
         $submissionService = new ContactSubmissionService();
         $result            = $submissionService->parse($_POST, $_SERVER['REQUEST_METHOD'] ?? 'GET');
 

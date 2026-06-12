@@ -195,6 +195,8 @@ export function initShopPage() {
         endsAt: promoEndsAtDate,
     };
 
+
+
     const isDesktopToast = () => desktopToastMedia.matches;
     const isDesktopQuickAdd = () => desktopQuickAddMedia.matches;
     const isSummarySheet = () => summarySheetMedia.matches;

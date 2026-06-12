@@ -245,6 +245,26 @@
                     data-promo-percent="<?php echo (int) ($shopPromo['discount_percent'] ?? 0); ?>"
                     data-promo-title="<?php echo $e($shopPromo['title'] ?? ''); ?>"
                     data-promo-ends-at="<?php echo $e($shopPromo['countdown_iso'] ?? ''); ?>">
+                    <?php
+                        $formProtection  = isset($formProtection) && is_array($formProtection) ? $formProtection : [];
+                        $formTokenField  = (string) ($formProtection['token_field'] ?? '__form_token');
+                        $formToken       = (string) ($formProtection['token'] ?? '');
+                        $formIssuedField = (string) ($formProtection['issued_field'] ?? '__form_issued_at');
+                        $formIssuedAt    = (string) ($formProtection['issued_at'] ?? '');
+                        $honeypotField   = (string) ($formProtection['honeypot_field'] ?? '__website');
+                    ?>
+                    <input type="hidden" name="<?php echo $e($formTokenField); ?>"
+                        value="<?php echo $e($formToken); ?>">
+                    <input type="hidden" name="<?php echo $e($formIssuedField); ?>"
+                        value="<?php echo $e($formIssuedAt); ?>">
+                    <div aria-hidden="true"
+                        style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
+                        <label>
+                            Ne pas remplir
+                            <input type="text" name="<?php echo $e($honeypotField); ?>" value="" tabindex="-1"
+                                autocomplete="off">
+                        </label>
+                    </div>
                     <?php if ($sections !== []): ?>
                     <div class="shopCatalogNav">
                         <div class="shopCatalogNav__head">
@@ -515,7 +535,8 @@
 
                                         <div class="shopItemCard__body">
                                             <div class="shopItemCard__top">
-                                                <h4 class="shopItemCard__title"><?php echo $e($item['name'] ?? ''); ?></h4>
+                                                <h4 class="shopItemCard__title"><?php echo $e($item['name'] ?? ''); ?>
+                                                </h4>
                                                 <span
                                                     class="shopItemCard__price"><?php echo $e($cardPriceDisplay); ?></span>
                                             </div>
@@ -532,10 +553,10 @@
                                                     data-shop-options-toggle data-item-id="<?php echo $itemId; ?>"
                                                     data-closed-label="Choisir un format"
                                                     data-open-label="Masquer les formats"
-                                                    data-filled-label="Modifier le format"
-                                                    aria-expanded="false"
+                                                    data-filled-label="Modifier le format" aria-expanded="false"
                                                     aria-controls="shop-options-<?php echo $itemId; ?>"
-                                                    <?php echo $isSoldOut ? 'disabled' : ''; ?>>Choisir un format</button>
+                                                    <?php echo $isSoldOut ? 'disabled' : ''; ?>>Choisir un
+                                                    format</button>
                                                 <?php elseif ($primaryPurchaseLine !== null): ?>
                                                 <?php
                                                     $lineKey               = (string) ($primaryPurchaseLine['line_key'] ?? '');
@@ -568,8 +589,7 @@
                                                     data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
                                                     <input type="hidden" name="shop_item[<?php echo $e($lineKey); ?>]"
                                                         value="<?php echo $itemId; ?>">
-                                                    <input type="hidden"
-                                                        name="shop_option[<?php echo $e($lineKey); ?>]"
+                                                    <input type="hidden" name="shop_option[<?php echo $e($lineKey); ?>]"
                                                         value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
                                                     <input type="hidden"
                                                         name="shop_option_label[<?php echo $e($lineKey); ?>]"
@@ -579,9 +599,8 @@
                                                         value="<?php echo $lineUnits; ?>">
 
                                                     <div class="shopItemCard__actions">
-                                                        <button type="button"
-                                                            class="btn btn--ghost shopItemCard__add" data-shop-add
-                                                            data-line-key="<?php echo $e($lineKey); ?>"
+                                                        <button type="button" class="btn btn--ghost shopItemCard__add"
+                                                            data-shop-add data-line-key="<?php echo $e($lineKey); ?>"
                                                             <?php echo $lineSoldOut ? 'disabled' : ''; ?>><?php echo $e($lineButtonLabel); ?></button>
 
                                                         <div class="shopQtyControls" data-shop-controls
@@ -595,8 +614,7 @@
                                                                     class="shopQty__label sr-only"><?php echo $e($lineQuantityLabel); ?></span>
                                                                 <input class="shopQty__input" type="number"
                                                                     name="shop_quantity[<?php echo $e($lineKey); ?>]"
-                                                                    min="0" max="<?php echo $lineAllowed; ?>"
-                                                                    value="0"
+                                                                    min="0" max="<?php echo $lineAllowed; ?>" value="0"
                                                                     <?php echo $lineSoldOut ? 'disabled' : ''; ?>
                                                                     data-shop-qty
                                                                     data-line-key="<?php echo $e($lineKey); ?>">
@@ -622,104 +640,106 @@
                                                         <p class="shopPurchaseOptions__intro">
                                                             <span>Choisissez un format puis ajustez la quantité.</span>
                                                         </p>
-                                                    <?php foreach ($purchaseLines as $purchaseLine): ?>
-                                                    <?php
-                                                        $lineKey               = (string) ($purchaseLine['line_key'] ?? '');
-                                                        $lineOptionId          = (int) ($purchaseLine['option_id'] ?? 0);
-                                                        $lineLabel             = trim((string) ($purchaseLine['option_label'] ?? ''));
-                                                        $lineUnits             = max(1, (int) ($purchaseLine['option_units'] ?? 1));
-                                                        $linePrice             = (string) ($purchaseLine['price_display'] ?? '');
-                                                        $linePriceCents        = (int) ($purchaseLine['price_cents'] ?? 0);
-                                                        $lineAllowed           = max(0, (int) ($purchaseLine['allowed'] ?? 0));
-                                                        $lineHint              = trim((string) ($purchaseLine['hint'] ?? ''));
-                                                        $lineMetaHint          = trim((string) ($purchaseLine['meta_hint'] ?? ''));
-                                                        $lineSoldOut           = $stockQuantity <= 0 || $lineAllowed <= 0;
-                                                        $lineTitle             = $lineLabel !== '' ? $lineLabel : 'Format standard';
-                                                        $lineQuantityLabel     = trim((string) ($purchaseLine['quantity_label'] ?? 'Quantité'));
-                                                        $lineButtonLabel       = trim((string) ($purchaseLine['button_label'] ?? 'Ajouter'));
-                                                        $lineCartLabelSingular = trim((string) ($purchaseLine['cart_label_singular'] ?? 'article'));
-                                                        $lineCartLabelPlural   = trim((string) ($purchaseLine['cart_label_plural'] ?? 'articles'));
-                                                    ?>
-                                                    <div class="shopPurchaseOption<?php echo $lineSoldOut ? ' is-sold-out' : ''; ?>"
-                                                        data-shop-order-line data-line-key="<?php echo $e($lineKey); ?>"
-                                                        data-item-id="<?php echo $itemId; ?>"
-                                                        data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
-                                                        data-item-stock="<?php echo $stockQuantity; ?>"
-                                                        data-item-stock-unit="<?php echo $e($stockUnit); ?>"
-                                                        data-item-low-stock-threshold="<?php echo max(0, (int) ($item['low_stock_threshold'] ?? 0)); ?>"
-                                                        data-item-price="<?php echo $e($linePrice); ?>"
-                                                        data-item-price-cents="<?php echo $linePriceCents; ?>"
-                                                        data-option-id="<?php echo $lineOptionId; ?>"
-                                                        data-option-label="<?php echo $e($lineLabel); ?>"
-                                                        data-option-stock="<?php echo array_key_exists('option_stock_quantity', $purchaseLine) && $purchaseLine['option_stock_quantity'] !== null ? max(0, (int) $purchaseLine['option_stock_quantity']) : ''; ?>"
-                                                        data-option-units="<?php echo $lineUnits; ?>"
-                                                        data-cart-label-singular="<?php echo $e($lineCartLabelSingular); ?>"
-                                                        data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
-                                                        <div class="shopPurchaseOption__head">
-                                                            <div class="shopPurchaseOption__copy">
-                                                                <strong
-                                                                    class="shopPurchaseOption__title"><?php echo $e($lineTitle); ?></strong>
-                                                                <p class="shopPurchaseOption__hint"
-                                                                    data-default-text="<?php echo $e($lineHint); ?>">
-                                                                    <span><?php echo $e($lineHint); ?></span>
-                                                                </p>
-                                                                <p class="shopPurchaseOption__meta">
-                                                                    <span><?php echo $e($lineMetaHint); ?></span>
-                                                                </p>
+                                                        <?php foreach ($purchaseLines as $purchaseLine): ?>
+                                                        <?php
+                                                            $lineKey               = (string) ($purchaseLine['line_key'] ?? '');
+                                                            $lineOptionId          = (int) ($purchaseLine['option_id'] ?? 0);
+                                                            $lineLabel             = trim((string) ($purchaseLine['option_label'] ?? ''));
+                                                            $lineUnits             = max(1, (int) ($purchaseLine['option_units'] ?? 1));
+                                                            $linePrice             = (string) ($purchaseLine['price_display'] ?? '');
+                                                            $linePriceCents        = (int) ($purchaseLine['price_cents'] ?? 0);
+                                                            $lineAllowed           = max(0, (int) ($purchaseLine['allowed'] ?? 0));
+                                                            $lineHint              = trim((string) ($purchaseLine['hint'] ?? ''));
+                                                            $lineMetaHint          = trim((string) ($purchaseLine['meta_hint'] ?? ''));
+                                                            $lineSoldOut           = $stockQuantity <= 0 || $lineAllowed <= 0;
+                                                            $lineTitle             = $lineLabel !== '' ? $lineLabel : 'Format standard';
+                                                            $lineQuantityLabel     = trim((string) ($purchaseLine['quantity_label'] ?? 'Quantité'));
+                                                            $lineButtonLabel       = trim((string) ($purchaseLine['button_label'] ?? 'Ajouter'));
+                                                            $lineCartLabelSingular = trim((string) ($purchaseLine['cart_label_singular'] ?? 'article'));
+                                                            $lineCartLabelPlural   = trim((string) ($purchaseLine['cart_label_plural'] ?? 'articles'));
+                                                        ?>
+                                                        <div class="shopPurchaseOption<?php echo $lineSoldOut ? ' is-sold-out' : ''; ?>"
+                                                            data-shop-order-line
+                                                            data-line-key="<?php echo $e($lineKey); ?>"
+                                                            data-item-id="<?php echo $itemId; ?>"
+                                                            data-item-name="<?php echo $e($item['name'] ?? ''); ?>"
+                                                            data-item-stock="<?php echo $stockQuantity; ?>"
+                                                            data-item-stock-unit="<?php echo $e($stockUnit); ?>"
+                                                            data-item-low-stock-threshold="<?php echo max(0, (int) ($item['low_stock_threshold'] ?? 0)); ?>"
+                                                            data-item-price="<?php echo $e($linePrice); ?>"
+                                                            data-item-price-cents="<?php echo $linePriceCents; ?>"
+                                                            data-option-id="<?php echo $lineOptionId; ?>"
+                                                            data-option-label="<?php echo $e($lineLabel); ?>"
+                                                            data-option-stock="<?php echo array_key_exists('option_stock_quantity', $purchaseLine) && $purchaseLine['option_stock_quantity'] !== null ? max(0, (int) $purchaseLine['option_stock_quantity']) : ''; ?>"
+                                                            data-option-units="<?php echo $lineUnits; ?>"
+                                                            data-cart-label-singular="<?php echo $e($lineCartLabelSingular); ?>"
+                                                            data-cart-label-plural="<?php echo $e($lineCartLabelPlural); ?>">
+                                                            <div class="shopPurchaseOption__head">
+                                                                <div class="shopPurchaseOption__copy">
+                                                                    <strong
+                                                                        class="shopPurchaseOption__title"><?php echo $e($lineTitle); ?></strong>
+                                                                    <p class="shopPurchaseOption__hint"
+                                                                        data-default-text="<?php echo $e($lineHint); ?>">
+                                                                        <span><?php echo $e($lineHint); ?></span>
+                                                                    </p>
+                                                                    <p class="shopPurchaseOption__meta">
+                                                                        <span><?php echo $e($lineMetaHint); ?></span>
+                                                                    </p>
+                                                                </div>
+                                                                <span
+                                                                    class="shopPurchaseOption__price"><?php echo $e($linePrice); ?></span>
                                                             </div>
-                                                            <span
-                                                                class="shopPurchaseOption__price"><?php echo $e($linePrice); ?></span>
-                                                        </div>
 
-                                                        <input type="hidden"
-                                                            name="shop_item[<?php echo $e($lineKey); ?>]"
-                                                            value="<?php echo $itemId; ?>">
-                                                        <input type="hidden"
-                                                            name="shop_option[<?php echo $e($lineKey); ?>]"
-                                                            value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
-                                                        <input type="hidden"
-                                                            name="shop_option_label[<?php echo $e($lineKey); ?>]"
-                                                            value="<?php echo $e($lineLabel); ?>">
-                                                        <input type="hidden"
-                                                            name="shop_option_units[<?php echo $e($lineKey); ?>]"
-                                                            value="<?php echo $lineUnits; ?>">
+                                                            <input type="hidden"
+                                                                name="shop_item[<?php echo $e($lineKey); ?>]"
+                                                                value="<?php echo $itemId; ?>">
+                                                            <input type="hidden"
+                                                                name="shop_option[<?php echo $e($lineKey); ?>]"
+                                                                value="<?php echo $lineOptionId > 0 ? $lineOptionId : ''; ?>">
+                                                            <input type="hidden"
+                                                                name="shop_option_label[<?php echo $e($lineKey); ?>]"
+                                                                value="<?php echo $e($lineLabel); ?>">
+                                                            <input type="hidden"
+                                                                name="shop_option_units[<?php echo $e($lineKey); ?>]"
+                                                                value="<?php echo $lineUnits; ?>">
 
-                                                        <div class="shopItemCard__actions">
-                                                            <button type="button"
-                                                                class="btn btn--ghost shopItemCard__add" data-shop-add
-                                                                data-line-key="<?php echo $e($lineKey); ?>"
-                                                                <?php echo $lineSoldOut ? 'disabled' : ''; ?>><?php echo $e($lineButtonLabel); ?></button>
-
-                                                            <div class="shopQtyControls" data-shop-controls
-                                                                data-line-key="<?php echo $e($lineKey); ?>" hidden>
-                                                                <button type="button" class="shopQtyControls__btn"
-                                                                    data-shop-decrease
+                                                            <div class="shopItemCard__actions">
+                                                                <button type="button"
+                                                                    class="btn btn--ghost shopItemCard__add"
+                                                                    data-shop-add
                                                                     data-line-key="<?php echo $e($lineKey); ?>"
-                                                                    aria-label="Retirer une unité de cette sélection">−</button>
-                                                                <label class="shopQty">
-                                                                    <span
-                                                                        class="shopQty__label"><?php echo $e($lineQuantityLabel); ?></span>
-                                                                    <input class="shopQty__input" type="number"
-                                                                        name="shop_quantity[<?php echo $e($lineKey); ?>]"
-                                                                        min="0" max="<?php echo $lineAllowed; ?>"
-                                                                        value="0"
-                                                                        <?php echo $lineSoldOut ? 'disabled' : ''; ?>
-                                                                        data-shop-qty
-                                                                        data-line-key="<?php echo $e($lineKey); ?>">
-                                                                </label>
-                                                                <button type="button" class="shopQtyControls__btn"
-                                                                    data-shop-increase
-                                                                    data-line-key="<?php echo $e($lineKey); ?>"
-                                                                    aria-label="Ajouter une unité à cette sélection">+</button>
-                                                                <button type="button" class="shopQtyControls__remove"
-                                                                    data-shop-remove
-                                                                    data-line-key="<?php echo $e($lineKey); ?>">Retirer</button>
+                                                                    <?php echo $lineSoldOut ? 'disabled' : ''; ?>><?php echo $e($lineButtonLabel); ?></button>
+
+                                                                <div class="shopQtyControls" data-shop-controls
+                                                                    data-line-key="<?php echo $e($lineKey); ?>" hidden>
+                                                                    <button type="button" class="shopQtyControls__btn"
+                                                                        data-shop-decrease
+                                                                        data-line-key="<?php echo $e($lineKey); ?>"
+                                                                        aria-label="Retirer une unité de cette sélection">−</button>
+                                                                    <label class="shopQty">
+                                                                        <span
+                                                                            class="shopQty__label"><?php echo $e($lineQuantityLabel); ?></span>
+                                                                        <input class="shopQty__input" type="number"
+                                                                            name="shop_quantity[<?php echo $e($lineKey); ?>]"
+                                                                            min="0" max="<?php echo $lineAllowed; ?>"
+                                                                            value="0"
+                                                                            <?php echo $lineSoldOut ? 'disabled' : ''; ?>
+                                                                            data-shop-qty
+                                                                            data-line-key="<?php echo $e($lineKey); ?>">
+                                                                    </label>
+                                                                    <button type="button" class="shopQtyControls__btn"
+                                                                        data-shop-increase
+                                                                        data-line-key="<?php echo $e($lineKey); ?>"
+                                                                        aria-label="Ajouter une unité à cette sélection">+</button>
+                                                                    <button type="button"
+                                                                        class="shopQtyControls__remove" data-shop-remove
+                                                                        data-line-key="<?php echo $e($lineKey); ?>">Retirer</button>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                        <?php endforeach; ?>
                                                     </div>
-                                                    <?php endforeach; ?>
                                                 </div>
-                                            </div>
                                             </div>
                                             <?php endif; ?>
                                         </div>
@@ -815,18 +835,26 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <article class="shopPickupInfo shopField--full" data-shop-pickup-location data-shop-pickup-notice hidden>
+                                        <article class="shopPickupInfo shopField--full" data-shop-pickup-location
+                                            data-shop-pickup-notice hidden>
                                             <span class="shopPickupInfo__eyebrow">Retrait boutique</span>
                                             <div class="shopPickupInfo__grid">
                                                 <div class="shopPickupInfo__section shopPickupInfo__section--place">
                                                     <strong class="shopPickupInfo__label">Lieu de retrait</strong>
-                                                    <p class="shopPickupInfo__address"><?php echo $e($pickupAddressLine); ?><br><?php echo $e($pickupPostalCode . ' ' . $pickupCity); ?></p>
-                                                    <p class="shopPickupInfo__text">Le retrait s’effectue à cette adresse, sur créneau proposé à partir de 2h après validation de la commande.</p>
-                                                    <a class="btn btn--ghost shopPickupInfo__action" href="<?php echo $e($pickupMapsUrl); ?>" target="_blank" rel="noopener noreferrer">
+                                                    <p class="shopPickupInfo__address">
+                                                        <?php echo $e($pickupAddressLine); ?><br><?php echo $e($pickupPostalCode . ' ' . $pickupCity); ?>
+                                                    </p>
+                                                    <p class="shopPickupInfo__text">Le retrait s’effectue à cette
+                                                        adresse, sur créneau proposé à partir de 2h après validation de
+                                                        la commande.</p>
+                                                    <a class="btn btn--ghost shopPickupInfo__action"
+                                                        href="<?php echo $e($pickupMapsUrl); ?>" target="_blank"
+                                                        rel="noopener noreferrer">
                                                         Voir l’itinéraire
                                                     </a>
                                                 </div>
-                                                <div class="shopPickupInfo__section shopPickupInfo__section--hours" aria-label="Horaires de retrait boutique">
+                                                <div class="shopPickupInfo__section shopPickupInfo__section--hours"
+                                                    aria-label="Horaires de retrait boutique">
                                                     <strong class="shopPickupInfo__label">Horaires</strong>
                                                     <div class="shopPickupInfo__rows">
                                                         <div class="shopPickupInfo__row">
@@ -842,28 +870,35 @@
                                                             <span class="shopPickupInfo__time">Fermé</span>
                                                         </div>
                                                     </div>
-                                                    <p class="shopPickupInfo__text shopPickupInfo__text--muted">Le jour même, seuls les créneaux respectant un délai minimum de 2h sont proposés. Samedi susceptible d’ajustement selon les prestations en cours.</p>
+                                                    <p class="shopPickupInfo__text shopPickupInfo__text--muted">Le jour
+                                                        même, seuls les créneaux respectant un délai minimum de 2h sont
+                                                        proposés. Samedi susceptible d’ajustement selon les prestations
+                                                        en cours.</p>
                                                 </div>
                                             </div>
                                         </article>
-                                        <label class="shopField shopField--appointment" data-shop-appointment-field hidden>
+                                        <label class="shopField shopField--appointment" data-shop-appointment-field
+                                            hidden>
                                             <span class="shopField__label">Date souhaitée</span>
                                             <input class="shopInput shopInput--date" type="date" name="pickup_date"
                                                 min="<?php echo $e($today); ?>" required data-shop-pickup-date
                                                 data-shop-default-min="<?php echo $e($today); ?>"
                                                 data-shop-pickup-min="<?php echo $e($firstAvailable); ?>">
                                         </label>
-                                        <label class="shopField shopField--appointment" data-shop-appointment-field hidden>
+                                        <label class="shopField shopField--appointment" data-shop-appointment-field
+                                            hidden>
                                             <span class="shopField__label">Créneau souhaité</span>
                                             <input class="shopInput shopInput--slot" type="text" name="pickup_slot"
                                                 placeholder="Choisissez d’abord une date" list="shopPickupSlots"
                                                 data-shop-pickup-slot autocomplete="off">
                                             <datalist id="shopPickupSlots" data-shop-pickup-slot-list></datalist>
-                                            <select class="shopInput shopInput--slot shopInput--slotSelect" data-shop-pickup-slot-select hidden disabled>
+                                            <select class="shopInput shopInput--slot shopInput--slotSelect"
+                                                data-shop-pickup-slot-select hidden disabled>
                                                 <option value="">Choisissez d’abord une date</option>
                                             </select>
                                             <small class="shopField__hint" data-shop-pickup-slot-hint>
-                                                Créneaux de retrait disponibles du mardi au vendredi de 8:30 à 19:00 et le samedi de 8:30 à 15:30, avec un délai minimum de 2h après validation.
+                                                Créneaux de retrait disponibles du mardi au vendredi de 8:30 à 19:00 et
+                                                le samedi de 8:30 à 15:30, avec un délai minimum de 2h après validation.
                                             </small>
                                         </label>
                                         <div class="shopDeliveryFields shopFieldGrid shopField--full"

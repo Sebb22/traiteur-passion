@@ -639,7 +639,7 @@ function initCatalogImageUploadUX() {
         });
 
         fileInput.addEventListener("change", () => {
-            const file = fileInput.files ? .[0];
+            const file = fileInput.files ?.[0];
             if (!file) {
                 sourceImage = null;
                 sourceFile = null;

@@ -49,7 +49,7 @@ export function initAboutStats() {
             }
 
             element.textContent = format.format(target);
-            element.closest(".aboutStat")?.classList.add("is-counter-visible");
+            element.closest(".aboutStat") ?.classList.add("is-counter-visible");
         };
 
         requestAnimationFrame(tick);

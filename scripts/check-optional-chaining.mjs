@@ -63,7 +63,9 @@ for (const file of jsFiles) {
 }
 
 if (issues.length) {
-    console.error("\n❌ Broken optional chaining or nullish coalescing detected (`? .`/`? ?` instead of `?.`/`??`)\n");
+    console.error(
+        "\n❌ Broken optional chaining or nullish coalescing detected (`? .`/`? ?` instead of `?.`/`??`)\n",
+    );
     for (const issue of issues) {
         console.error(`- ${issue}`);
     }

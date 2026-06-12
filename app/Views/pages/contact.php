@@ -55,20 +55,23 @@
                         livraison. Intervention et livraison selon votre zone.</p>
                     <div class="contactHead__story" aria-label="Approche de la demande">
                         <article class="contactHeadCard">
-                            <span class="contactHeadCard__kicker"><span class="contactHeadCard__icon" aria-hidden="true"><?php echo $contactIcon('method'); ?></span>Méthode</span>
+                            <span class="contactHeadCard__kicker"><span class="contactHeadCard__icon"
+                                    aria-hidden="true"><?php echo $contactIcon('method'); ?></span>Méthode</span>
                             <strong class="contactHeadCard__title">Un cadrage simple avant le devis</strong>
                             <p class="contactHeadCard__copy">Nombre de convives, format, lieu, contraintes et ambiance
                                 souhaitée: nous utilisons ces éléments pour proposer une base réellement exploitable.
                             </p>
                         </article>
                         <article class="contactHeadCard">
-                            <span class="contactHeadCard__kicker"><span class="contactHeadCard__icon" aria-hidden="true"><?php echo $contactIcon('reactive'); ?></span>Réactivité</span>
-                            <strong class="contactHeadCard__title">Un retour clair, pas un échange flou</strong>
+                            <span class="contactHeadCard__kicker"><span class="contactHeadCard__icon"
+                                    aria-hidden="true"><?php echo $contactIcon('reactive'); ?></span>Réactivité</span>
+                            <strong class="contactHeadCard__title">Un retour clair</strong>
                             <p class="contactHeadCard__copy">L’objectif n’est pas seulement de répondre vite, mais de
                                 formuler une proposition structurée, lisible et cohérente avec votre réception.</p>
                         </article>
                         <article class="contactHeadCard">
-                            <span class="contactHeadCard__kicker"><span class="contactHeadCard__icon" aria-hidden="true"><?php echo $contactIcon('location'); ?></span>Zone</span>
+                            <span class="contactHeadCard__kicker"><span class="contactHeadCard__icon"
+                                    aria-hidden="true"><?php echo $contactIcon('location'); ?></span>Zone</span>
                             <strong class="contactHeadCard__title">Compiègne, Oise et alentours</strong>
                             <p class="contactHeadCard__copy">Mariage, événement professionnel, cocktail ou repas privé:
                                 nous ajustons ensuite la logistique, la livraison et le niveau de service selon votre
@@ -79,7 +82,8 @@
                 <?php require dirname(__DIR__) . '/partials/request-form.php'; ?>
                 <section class="contactInfos" aria-label="Coordonnées">
                     <div class="contactInfo contactInfo--phone">
-                        <span class="contactInfo__k"><span class="contactInfo__icon" aria-hidden="true"><?php echo $contactIcon('phone'); ?></span>Téléphone</span>
+                        <span class="contactInfo__k"><span class="contactInfo__icon"
+                                aria-hidden="true"><?php echo $contactIcon('phone'); ?></span>Téléphone</span>
                         <a class="contactInfo__v" href="tel:+33659215349">
                             <span class="contactInfo__line">06 59 21 53 49</span>
                             <span class="contactInfo__meta">Mylène • relation clientèle</span>
@@ -90,16 +94,19 @@
                         </a>
                     </div>
                     <div class="contactInfo">
-                        <span class="contactInfo__k"><span class="contactInfo__icon" aria-hidden="true"><?php echo $contactIcon('email'); ?></span>Email</span>
+                        <span class="contactInfo__k"><span class="contactInfo__icon"
+                                aria-hidden="true"><?php echo $contactIcon('email'); ?></span>Email</span>
                         <a class="contactInfo__v"
                             href="mailto:contact@traiteurpassion.fr">contact@traiteurpassion.fr</a>
                     </div>
                     <div class="contactInfo">
-                        <span class="contactInfo__k"><span class="contactInfo__icon" aria-hidden="true"><?php echo $contactIcon('location'); ?></span>Zone</span>
+                        <span class="contactInfo__k"><span class="contactInfo__icon"
+                                aria-hidden="true"><?php echo $contactIcon('location'); ?></span>Zone</span>
                         <span class="contactInfo__v">Vignemont • Oise</span>
                     </div>
                     <div class="contactInfo contactInfo--hours">
-                        <span class="contactInfo__k"><span class="contactInfo__icon" aria-hidden="true"><?php echo $contactIcon('clock'); ?></span>Horaires</span>
+                        <span class="contactInfo__k"><span class="contactInfo__icon"
+                                aria-hidden="true"><?php echo $contactIcon('clock'); ?></span>Horaires</span>
                         <div class="contactHours" aria-label="Horaires d'ouverture">
                             <div class="contactHours__row">
                                 <span class="contactHours__day">Mardi au vendredi</span>
@@ -116,7 +123,8 @@
                         </div>
                         <p class="contactInfo__note">
                             Les horaires du week-end peuvent varier selon les prestations en cours. Si besoin, vous
-                            pouvez nous transmettre votre demande via le <a href="#contactForm">formulaire de contact</a>.
+                            pouvez nous transmettre votre demande via le <a href="#contactForm">formulaire de
+                                contact</a>.
                         </p>
                     </div>
                 </section>

@@ -37,20 +37,23 @@ final class Contact
 
             // Insert main contact request
             $sql = "INSERT INTO contact_requests
-                    (name, email, phone, people, date, location, type, message, created_at)
+                    (name, email, phone, people, date, location, customer_address, customer_postal_code, customer_city, type, message, created_at)
                     VALUES
-                    (:name, :email, :phone, :people, :date, :location, :type, :message, NOW())";
+                    (:name, :email, :phone, :people, :date, :location, :customer_address, :customer_postal_code, :customer_city, :type, :message, NOW())";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
-                ':name'     => $data['name'],
-                ':email'    => $data['email'],
-                ':phone'    => $data['phone'] ?? null,
-                ':people'   => $data['people'] ?? null,
-                ':date'     => $data['date'] ?? null,
-                ':location' => $data['location'] ?? null,
-                ':type'     => $data['type'] ?? null,
-                ':message'  => $data['message'],
+                ':name'                 => $data['name'],
+                ':email'                => $data['email'],
+                ':phone'                => $data['phone'] ?? null,
+                ':people'               => $data['people'] ?? null,
+                ':date'                 => $data['date'] ?? null,
+                ':location'             => $data['location'] ?? null,
+                ':customer_address'     => $data['customer_address'] ?? null,
+                ':customer_postal_code' => $data['customer_postal_code'] ?? null,
+                ':customer_city'        => $data['customer_city'] ?? null,
+                ':type'                 => $data['type'] ?? null,
+                ':message'              => $data['message'],
             ]);
 
             $contactId = (int) $this->db->lastInsertId();

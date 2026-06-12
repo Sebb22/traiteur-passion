@@ -5,6 +5,20 @@ namespace App\Services;
 
 final class ContactSubmissionService
 {
+    private const FIELD_LABELS = [
+        'name'                 => 'nom',
+        'email'                => 'email',
+        'phone'                => 'telephone',
+        'people'               => 'nombre de personnes',
+        'date'                 => 'date de l\'evenement',
+        'location'             => 'lieu',
+        'type'                 => 'type d\'evenement',
+        'message'              => 'message',
+        'customer_address'     => 'adresse de facturation',
+        'customer_postal_code' => 'code postal',
+        'customer_city'        => 'commune',
+    ];
+
     /**
      * @return array{success:bool,status:int,error?:string,contactData?:array<string,mixed>,menuItems?:array<int,array<string,mixed>>}
      */
@@ -18,14 +32,26 @@ final class ContactSubmissionService
             ];
         }
 
-        $requiredFields = ['name', 'email', 'message'];
+        $requiredFields = [
+            'name',
+            'email',
+            'phone',
+            'people',
+            'date',
+            'location',
+            'type',
+            'message',
+            'customer_address',
+            'customer_postal_code',
+            'customer_city',
+        ];
         foreach ($requiredFields as $field) {
             $value = trim((string) ($post[$field] ?? ''));
             if ($value === '') {
                 return [
                     'success' => false,
                     'status'  => 400,
-                    'error'   => "Le champ {$field} est requis",
+                    'error'   => sprintf('Le champ %s est requis.', $this->fieldLabel($field)),
                 ];
             }
         }
@@ -39,15 +65,45 @@ final class ContactSubmissionService
             ];
         }
 
+        $people = $this->nullablePositiveInt($post['people'] ?? null);
+        if ($people === null) {
+            return [
+                'success' => false,
+                'status'  => 400,
+                'error'   => 'Nombre de personnes invalide',
+            ];
+        }
+
+        $date = $this->nullableDate($post['date'] ?? null);
+        if ($date === null) {
+            return [
+                'success' => false,
+                'status'  => 400,
+                'error'   => 'Date de l\'événement invalide',
+            ];
+        }
+
+        $customerPostalCode = trim((string) ($post['customer_postal_code'] ?? ''));
+        if (! preg_match('/^\d{5}$/', $customerPostalCode)) {
+            return [
+                'success' => false,
+                'status'  => 400,
+                'error'   => 'Code postal invalide',
+            ];
+        }
+
         $contactData = [
-            'name'     => trim((string) ($post['name'] ?? '')),
-            'email'    => $email,
-            'phone'    => $this->nullableTrim($post['phone'] ?? null),
-            'people'   => $this->nullablePositiveInt($post['people'] ?? null),
-            'date'     => $this->nullableDate($post['date'] ?? null),
-            'location' => $this->nullableTrim($post['location'] ?? null),
-            'type'     => $this->nullableTrim($post['type'] ?? null),
-            'message'  => trim((string) ($post['message'] ?? '')),
+            'name'                 => trim((string) ($post['name'] ?? '')),
+            'email'                => $email,
+            'phone'                => trim((string) ($post['phone'] ?? '')),
+            'people'               => $people,
+            'date'                 => $date,
+            'location'             => trim((string) ($post['location'] ?? '')),
+            'customer_address'     => trim((string) ($post['customer_address'] ?? '')),
+            'customer_postal_code' => $customerPostalCode,
+            'customer_city'        => trim((string) ($post['customer_city'] ?? '')),
+            'type'                 => trim((string) ($post['type'] ?? '')),
+            'message'              => trim((string) ($post['message'] ?? '')),
         ];
 
         return [
@@ -129,5 +185,10 @@ final class ContactSubmissionService
         }
 
         return $value;
+    }
+
+    private function fieldLabel(string $field): string
+    {
+        return self::FIELD_LABELS[$field] ?? $field;
     }
 }

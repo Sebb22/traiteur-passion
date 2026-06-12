@@ -8,6 +8,7 @@ use App\Models\Contact;
 use App\Models\Menu;
 use App\Services\ContactNotificationService;
 use App\Services\ContactSubmissionService;
+use App\Services\PublicFormProtectionService;
 
 final class QuoteController
 {
@@ -38,11 +39,20 @@ final class QuoteController
             'title'            => 'Traiteur Passion — Devis',
             'sections'         => $sections,
             'selectedCategory' => $selectedCategory,
+            'formProtection'   => (new PublicFormProtectionService())->issue('quote'),
         ]);
     }
 
     public function store(): void
     {
+        $formProtectionResult = (new PublicFormProtectionService())->verify('quote', $_POST, $_SERVER);
+        if (($formProtectionResult['success'] ?? false) !== true) {
+            $this->json((int) ($formProtectionResult['status'] ?? 422), [
+                'error' => $formProtectionResult['error'] ?? 'Requête invalide',
+            ]);
+            return;
+        }
+
         $submissionService = new ContactSubmissionService();
         $result            = $submissionService->parse($_POST, $_SERVER['REQUEST_METHOD'] ?? 'GET');
 
