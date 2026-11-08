@@ -1082,6 +1082,7 @@ export function initShopPage() {
 
             badge.textContent = label;
             badge.className = `shopStockBadge${tone}`;
+            badge.hidden = !soldOut && !lowStock;
         });
     };
 

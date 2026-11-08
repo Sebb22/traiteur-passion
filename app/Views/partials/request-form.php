@@ -66,12 +66,13 @@
             </label>
 
             <label class="field field--required">
-                <span class="field__label">Nombre de personnes <span class="field__required" aria-hidden="true">*</span></span>
+                <span class="field__label">Nombre de personnes </span>
                 <input class="field__input" type="number" name="people" min="1" max="500" placeholder="1–200" required>
             </label>
 
             <label class="field field--required">
-                <span class="field__label">Date de l'évènement <span class="field__required" aria-hidden="true">*</span></span>
+                <span class="field__label">Date de l'évènement <span class="field__required"
+                        aria-hidden="true">*</span></span>
                 <input class="field__input" type="date" name="date" required>
             </label>
 

@@ -6,10 +6,11 @@
     $flash         = is_array($flash ?? null) ? $flash : null;
     $loadError     = is_string($loadError ?? null) ? $loadError : null;
 
-    $activeSections   = 0;
-    $inactiveSections = 0;
-    $activeItems      = 0;
-    $inactiveItems    = 0;
+    $activeSections    = 0;
+    $inactiveSections  = 0;
+    $activeItems       = 0;
+    $inactiveItems     = 0;
+    $itemsWithoutImage = 0;
 
     foreach ($sections as $section) {
     if (! empty($section['is_active'])) {
@@ -23,6 +24,10 @@
             $activeItems++;
         } else {
             $inactiveItems++;
+        }
+
+        if (trim((string) ($item['image_path'] ?? '')) === '') {
+            $itemsWithoutImage++;
         }
     }
     }
@@ -103,21 +108,18 @@
     </aside>
 
     <main class="adminSplit__panel">
+        <?php require dirname(__DIR__) . '/partials/admin-navigation.php'; ?>
         <header class="adminPanelHead">
             <div class="adminPanelHead__row">
                 <div>
-                    <h2 class="adminTitle">Éditer la boutique</h2>
-                    <p class="adminSubtitle">Le flux boutique reste distinct de la carte : ici vous gérez les sections,
-                        les produits et le stock réel.</p>
+                    <h2 class="adminTitle">Boutique</h2>
+                    <p class="adminSubtitle">Produits, disponibilité et visuels.</p>
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
                         <a href="/boutique-en-ligne" class="adminBtn adminBtn--primary">Voir la boutique</a>
-                    </div>
-                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
-                        <a href="/admin" class="adminBtn">Dashboard</a>
-                        <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
-                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                        <button type="button" class="adminBtn" data-shop-product-dialog-open>Nouveau produit</button>
+                        <a href="#new-section" class="adminBtn">Nouvelle section</a>
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <form action="/admin/logout" method="post">
@@ -127,6 +129,28 @@
                 </div>
             </div>
         </header>
+
+        <dialog class="adminCreateDialog" data-shop-product-dialog aria-labelledby="new-product-dialog-title">
+            <form method="dialog" class="adminCreateDialog__form">
+                <div>
+                    <h3 id="new-product-dialog-title">Nouveau produit</h3>
+                    <p>Choisissez la section dans laquelle créer ce produit.</p>
+                </div>
+                <label class="adminField">
+                    <span class="adminField__label">Section</span>
+                    <select class="adminSelect" data-shop-product-section required>
+                        <option value="">Choisir une section</option>
+                        <?php foreach ($sections as $section): ?>
+                        <option value="<?php echo (int) ($section['id'] ?? 0); ?>"><?php echo $e($section['name'] ?? 'Section'); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <div class="adminInlineActions">
+                    <button type="button" class="adminBtn adminBtn--primary" data-shop-product-dialog-confirm>Continuer</button>
+                    <button type="submit" class="adminBtn">Annuler</button>
+                </div>
+            </form>
+        </dialog>
 
         <?php if ($flash !== null): ?>
         <div class="adminFlash adminFlash--<?php echo $e($flash['type'] ?? 'success'); ?>">
@@ -142,31 +166,45 @@
 
         <section class="adminStats adminStats--panel" aria-label="Statistiques boutique">
             <div class="statCard">
-                <div class="statCard__label">Sections totales</div>
-                <div class="statCard__value"><?php echo (int) ($stats['total_sections'] ?? 0); ?></div>
-            </div>
-            <div class="statCard">
-                <div class="statCard__label">Sections visibles</div>
-                <div class="statCard__value"><?php echo $activeSections; ?></div>
-            </div>
-            <div class="statCard">
                 <div class="statCard__label">Produits visibles</div>
                 <div class="statCard__value"><?php echo $activeItems; ?></div>
+            </div>
+            <div class="statCard">
+                <div class="statCard__label">Ruptures</div>
+                <div class="statCard__value"><?php echo (int) ($stats['sold_out_items'] ?? 0); ?></div>
             </div>
             <div class="statCard">
                 <div class="statCard__label">Stocks bas</div>
                 <div class="statCard__value"><?php echo (int) ($stats['low_stock_items'] ?? 0); ?></div>
             </div>
+            <div class="statCard">
+                <div class="statCard__label">Sans image</div>
+                <div class="statCard__value"><?php echo $itemsWithoutImage; ?></div>
+            </div>
         </section>
 
         <?php if ($loadError === null): ?>
+        <?php if ($lowStockItems !== []): ?>
+        <section class="adminShopAlerts" aria-label="Produits à traiter">
+            <div class="adminShopAlerts__head">
+                <strong>À traiter</strong>
+                <span><?php echo count($lowStockItems); ?> produit(s) à surveiller</span>
+            </div>
+            <div class="adminShopAlerts__list">
+                <?php foreach ($lowStockItems as $item): ?>
+                <?php $alertUnit = $normalizeStockUnit($item['stock_unit'] ?? 'unit'); ?>
+                <a class="adminShopAlert" href="#item-<?php echo (int) ($item['id'] ?? 0); ?>">
+                    <span><?php echo $e($item['name'] ?? 'Produit'); ?></span>
+                    <span><?php echo $e($formatStockQuantity($item['stock_quantity'] ?? 0, $alertUnit)); ?></span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
         <section class="adminCatalogUtilityGrid" aria-label="Outils boutique">
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Retrouver rapidement un produit</div>
-                    <div class="adminCard__meta">
-                        <span class="adminHint">Cherchez une section ou un produit sans quitter l'écran</span>
-                    </div>
+                    <div class="adminCard__title">Recherche catalogue</div>
                 </div>
 
                 <div class="adminCatalogToolbar">
@@ -189,49 +227,35 @@
                     </label>
 
                     <div class="adminInlineActions adminInlineActions--filters">
-                        <button type="button" class="adminBtn" data-catalog-expand-all>Tout ouvrir</button>
-                        <button type="button" class="adminBtn" data-catalog-collapse-all>Tout fermer</button>
+                        <button type="button" class="adminBtn" data-catalog-view-toggle>Vue images</button>
+                        <button type="button" class="adminBtn" data-catalog-collapse-all>Fermer les sections</button>
                     </div>
                 </div>
             </article>
 
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Repères stock</div>
-                    <div class="adminCard__meta">
-                        <span class="adminHint">La boutique se pilote par disponibilité immédiate et visibilité des
-                            produits</span>
-                    </div>
+                    <div class="adminCard__title">Afficher</div>
                 </div>
 
-                <div class="adminDashboardStatus adminDashboardStatus--compact">
-                    <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Sections masquées</div>
-                        <div class="adminStatusPill__value"><?php echo $inactiveSections; ?></div>
-                    </div>
-                    <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Produits masqués</div>
-                        <div class="adminStatusPill__value"><?php echo $inactiveItems; ?></div>
-                    </div>
-                    <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Ruptures</div>
-                        <div class="adminStatusPill__value"><?php echo (int) ($stats['sold_out_items'] ?? 0); ?></div>
-                    </div>
-                    <div class="adminStatusPill">
-                        <div class="adminStatusPill__label">Stocks bas</div>
-                        <div class="adminStatusPill__value"><?php echo (int) ($stats['low_stock_items'] ?? 0); ?></div>
-                    </div>
+                <div class="adminCatalogFilterGroup" role="group" aria-label="Filtres catalogue">
+                    <button type="button" class="adminFilterButton is-active" data-catalog-filter="all">Tous</button>
+                    <button type="button" class="adminFilterButton" data-catalog-filter="low-stock">Stock bas</button>
+                    <button type="button" class="adminFilterButton" data-catalog-filter="sold-out">Rupture</button>
+                    <button type="button" class="adminFilterButton" data-catalog-filter="hidden">Masqués</button>
+                    <button type="button" class="adminFilterButton" data-catalog-filter="no-image">Sans image</button>
                 </div>
+                <p class="adminCatalogResults" data-catalog-results aria-live="polite"></p>
             </article>
         </section>
 
-        <section class="adminCard adminCatalogCreateSection">
-            <div class="adminCard__head">
-                <div class="adminCard__title">Ajouter une section</div>
-                <div class="adminCard__meta">
-                    <span class="adminHint">Le slug est auto-généré si vous le laissez vide.</span>
-                </div>
-            </div>
+        <div class="adminCatalogNoResults" data-catalog-no-results hidden>
+            Aucun produit ne correspond à ces critères.
+            <button type="button" class="adminLink" data-catalog-reset>Réinitialiser</button>
+        </div>
+
+        <details class="adminCard adminCatalogCreateSection" id="new-section">
+            <summary class="adminCard__head"><span class="adminCard__title">Nouvelle section</span></summary>
             <div class="adminCatalogBody">
                 <form action="/admin/boutique/sections/create" method="post" class="adminForm adminForm--create">
                     <div class="adminFieldGrid">
@@ -256,7 +280,7 @@
                     </div>
                 </form>
             </div>
-        </section>
+        </details>
 
         <form action="/admin/boutique/sections/reorder" method="post" id="catalogSectionOrderForm"
             class="adminReorderForm">
@@ -279,14 +303,24 @@
         <div class="adminCatalogList" data-section-sortable data-reorder-scope="sections">
             <?php foreach ($sections as $section): ?>
             <?php
-                $sectionName      = (string) ($section['name'] ?? 'Section');
-                $sectionSlug      = (string) ($section['slug'] ?? '');
-                $sectionSearch    = strtolower(trim($sectionName . ' ' . $sectionSlug . ' ' . (string) ($section['description'] ?? '')));
-                $sectionState     = ! empty($section['is_active']) ? 'Visible' : 'Masquee';
-                $sectionItemCount = count($section['items'] ?? []);
-                $sectionStock     = 0;
+                $sectionName         = (string) ($section['name'] ?? 'Section');
+                $sectionSlug         = (string) ($section['slug'] ?? '');
+                $sectionSearch       = strtolower(trim($sectionName . ' ' . $sectionSlug . ' ' . (string) ($section['description'] ?? '')));
+                $sectionState        = ! empty($section['is_active']) ? 'Visible' : 'Masquee';
+                $sectionItemCount    = count($section['items'] ?? []);
+                $sectionStock        = 0;
+                $sectionVisibleItems = 0;
+                $sectionAlertItems   = 0;
                 foreach (($section['items'] ?? []) as $sectionItemForStock) {
                     $sectionStock += max(0, (int) ($sectionItemForStock['stock_quantity'] ?? 0));
+                    if (! empty($sectionItemForStock['is_active'])) {
+                        $sectionVisibleItems++;
+                    }
+                    $sectionItemStock     = max(0, (int) ($sectionItemForStock['stock_quantity'] ?? 0));
+                    $sectionItemThreshold = max(0, (int) ($sectionItemForStock['low_stock_threshold'] ?? 0));
+                    if ($sectionItemStock <= $sectionItemThreshold) {
+                        $sectionAlertItems++;
+                    }
                 }
             ?>
             <details class="adminCard adminCatalogSection" id="section-<?php echo (int) ($section['id'] ?? 0); ?>"
@@ -297,8 +331,10 @@
                         <div class="adminCard__title"><?php echo $e($sectionName); ?></div>
                         <div class="adminCatalogMeta">
                             <span>Slug : <?php echo $e($sectionSlug); ?></span>
-                            <span><?php echo $sectionItemCount; ?> produit(s)</span>
-                            <span><?php echo $sectionStock; ?> unité(s) en stock</span>
+                            <span><?php echo $sectionVisibleItems; ?>/<?php echo $sectionItemCount; ?> visible(s)</span>
+                            <?php if ($sectionAlertItems > 0): ?>
+                            <span class="adminSectionAlert"><?php echo $sectionAlertItems; ?> alerte(s) stock</span>
+                            <?php endif; ?>
                             <span><?php echo $sectionState; ?></span>
                         </div>
                     </div>
@@ -310,7 +346,7 @@
 
                 <div class="adminCatalogBody">
                     <div class="adminCatalogSectionGrid">
-                        <details class="adminEditorBlock adminEditorBlock--collapsible">
+                        <details class="adminEditorBlock adminEditorBlock--collapsible" data-new-shop-item>
                             <summary class="adminEditorBlock__summary">
                                 <div class="adminEditorBlock__head adminEditorBlock__head--summary">
                                     <div class="adminEditorBlock__title">Réglages de la section</div>
@@ -487,6 +523,19 @@
                                 stock.</span>
                         </div>
                         <div class="adminInlineActions adminInlineActions--reorder">
+                            <details class="adminItemMenu">
+                                <summary class="adminBtn">Section</summary>
+                                <div class="adminItemMenu__content">
+                                    <form action="/admin/boutique/sections/<?php echo (int) ($section['id'] ?? 0); ?>/items/visibility" method="post">
+                                        <input type="hidden" name="is_active" value="1">
+                                        <button type="submit" class="adminItemMenu__action">Rendre tous visibles</button>
+                                    </form>
+                                    <form action="/admin/boutique/sections/<?php echo (int) ($section['id'] ?? 0); ?>/items/visibility" method="post">
+                                        <input type="hidden" name="is_active" value="0">
+                                        <button type="submit" class="adminItemMenu__action" onclick="return confirm('Masquer tous les produits de cette section ?');">Masquer tous les produits</button>
+                                    </form>
+                                </div>
+                            </details>
                             <button type="button" class="adminBtn"
                                 data-reorder-toggle="items-<?php echo (int) ($section['id'] ?? 0); ?>">Réordonner</button>
                             <button type="button" class="adminBtn adminBtn--primary"
@@ -521,19 +570,35 @@
                             $itemStockState        = $itemStock <= 0
                                 ? 'Rupture'
                                 : ($itemLowStockThreshold > 0 && $itemStock <= $itemLowStockThreshold ? 'Stock bas' : 'Disponible');
+                            $itemImagePath   = trim((string) ($item['image_path'] ?? ''));
+                            $itemFilterState = $itemStock <= 0 ? 'sold-out' : ($itemLowStockThreshold > 0 && $itemStock <= $itemLowStockThreshold ? 'low-stock' : 'available');
+                            $itemFormId      = 'shop-item-form-' . (int) ($item['id'] ?? 0);
                         ?>
                         <details class="adminCatalogItem" id="item-<?php echo (int) ($item['id'] ?? 0); ?>"
                             data-item-id="<?php echo (int) ($item['id'] ?? 0); ?>" draggable="false" data-catalog-item
-                            data-catalog-search-text="<?php echo $e($itemSearch); ?>">
+                            data-catalog-search-text="<?php echo $e($itemSearch); ?>"
+                            data-catalog-stock-state="<?php echo $e($itemFilterState); ?>"
+                            data-catalog-visibility="<?php echo ! empty($item['is_active']) ? 'visible' : 'hidden'; ?>"
+                            data-catalog-image-state="<?php echo $itemImagePath === '' ? 'missing' : 'present'; ?>">
                             <summary class="adminCatalogItem__summary">
+                                <div class="adminCatalogItem__thumb" aria-hidden="true">
+                                    <?php if ($itemImagePath !== ''): ?>
+                                    <img src="<?php echo $e($itemImagePath); ?>" alt="" loading="lazy">
+                                    <?php else: ?>
+                                    <span>Sans image</span>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="adminCatalogItem__summaryMain">
                                     <strong><?php echo $e($item['name'] ?? 'Produit'); ?></strong>
                                     <div class="adminCatalogMeta adminCatalogMeta--inline">
                                         <span><?php echo $e($formatItemPrice($item)); ?></span>
                                         <span>Stock : <?php echo $e($itemStockDisplay); ?></span>
-                                        <span><?php echo $itemStockState; ?></span>
+                                        <span class="adminStockBadge adminStockBadge--<?php echo $e($itemFilterState); ?>"><?php echo $itemStockState; ?></span>
                                         <span><?php echo $itemOptionsCount; ?> option(s)</span>
                                         <span><?php echo $itemVisibilityLabel; ?></span>
+                                        <?php if ($itemImagePath === ''): ?>
+                                        <span class="adminImageMissingBadge">Sans image</span>
+                                        <?php endif; ?>
                                     </div>
                                     <?php if ($itemDescription !== ''): ?>
                                     <p class="adminCatalogItem__summaryText"><?php echo $e($itemDescription); ?></p>
@@ -557,12 +622,33 @@
                                             <span>Section : <?php echo $e($section['name'] ?? ''); ?></span>
                                         </div>
                                     </div>
-                                    <span class="adminHint">Ouvrez uniquement le bloc à modifier : contenu, stock,
-                                        image ou lots.</span>
+                                    <div class="adminItemActions">
+                                        <button type="submit" class="adminBtn adminBtn--primary" form="<?php echo $e($itemFormId); ?>">Enregistrer</button>
+                                        <details class="adminItemMenu">
+                                            <summary class="adminBtn" aria-label="Actions du produit">Actions</summary>
+                                            <div class="adminItemMenu__content">
+                                                <button type="button" class="adminItemMenu__action" data-open-product-panel="stock">Modifier le stock</button>
+                                                <button type="button" class="adminItemMenu__action" data-open-product-panel="image">Modifier l'image</button>
+                                                <form action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/visibility" method="post">
+                                                    <input type="hidden" name="is_active" value="<?php echo ! empty($item['is_active']) ? '0' : '1'; ?>">
+                                                    <button type="submit" class="adminItemMenu__action">
+                                                        <?php echo ! empty($item['is_active']) ? 'Masquer le produit' : 'Rendre visible'; ?>
+                                                    </button>
+                                                </form>
+                                                <form action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/duplicate" method="post">
+                                                    <button type="submit" class="adminItemMenu__action">Dupliquer</button>
+                                                </form>
+                                                <button type="submit" class="adminItemMenu__action adminItemMenu__action--danger" form="<?php echo $e($itemFormId); ?>"
+                                                    formaction="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/delete"
+                                                    formmethod="post"
+                                                    onclick="return confirm('Supprimer ce produit et ses options ?');">Supprimer</button>
+                                            </div>
+                                        </details>
+                                    </div>
                                 </div>
 
                                 <form action="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>"
-                                    method="post" enctype="multipart/form-data" class="adminForm">
+                                    method="post" enctype="multipart/form-data" class="adminForm" id="<?php echo $e($itemFormId); ?>">
                                     <div class="adminCatalogEditorGrid adminCatalogEditorGrid--stacked">
                                         <details
                                             class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible"
@@ -613,7 +699,8 @@
                                         </details>
 
                                         <details
-                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible">
+                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible"
+                                            data-product-panel="stock">
                                             <summary class="adminEditorBlock__summary">
                                                 <div class="adminEditorBlock__head adminEditorBlock__head--summary">
                                                     <div class="adminEditorBlock__title">Stock & limites</div>
@@ -645,7 +732,8 @@
                                         </details>
 
                                         <details
-                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible">
+                                            class="adminEditorBlock adminEditorBlock--nested adminEditorBlock--collapsible"
+                                            data-product-panel="image">
                                             <summary class="adminEditorBlock__summary">
                                                 <div class="adminEditorBlock__head adminEditorBlock__head--summary">
                                                     <div class="adminEditorBlock__title">Image du produit</div>
@@ -736,14 +824,7 @@
                                         value="<?php echo (int) ($section['id'] ?? 0); ?>">
 
                                     <div class="adminInlineActions">
-                                        <button type="submit" class="adminBtn adminBtn--primary">Enregistrer le
-                                            produit</button>
-                                        <button type="submit" class="adminBtn adminBtn--danger"
-                                            formaction="/admin/boutique/items/<?php echo (int) ($item['id'] ?? 0); ?>/delete"
-                                            formmethod="post"
-                                            onclick="return confirm('Supprimer ce produit boutique ?');">
-                                            Supprimer le produit
-                                        </button>
+                                        <button type="submit" class="adminBtn adminBtn--primary">Enregistrer les modifications</button>
                                     </div>
                                 </form>
 
@@ -930,48 +1011,11 @@
             <?php endforeach; ?>
         </div>
 
-        <section class="adminDashboardGrid">
-            <article class="adminCard adminCard--table">
-                <div class="adminCard__head">
-                    <div class="adminCard__title">Stocks bas</div>
-                    <div class="adminCard__meta">
-                        <span class="adminHint"><?php echo (int) ($stats['low_stock_items'] ?? 0); ?> produit(s) a
-                            surveiller</span>
-                    </div>
-                </div>
-                <?php if ($lowStockItems === []): ?>
-                <div class="adminEmptyState">Aucun stock bas detecte actuellement.</div>
-                <?php else: ?>
-                <div class="adminTableWrap">
-                    <table class="adminTable">
-                        <thead>
-                            <tr>
-                                <th>Produit</th>
-                                <th>Section</th>
-                                <th>Stock</th>
-                                <th>Seuil</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($lowStockItems as $item): ?>
-                            <?php $lowStockUnit = $normalizeStockUnit($item['stock_unit'] ?? 'unit'); ?>
-                            <tr>
-                                <td>
-                                    <a href="#item-<?php echo (int) ($item['id'] ?? 0); ?>" class="adminLink">
-                                        <?php echo $e($item['name'] ?? ''); ?>
-                                    </a>
-                                </td>
-                                <td><?php echo $e($item['section_name'] ?? ''); ?></td>
-                                <td><?php echo $e($formatStockQuantity($item['stock_quantity'] ?? 0, $lowStockUnit)); ?></td>
-                                <td><?php echo $e($formatStockQuantity($item['low_stock_threshold'] ?? 0, $lowStockUnit)); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </article>
-        </section>
         <?php endif; ?>
+        <div class="adminStickySave" data-sticky-save hidden>
+            <span data-sticky-save-label>Vous avez des modifications non enregistrées.</span>
+            <button type="button" class="adminBtn" data-sticky-save-discard>Annuler les modifications</button>
+            <button type="button" class="adminBtn adminBtn--primary" data-sticky-save-submit>Enregistrer les modifications</button>
+        </div>
     </main>
 </div>

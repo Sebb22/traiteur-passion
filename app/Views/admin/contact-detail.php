@@ -1,6 +1,7 @@
 <?php
     $contact       = isset($contact) && is_array($contact) ? $contact : [];
     $statusOptions = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
+    $backUrl       = is_string($backUrl ?? null) ? $backUrl : '/admin/contacts?view=contacts';
     $flash         = isset($flash) && is_array($flash) ? $flash : null;
 
     $e = static function ($value): string {
@@ -85,6 +86,7 @@
     </aside>
 
     <main class="adminSplit__panel">
+        <?php require dirname(__DIR__) . '/partials/admin-navigation.php'; ?>
         <header class="adminPanelHead">
             <div class="adminPanelHead__row">
                 <div>
@@ -93,11 +95,7 @@
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
-                        <a href="/admin/contacts" class="adminBtn adminBtn--primary">Retour aux demandes</a>
-                    </div>
-                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
-                        <a href="/admin" class="adminBtn">Dashboard</a>
-                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                        <a href="<?php echo $e($backUrl); ?>" class="adminBtn adminBtn--primary">Retour aux demandes</a>
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <form action="/admin/logout" method="post">
@@ -258,7 +256,7 @@
                         <form action="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>/status" method="post"
                             class="adminInlineForm adminInlineForm--stack">
                             <input type="hidden" name="redirect"
-                                value="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>">
+                                value="/admin/contacts/<?php echo (int) ($contact['id'] ?? 0); ?>?redirect=<?php echo rawurlencode($backUrl); ?>">
                             <label class="adminField">
                                 <span class="adminField__label">Mettre a jour</span>
                                 <select name="status" class="adminSelect">

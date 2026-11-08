@@ -1,0 +1,21 @@
+[data-seasonal-ambience] {
+    display: none;
+}
+
+.seasonalAmbienceAdminPreview {
+    position: fixed;
+    inset: 0;
+    z-index: 1290;
+    background: transparent;
+    pointer-events: none;
+}
+
+.seasonalAmbienceAdminPreview[hidden] {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-seasonal-ambience] {
+        display: none;
+    }
+}

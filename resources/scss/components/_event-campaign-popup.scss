@@ -1,0 +1,300 @@
+.eventCampaign[hidden] {
+    display: none;
+}
+
+.eventCampaign {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+}
+
+.eventCampaign__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 15, 15, .62);
+    animation: eventCampaignFade .4s ease both;
+}
+
+.eventCampaign__dialog {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 48% 52%;
+    width: min(1020px, 100%);
+    max-height: min(720px, calc(100dvh - 2.5rem));
+    overflow: hidden;
+    border-radius: 18px;
+    background: #f8f4ec;
+    color: #201d1a;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, .3);
+    animation: eventCampaignEnter .4s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+.eventCampaign__visual {
+    min-height: 520px;
+    background: #ddd5ca;
+}
+
+.eventCampaign__visual picture,
+.eventCampaign__visual img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.eventCampaign__visual img {
+    object-fit: cover;
+}
+
+.eventCampaign__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2.5rem, 5vw, 5rem) clamp(2rem, 5vw, 4.5rem);
+    text-align: center;
+}
+
+.eventCampaign__eyebrow {
+    margin: 0 0 1.25rem;
+    color: #a97a32;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.eventCampaign__content h2 {
+    max-width: 24rem;
+    margin: 0 auto 1.25rem;
+    font-family: "Playfair Display", Forum, Georgia, serif;
+    font-size: clamp(2.15rem, 4vw, 3.55rem);
+    font-weight: 500;
+    line-height: 1.08;
+}
+
+.eventCampaign__content p:not(.eventCampaign__eyebrow) {
+    max-width: 35rem;
+    margin: 0 auto;
+    color: #625b53;
+    line-height: 1.7;
+}
+
+.eventCampaign__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.eventCampaign__primary,
+.eventCampaign__secondary {
+    display: inline-flex;
+    min-height: 3.15rem;
+    align-items: center;
+    justify-content: center;
+    padding: .8rem 1.35rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.eventCampaign__primary {
+    gap: 1.25rem;
+    background: #102d20;
+    color: #f8f4ec;
+    transition: background-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+}
+
+.eventCampaign__primary:hover,
+.eventCampaign__primary:focus-visible {
+    background: #1d4935;
+    box-shadow: 0 10px 24px rgba(16, 45, 32, .2);
+    transform: translateY(-2px);
+}
+
+.eventCampaign__arrow {
+    font-size: 1.35rem;
+    line-height: 1;
+    transition: transform 220ms ease;
+}
+
+.eventCampaign__primary:hover .eventCampaign__arrow,
+.eventCampaign__primary:focus-visible .eventCampaign__arrow {
+    transform: translateX(4px);
+}
+
+.eventCampaign__secondary {
+    border-color: #c9a45b;
+    background: transparent;
+    color: #625b53;
+}
+
+.eventCampaign__close {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    z-index: 2;
+    display: grid;
+    width: 2.7rem;
+    height: 2.7rem;
+    place-items: center;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #201d1a;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.eventCampaign__close:hover,
+.eventCampaign__close:focus-visible {
+    color: #a97a32;
+}
+
+.eventCampaign__rule {
+    width: 82px;
+    height: 1px;
+    margin: 0 auto 1.7rem;
+    background: #c9a45b;
+}
+
+.eventCampaign__ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0 auto 1.25rem;
+    color: #b1843d;
+    font-size: 1.15rem;
+}
+
+.eventCampaign__ornament i {
+    display: block;
+    width: 55px;
+    height: 1px;
+    background: #c9a45b;
+}
+
+.eventCampaign__sprigs {
+    position: absolute;
+    right: 2rem;
+    bottom: 1.5rem;
+    display: flex;
+    gap: .45rem;
+    color: rgba(169, 122, 50, .42);
+    font-size: 1.25rem;
+    transform: rotate(-12deg);
+}
+
+.eventCampaign--christmas .eventCampaign__content::before {
+    position: absolute;
+    top: 5.5rem;
+    left: 1.3rem;
+    color: rgba(169, 122, 50, .55);
+    content: "✧  ✦  ✧";
+    font-size: 1.15rem;
+    letter-spacing: .45rem;
+    transform: rotate(-18deg);
+}
+
+.eventCampaign--christmas .eventCampaign__content::after {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 5.5rem;
+    color: rgba(169, 122, 50, .5);
+    content: "✧  ✦";
+    font-size: 1rem;
+    letter-spacing: .4rem;
+    transform: rotate(12deg);
+}
+
+.eventCampaignOpen {
+    overflow: hidden;
+}
+
+.eventCampaign.is-closing .eventCampaign__overlay {
+    animation: eventCampaignFadeOut .24s ease both;
+}
+
+.eventCampaign.is-closing .eventCampaign__dialog {
+    animation: eventCampaignExit .24s ease both;
+}
+
+@keyframes eventCampaignFade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes eventCampaignEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes eventCampaignFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes eventCampaignExit {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(8px); }
+}
+
+@media (max-width: 700px) {
+    .eventCampaign {
+        padding: .75rem;
+    }
+    .eventCampaign__dialog {
+        display: block;
+        max-height: calc(100dvh - 1.5rem);
+    }
+    .eventCampaign__visual {
+        height: min(42vh, 300px);
+        min-height: 0;
+    }
+    .eventCampaign__content {
+        padding: 2rem 1.5rem 1.75rem;
+    }
+    .eventCampaign__content h2 {
+        font-size: clamp(1.9rem, 9vw, 2.7rem);
+    }
+    .eventCampaign__content::before,
+    .eventCampaign__content::after,
+    .eventCampaign__sprigs {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .eventCampaign__overlay,
+    .eventCampaign__dialog,
+    .eventCampaign__primary,
+    .eventCampaign__arrow {
+        animation: none;
+        transition: none;
+    }
+    .eventCampaign.is-closing .eventCampaign__overlay,
+    .eventCampaign.is-closing .eventCampaign__dialog {
+        animation: none;
+    }
+}

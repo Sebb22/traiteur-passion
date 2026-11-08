@@ -66,13 +66,7 @@ final class ContactSubmissionService
         }
 
         $people = $this->nullablePositiveInt($post['people'] ?? null);
-        if ($people === null) {
-            return [
-                'success' => false,
-                'status'  => 400,
-                'error'   => 'Nombre de personnes invalide',
-            ];
-        }
+      
 
         $date = $this->nullableDate($post['date'] ?? null);
         if ($date === null) {

@@ -27,6 +27,16 @@ $router->post('/admin/login', 'AuthController@login');
 $router->post('/admin/logout', 'AuthController@logout');
 
 // Admin routes
+$router->get('/admin/campagnes', 'EventCampaignController@index');
+$router->get('/admin/campagnes/create', 'EventCampaignController@create');
+$router->post('/admin/campagnes/create', 'EventCampaignController@store');
+$router->get('/admin/campagnes/{id}/edit', 'EventCampaignController@edit');
+$router->post('/admin/campagnes/{id}', 'EventCampaignController@update');
+$router->post('/admin/campagnes/{id}/toggle', 'EventCampaignController@toggle');
+$router->post('/admin/campagnes/{id}/delete', 'EventCampaignController@delete');
+$router->get('/admin/campagnes/{id}/preview', 'EventCampaignController@preview');
+$router->get('/admin/ambiances-saisonnieres', 'SeasonalAmbienceController@index');
+$router->post('/admin/ambiances-saisonnieres', 'SeasonalAmbienceController@update');
 $router->get('/admin', 'AdminController@dashboard');
 $router->get('/admin/dashboard', 'AdminController@dashboard');
 $router->get('/admin/clients', 'AdminController@clientDetail');
@@ -55,13 +65,17 @@ $router->post('/admin/boutique/sections/{id}', 'AdminController@updateShopSectio
 $router->post('/admin/boutique/sections/{id}/delete', 'AdminController@deleteShopSection');
 $router->post('/admin/boutique/sections/{id}/items/create', 'AdminController@createShopItem');
 $router->post('/admin/boutique/sections/{id}/items/reorder', 'AdminController@reorderShopItems');
+$router->post('/admin/boutique/sections/{id}/items/visibility', 'AdminController@updateShopSectionItemsVisibility');
 $router->post('/admin/boutique/items/{id}', 'AdminController@updateShopItem');
+$router->post('/admin/boutique/items/{id}/duplicate', 'AdminController@duplicateShopItem');
+$router->post('/admin/boutique/items/{id}/visibility', 'AdminController@updateShopItemVisibility');
 $router->post('/admin/boutique/image-preview', 'AdminController@previewShopImage');
 $router->post('/admin/boutique/items/{id}/delete', 'AdminController@deleteShopItem');
 $router->get('/admin/boutique/orders/{id}', 'AdminController@orderDetail');
 $router->post('/admin/boutique/orders/{id}/status', 'AdminController@updateShopOrderStatus');
 $router->get('/admin/contacts/export', 'AdminController@exportContacts');
 $router->get('/admin/contacts', 'AdminController@contacts');
+$router->post('/admin/contacts/status', 'AdminController@updateContactsStatus');
 $router->post('/admin/contacts/{id}/status', 'AdminController@updateContactStatus');
 $router->get('/admin/contacts/{id}', 'AdminController@contactDetail');
 $router->post('/admin/boutique/items/{id}/options/create', 'AdminController@createShopItemOption');

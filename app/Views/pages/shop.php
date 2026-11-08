@@ -164,6 +164,8 @@
                             Sans paiement en ligne
                         </span>
                     </div>
+                    <details class="shopIntroDetails">
+                        <summary>Comment commander</summary>
                     <div class="shopIntroSteps" aria-label="Parcours de commande boutique">
                         <article class="shopIntroStep shopIntroStep--gold">
                             <div class="shopIntroStep__marker">
@@ -203,6 +205,7 @@
                             </div>
                         </article>
                     </div>
+                    </details>
                     <p class="shopIntro__note">
                         <span class="shopIntro__noteIcon" aria-hidden="true">
                             <?php echo $shopIcon('location'); ?>
@@ -210,6 +213,9 @@
                         <span>Carte courte, fait maison, stock revérifié à l’enregistrement. Retrait sur créneau ou
                             livraison locale selon votre adresse.</span>
                     </p>
+                    <?php if ($sections !== []): ?>
+                    <a class="btn btn--ghost shopIntro__catalogShortcut" href="#shop-catalog">Voir les produits disponibles</a>
+                    <?php endif; ?>
                 </header>
 
                 <?php if ($loadError !== null): ?>
@@ -416,7 +422,7 @@
                             </aside>
                         </div>
 
-                        <section class="shopCatalog" aria-label="Produits boutique">
+                        <section class="shopCatalog" id="shop-catalog" aria-label="Produits boutique">
                             <?php foreach ($sections as $section): ?>
                             <?php $sectionAnchor = $resolveSectionAnchor($section); ?>
                             <article class="shopCatalogSection" id="<?php echo $e($sectionAnchor); ?>">
@@ -518,6 +524,7 @@
                                         $statusLabel = $isSoldOut
                                             ? 'Rupture'
                                             : ($isLowStock ? 'Plus que ' . $formatStockQuantity($stockQuantity, $stockUnit) : $formatStockQuantity($stockQuantity, $stockUnit));
+                                        $showStockAlert = $isSoldOut || $isLowStock;
                                     ?>
                                     <article class="shopItemCard<?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
                                         data-item-id="<?php echo $itemId; ?>" data-shop-item-card>
@@ -541,10 +548,16 @@
                                                     class="shopItemCard__price"><?php echo $e($cardPriceDisplay); ?></span>
                                             </div>
 
+                                            <?php $itemDescription = trim((string) ($item['description'] ?? $item['short_description'] ?? '')); ?>
+                                            <?php if ($itemDescription !== ''): ?>
+                                            <p class="shopItemCard__description"><?php echo $e($itemDescription); ?></p>
+                                            <?php endif; ?>
+
                                             <div class="shopItemCard__footer">
                                                 <span
                                                     class="shopStockBadge<?php echo $isLowStock ? ' is-low' : ''; ?><?php echo $isSoldOut ? ' is-sold-out' : ''; ?>"
-                                                    data-shop-stock data-item-id="<?php echo $itemId; ?>">
+                                                    data-shop-stock data-item-id="<?php echo $itemId; ?>"
+                                                    <?php echo ! $showStockAlert ? 'hidden' : ''; ?>>
                                                     <span><?php echo $e($statusLabel); ?></span>
                                                 </span>
 

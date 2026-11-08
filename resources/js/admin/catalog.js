@@ -71,6 +71,179 @@ export function initAdminCatalog() {
     });
 
     initCatalogImageUploadUX();
+    initAdminFormGuard();
+    initProductQuickActions();
+    restoreAdminShopPosition();
+}
+
+function initAdminFormGuard() {
+    const forms = Array.from(document.querySelectorAll(".adminSplit--catalog form")).filter(
+        (form) => !form.classList.contains("adminReorderForm"),
+    );
+    const dirtyForms = new Set();
+    const stickySave = document.querySelector("[data-sticky-save]");
+    const stickySubmit = document.querySelector("[data-sticky-save-submit]");
+    const stickyDiscard = document.querySelector("[data-sticky-save-discard]");
+    let activeDirtyForm = null;
+
+    const renderStickySave = () => {
+        if (!stickySave) return;
+        stickySave.hidden = !(activeDirtyForm instanceof HTMLFormElement);
+    };
+
+    const setDirty = (form) => {
+        dirtyForms.add(form);
+        activeDirtyForm = form;
+        form.classList.add("is-dirty");
+        form.setAttribute("data-form-dirty", "true");
+        renderStickySave();
+
+        if (!form.classList.contains("adminForm") || form.querySelector("[data-form-dirty-notice]")) return;
+
+        const notice = document.createElement("span");
+        notice.className = "adminFormDirtyNotice";
+        notice.setAttribute("data-form-dirty-notice", "");
+        notice.textContent = "Modifications à enregistrer";
+        const actions = form.querySelector(".adminInlineActions:last-of-type");
+        if (actions) actions.prepend(notice);
+    };
+
+    const clearDirty = (form) => {
+        dirtyForms.delete(form);
+        form.classList.remove("is-dirty");
+        form.removeAttribute("data-form-dirty");
+        form.querySelector("[data-form-dirty-notice]") ?.remove();
+        if (activeDirtyForm === form) {
+            activeDirtyForm = Array.from(dirtyForms).at(-1) || null;
+        }
+        renderStickySave();
+    };
+
+    forms.forEach((form) => {
+        form.addEventListener("input", () => setDirty(form));
+        form.addEventListener("change", () => setDirty(form));
+        form.addEventListener("submit", (event) => {
+            rememberAdminShopPosition(form, event.submitter);
+            clearDirty(form);
+        });
+        form.addEventListener("reset", () => window.setTimeout(() => clearDirty(form), 0));
+    });
+
+    if (stickySubmit instanceof HTMLButtonElement) {
+        stickySubmit.addEventListener("click", () => {
+            if (activeDirtyForm instanceof HTMLFormElement) activeDirtyForm.requestSubmit();
+        });
+    }
+    if (stickyDiscard instanceof HTMLButtonElement) {
+        stickyDiscard.addEventListener("click", () => {
+            if (activeDirtyForm instanceof HTMLFormElement) activeDirtyForm.reset();
+        });
+    }
+
+    window.addEventListener("beforeunload", (event) => {
+        if (dirtyForms.size === 0) return;
+        event.preventDefault();
+        event.returnValue = "";
+    });
+}
+
+function initProductQuickActions() {
+    document.querySelectorAll("[data-open-product-panel]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const item = button.closest("[data-catalog-item]");
+            const panelName = String(button.getAttribute("data-open-product-panel") || "");
+            const panel = item ?.querySelector(`[data-product-panel="${panelName}"]`);
+            if (!(panel instanceof HTMLDetailsElement)) return;
+
+            panel.open = true;
+            const menu = button.closest("details");
+            if (menu instanceof HTMLDetailsElement) menu.open = false;
+            window.setTimeout(() => panel.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
+        });
+    });
+
+    const toggle = document.querySelector("[data-catalog-view-toggle]");
+    const lists = Array.from(document.querySelectorAll("[data-item-sortable]"));
+    const applyView = (isVisual) => {
+        lists.forEach((list) => list.classList.toggle("is-visual-view", isVisual));
+        if (toggle instanceof HTMLButtonElement) {
+            toggle.textContent = isVisual ? "Vue liste" : "Vue images";
+            toggle.setAttribute("aria-pressed", isVisual ? "true" : "false");
+        }
+    };
+
+    let visualView = false;
+    try {
+        visualView = window.localStorage.getItem("admin-shop-visual-view") === "true";
+    } catch {
+        visualView = false;
+    }
+    applyView(visualView);
+
+    if (toggle instanceof HTMLButtonElement) {
+        toggle.addEventListener("click", () => {
+            visualView = !visualView;
+            applyView(visualView);
+            try {
+                window.localStorage.setItem("admin-shop-visual-view", String(visualView));
+            } catch {
+                // La vue reste active pour cette page si le stockage est indisponible.
+            }
+        });
+    }
+}
+
+function rememberAdminShopPosition(form, submitter) {
+    const item = form.closest("[data-item-id]");
+    const section = form.closest("[data-section-id]");
+    const isDelete = submitter instanceof HTMLButtonElement && String(submitter.formAction || "").includes("/delete");
+    const target = isDelete ? section : item || section;
+
+    if (!(target instanceof HTMLElement)) return;
+
+    try {
+        window.sessionStorage.setItem("admin-shop-return-position", JSON.stringify({
+            id: target.id,
+            timestamp: Date.now(),
+        }));
+    } catch {
+        // Le retour par ancre continue de fonctionner si le stockage est indisponible.
+    }
+}
+
+function restoreAdminShopPosition() {
+    let savedPosition = null;
+    try {
+        savedPosition = JSON.parse(window.sessionStorage.getItem("admin-shop-return-position") || "null");
+        window.sessionStorage.removeItem("admin-shop-return-position");
+    } catch {
+        return;
+    }
+
+    if (!savedPosition || typeof savedPosition.id !== "string" || Date.now() - Number(savedPosition.timestamp || 0) > 30000) {
+        return;
+    }
+
+    const target = document.getElementById(savedPosition.id);
+    if (!target) return;
+
+    const section = target.closest("[data-catalog-section]");
+    if (section instanceof HTMLDetailsElement) section.open = true;
+    if (target instanceof HTMLDetailsElement) target.open = true;
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            window.setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+        });
+    });
+
+    if (document.querySelector(".adminFlash--success")) {
+        const notice = document.createElement("div");
+        notice.className = "adminInlineSuccess";
+        notice.textContent = "Modifications enregistrées";
+        target.prepend(notice);
+        window.setTimeout(() => notice.remove(), 5000);
+    }
 }
 
 const SORTABLE_LIST_SELECTOR = "[data-section-sortable], [data-item-sortable], [data-option-sortable]";
@@ -327,44 +500,118 @@ function initCatalogWorkspaceTools() {
     const jumpSelect = document.querySelector("[data-catalog-jump]");
     const expandAllButton = document.querySelector("[data-catalog-expand-all]");
     const collapseAllButton = document.querySelector("[data-catalog-collapse-all]");
+    const filterButtons = Array.from(document.querySelectorAll("[data-catalog-filter]"));
+    const resultsSummary = document.querySelector("[data-catalog-results]");
+    const noResults = document.querySelector("[data-catalog-no-results]");
+    const resetFiltersButton = document.querySelector("[data-catalog-reset]");
     const sections = Array.from(document.querySelectorAll("[data-catalog-section]"));
+    let activeFilter = "all";
+
+    document.querySelectorAll('a[href="#new-section"]').forEach((link) => {
+        link.addEventListener("click", () => {
+            const target = document.getElementById("new-section");
+            if (target instanceof HTMLDetailsElement) {
+                target.open = true;
+            }
+        });
+    });
+
+    const newProductDialog = document.querySelector("[data-shop-product-dialog]");
+    const newProductSection = document.querySelector("[data-shop-product-section]");
+    const newProductConfirm = document.querySelector("[data-shop-product-dialog-confirm]");
+    document.querySelectorAll("[data-shop-product-dialog-open]").forEach((button) => {
+        button.addEventListener("click", () => {
+            if (newProductDialog instanceof HTMLDialogElement) {
+                newProductDialog.showModal();
+            }
+        });
+    });
+
+    if (newProductConfirm instanceof HTMLButtonElement) {
+        newProductConfirm.addEventListener("click", () => {
+            const sectionId = newProductSection instanceof HTMLSelectElement ? newProductSection.value : "";
+            const section = document.getElementById(`section-${sectionId}`);
+            if (!sectionId || !(section instanceof HTMLDetailsElement)) {
+                if (newProductSection instanceof HTMLSelectElement) newProductSection.focus();
+                return;
+            }
+
+            section.open = true;
+            const createBlock = section.querySelector("[data-new-shop-item]");
+            if (createBlock instanceof HTMLDetailsElement) {
+                createBlock.open = true;
+                window.setTimeout(() => createBlock.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+                const firstField = createBlock.querySelector('input[name="name"]');
+                if (firstField instanceof HTMLInputElement) window.setTimeout(() => firstField.focus(), 250);
+            }
+            if (newProductDialog instanceof HTMLDialogElement) newProductDialog.close();
+        });
+    }
 
     if (sections.length === 0) {
         return;
     }
 
     const filterCatalog = () => {
-        const query = String(searchInput ? searchInput.value : "")
-            .trim()
-            .toLowerCase();
+            const query = String(searchInput ? searchInput.value : "")
+                .trim()
+                .toLowerCase();
 
-        sections.forEach((section) => {
-            const sectionText = String(section.getAttribute("data-catalog-search-text") || "");
-            const items = Array.from(section.querySelectorAll("[data-catalog-item]"));
+            let visibleItemsTotal = 0;
+            let visibleSectionsTotal = 0;
 
-            let sectionMatches = query === "" || sectionText.includes(query);
-            let visibleItemsCount = 0;
+            sections.forEach((section) => {
+                const sectionText = String(section.getAttribute("data-catalog-search-text") || "");
+                const items = Array.from(section.querySelectorAll("[data-catalog-item]"));
 
-            items.forEach((item) => {
-                const itemText = String(item.getAttribute("data-catalog-search-text") || "");
-                const itemMatches = query === "" || sectionMatches || itemText.includes(query);
+                let sectionMatches = query === "" || sectionText.includes(query);
+                let visibleItemsCount = 0;
 
-                item.classList.toggle("is-filtered-out", !itemMatches);
-                if (itemMatches) {
-                    visibleItemsCount += 1;
+                items.forEach((item) => {
+                    const itemText = String(item.getAttribute("data-catalog-search-text") || "");
+                    const matchesSearch = query === "" || sectionMatches || itemText.includes(query);
+                    const stockState = String(item.getAttribute("data-catalog-stock-state") || "");
+                    const visibility = String(item.getAttribute("data-catalog-visibility") || "");
+                    const imageState = String(item.getAttribute("data-catalog-image-state") || "");
+                    const matchesFilter =
+                        activeFilter === "all" ||
+                        (activeFilter === "low-stock" && stockState === "low-stock") ||
+                        (activeFilter === "sold-out" && stockState === "sold-out") ||
+                        (activeFilter === "hidden" && visibility === "hidden") ||
+                        (activeFilter === "no-image" && imageState === "missing");
+                    const itemMatches = matchesSearch && matchesFilter;
+
+                    item.classList.toggle("is-filtered-out", !itemMatches);
+                    if (itemMatches) {
+                        visibleItemsCount += 1;
+                    }
+                });
+
+                if (!sectionMatches && visibleItemsCount > 0) {
+                    sectionMatches = true;
+                }
+
+                section.classList.toggle("is-filtered-out", !sectionMatches);
+
+                if (sectionMatches) {
+                    visibleSectionsTotal += 1;
+                    visibleItemsTotal += visibleItemsCount;
+                }
+
+                if (query !== "" && sectionMatches) {
+                    section.setAttribute("open", "open");
                 }
             });
 
-            if (!sectionMatches && visibleItemsCount > 0) {
-                sectionMatches = true;
-            }
-
-            section.classList.toggle("is-filtered-out", !sectionMatches);
-
-            if (query !== "" && sectionMatches) {
-                section.setAttribute("open", "open");
-            }
-        });
+            if (resultsSummary) {
+                const filterLabel = filterButtons.find((button) => button.classList.contains("is-active")) ?.textContent ?.trim();
+                resultsSummary.textContent = query || activeFilter !== "all" ?
+                    `${visibleItemsTotal} produit${visibleItemsTotal > 1 ? "s" : ""} dans ${visibleSectionsTotal} section${visibleSectionsTotal > 1 ? "s" : ""}${filterLabel ? ` · ${filterLabel}` : ""}`
+                : "";
+        }
+        if (noResults) {
+            noResults.hidden = visibleItemsTotal !== 0 || (query === "" && activeFilter === "all");
+        }
     };
 
     if (searchInput) {
@@ -406,6 +653,57 @@ function initCatalogWorkspaceTools() {
             });
         });
     }
+
+    filterButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", button.classList.contains("is-active") ? "true" : "false");
+        button.addEventListener("click", () => {
+            activeFilter = String(button.getAttribute("data-catalog-filter") || "all");
+            filterButtons.forEach((candidate) => {
+                const isActive = candidate === button;
+                candidate.classList.toggle("is-active", isActive);
+                candidate.setAttribute("aria-pressed", isActive ? "true" : "false");
+            });
+            filterCatalog();
+        });
+    });
+
+    if (resetFiltersButton) {
+        resetFiltersButton.addEventListener("click", () => {
+            activeFilter = "all";
+            if (searchInput instanceof HTMLInputElement) searchInput.value = "";
+            if (jumpSelect instanceof HTMLSelectElement) jumpSelect.value = "";
+            filterButtons.forEach((button) => {
+                const isActive = button.getAttribute("data-catalog-filter") === "all";
+                button.classList.toggle("is-active", isActive);
+                button.setAttribute("aria-pressed", isActive ? "true" : "false");
+            });
+            filterCatalog();
+        });
+    }
+
+    const openAnchorTarget = () => {
+        const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+        if (!id) return;
+
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        const parentSection = target.closest("[data-catalog-section]");
+        if (parentSection instanceof HTMLDetailsElement) {
+            parentSection.open = true;
+        }
+        const parentItem = target.closest("[data-catalog-item]");
+        if (parentItem instanceof HTMLDetailsElement) {
+            parentItem.open = true;
+        }
+        if (target instanceof HTMLDetailsElement) {
+            target.open = true;
+        }
+        window.setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
+    };
+
+    window.addEventListener("hashchange", openAnchorTarget);
+    openAnchorTarget();
 }
 
 function initCatalogImageUploadUX() {

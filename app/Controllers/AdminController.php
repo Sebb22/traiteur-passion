@@ -112,19 +112,23 @@ final class AdminController
         $catalogStats   = $menuModel->getAdminSummary();
         $recentContacts = $searchQuery !== ''
             ? $contactModel->getFiltered($dashboardQuery, 8)
-            : $contactModel->getRecentWithMenuFlag(8);
+            : $contactModel->getDashboardQueue(8);
         $contactResultsCount = $searchQuery !== ''
             ? $contactModel->countFiltered($dashboardQuery)
             : count($recentContacts);
         $typeBreakdown = $contactModel->getTypeBreakdown(6);
         $orderStats    = [
-            'total'           => 0,
-            'new_count'       => 0,
-            'confirmed_count' => 0,
-            'preparing_count' => 0,
-            'ready_count'     => 0,
-            'completed_count' => 0,
-            'cancelled_count' => 0,
+            'total'                    => 0,
+            'new_count'                => 0,
+            'new_today_count'          => 0,
+            'confirmed_count'          => 0,
+            'preparing_count'          => 0,
+            'ready_count'              => 0,
+            'completed_count'          => 0,
+            'cancelled_count'          => 0,
+            'fulfillments_next_7_days' => 0,
+            'overdue_fulfillments'     => 0,
+            'priority_count'           => 0,
         ];
         $recentOrders       = [];
         $orderResultsCount  = 0;
@@ -142,11 +146,13 @@ final class AdminController
         $shopLoadError = null;
 
         try {
-            $shopModel         = new Shop();
-            $orderModel        = new ShopOrder();
-            $shopStats         = $shopModel->getAdminSummary();
-            $orderStats        = $orderModel->getAdminSummary();
-            $recentOrders      = $orderModel->getRecentOrders($searchQuery !== '' ? 8 : 5, $searchQuery !== '' ? $searchQuery : null);
+            $shopModel    = new Shop();
+            $orderModel   = new ShopOrder();
+            $shopStats    = $shopModel->getAdminSummary();
+            $orderStats   = $orderModel->getAdminSummary();
+            $recentOrders = $searchQuery !== ''
+                ? $orderModel->getRecentOrders(8, $searchQuery)
+                : $orderModel->getDashboardQueue(5);
             $orderResultsCount = $searchQuery !== ''
                 ? $orderModel->countFilteredOrders($searchQuery)
                 : count($recentOrders);
@@ -509,6 +515,55 @@ final class AdminController
         $this->redirectShop($anchor);
     }
 
+    public function duplicateShopItem(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        try {
+            $newId = (new Shop())->duplicateItem((int) $id);
+            $this->pushFlash('success', 'Produit dupliqué. Vérifiez la copie avant de la rendre visible.');
+            $this->redirectShop('#item-' . $newId);
+        } catch (\Throwable $e) {
+            error_log('Shop item duplicate error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de dupliquer ce produit boutique.');
+            $this->redirectShop('#item-' . (int) $id);
+        }
+    }
+
+    public function updateShopItemVisibility(string $id): void
+    {
+        AdminAuth::requireAuth();
+
+        $itemId = (int) $id;
+        try {
+            $isActive = ! empty($_POST['is_active']);
+            (new Shop())->updateItemVisibility($itemId, $isActive);
+            $this->pushFlash('success', $isActive ? 'Produit rendu visible.' : 'Produit masqué.');
+        } catch (\Throwable $e) {
+            error_log('Shop item visibility update error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de modifier la visibilité du produit.');
+        }
+
+        $this->redirectShop('#item-' . $itemId);
+    }
+
+    public function updateShopSectionItemsVisibility(string $sectionId): void
+    {
+        AdminAuth::requireAuth();
+
+        $sectionIdInt = (int) $sectionId;
+        try {
+            $isActive = ! empty($_POST['is_active']);
+            (new Shop())->updateSectionItemsVisibility($sectionIdInt, $isActive);
+            $this->pushFlash('success', $isActive ? 'Les produits de la section sont visibles.' : 'Les produits de la section sont masqués.');
+        } catch (\Throwable $e) {
+            error_log('Shop section items visibility update error: ' . $e->getMessage());
+            $this->pushFlash('error', 'Impossible de modifier la visibilité des produits de cette section.');
+        }
+
+        $this->redirectShop('#section-' . $sectionIdInt);
+    }
+
     public function reorderShopItems(string $sectionId): void
     {
         AdminAuth::requireAuth();
@@ -594,6 +649,8 @@ final class AdminController
     {
         AdminAuth::requireAuth();
 
+        $backUrl = $this->safeAdminRedirect((string) ($_GET['redirect'] ?? '/admin/contacts?view=orders'));
+
         $orderModel = new ShopOrder();
         $order      = $orderModel->getByIdWithItems((int) $id);
 
@@ -624,6 +681,7 @@ final class AdminController
             'title'         => 'Administration — Détail commande boutique',
             'order'         => $order,
             'statusOptions' => ShopOrder::STATUS_LABELS,
+            'backUrl'       => $backUrl,
             'flash'         => $this->pullFlash(),
         ]);
     }
@@ -948,15 +1006,22 @@ final class AdminController
         AdminAuth::requireAuth();
 
         $filters = [
-            'status' => $this->sanitizeContactStatusFilter((string) ($_GET['status'] ?? '')),
-            'q'      => trim((string) ($_GET['q'] ?? '')),
+            'status'   => $this->sanitizeContactStatusFilter((string) ($_GET['status'] ?? '')),
+            'deadline' => $this->sanitizeAdminDeadlineFilter((string) ($_GET['deadline'] ?? '')),
+            'q'        => trim((string) ($_GET['q'] ?? '')),
         ];
+        $perPage      = 25;
+        $contactsPage = max(1, (int) ($_GET['contacts_page'] ?? 1));
+        $ordersPage   = max(1, (int) ($_GET['orders_page'] ?? 1));
+        $view         = $this->sanitizeContactsView((string) ($_GET['view'] ?? 'contacts'));
 
-        $contactModel  = new Contact();
-        $contacts      = $contactModel->getFiltered($filters, 100);
-        $stats         = $contactModel->getAdminSummary();
-        $filteredCount = $contactModel->countFiltered($filters);
-        $orderStats    = [
+        $contactModel      = new Contact();
+        $stats             = $contactModel->getAdminSummary();
+        $filteredCount     = $contactModel->countFiltered($filters);
+        $contactsPageCount = max(1, (int) ceil($filteredCount / $perPage));
+        $contactsPage      = min($contactsPage, $contactsPageCount);
+        $contacts          = $contactModel->getFiltered($filters, $perPage, ($contactsPage - 1) * $perPage);
+        $orderStats        = [
             'total'           => 0,
             'new_count'       => 0,
             'confirmed_count' => 0,
@@ -970,10 +1035,12 @@ final class AdminController
         $orderLoadError = null;
 
         try {
-            $orderModel   = new ShopOrder();
-            $orderStats   = $orderModel->getAdminSummary();
-            $recentOrders = $orderModel->getRecentOrders(12, $filters['q']);
-            $ordersCount  = $orderModel->countFilteredOrders($filters['q']);
+            $orderModel      = new ShopOrder();
+            $orderStats      = $orderModel->getAdminSummary();
+            $ordersCount     = $orderModel->countFilteredOrders($filters['q'], $filters['deadline']);
+            $ordersPageCount = max(1, (int) ceil($ordersCount / $perPage));
+            $ordersPage      = min($ordersPage, $ordersPageCount);
+            $recentOrders    = $orderModel->getRecentOrders($perPage, $filters['q'], $filters['deadline'], ($ordersPage - 1) * $perPage);
         } catch (\Throwable $e) {
             error_log('Admin contacts order load error: ' . $e->getMessage());
             $orderLoadError = 'Les commandes boutique sont temporairement indisponibles sur cet écran.';
@@ -988,7 +1055,14 @@ final class AdminController
             'ordersCount'        => $ordersCount,
             'orderLoadError'     => $orderLoadError,
             'filteredCount'      => $filteredCount,
+            'pagination'         => [
+                'contacts_page'       => $contactsPage,
+                'contacts_page_count' => $contactsPageCount,
+                'orders_page'         => $ordersPage,
+                'orders_page_count'   => $ordersPageCount ?? 1,
+            ],
             'filters'            => $filters,
+            'view'               => $view,
             'statusOptions'      => Contact::STATUS_LABELS,
             'orderStatusOptions' => ShopOrder::STATUS_LABELS,
             'flash'              => $this->pullFlash(),
@@ -1052,12 +1126,55 @@ final class AdminController
         exit;
     }
 
+    public function updateContactsStatus(): void
+    {
+        AdminAuth::requireAuth();
+
+        $status     = trim((string) ($_POST['status'] ?? ''));
+        $redirect   = $this->safeAdminRedirect((string) ($_POST['redirect'] ?? '/admin/contacts'));
+        $rawIds     = is_array($_POST['contact_ids'] ?? null) ? $_POST['contact_ids'] : [];
+        $contactIds = array_values(array_unique(array_filter(array_map('intval', $rawIds), static function (int $id): bool {
+            return $id > 0;
+        })));
+
+        if (! isset(Contact::STATUS_LABELS[$status])) {
+            $this->pushFlash('error', 'Choisissez un statut avant la mise à jour.');
+            header('Location: ' . $redirect);
+            exit;
+        }
+
+        if ($contactIds === []) {
+            $this->pushFlash('error', 'Sélectionnez au moins un dossier.');
+            header('Location: ' . $redirect);
+            exit;
+        }
+
+        $contactModel = new Contact();
+        $updatedCount = 0;
+        foreach ($contactIds as $contactId) {
+            if ($contactModel->getById($contactId) !== null && $contactModel->updateStatus($contactId, $status)) {
+                $updatedCount++;
+            }
+        }
+
+        if ($updatedCount === 0) {
+            $this->pushFlash('error', 'Aucun dossier n’a pu être mis à jour.');
+        } else {
+            $this->pushFlash('success', $updatedCount . ' dossier(s) mis à jour. Aucun message client n’a été envoyé.');
+        }
+
+        header('Location: ' . $redirect);
+        exit;
+    }
+
     /**
      * Display a single contact request with menu items
      */
     public function contactDetail(string $id): void
     {
         AdminAuth::requireAuth();
+
+        $backUrl = $this->safeAdminRedirect((string) ($_GET['redirect'] ?? '/admin/contacts?view=contacts'));
 
         $contactModel = new Contact();
         $contact      = $contactModel->getById((int) $id);
@@ -1089,6 +1206,7 @@ final class AdminController
             'title'         => 'Administration — Détail demande / devis',
             'contact'       => $contact,
             'statusOptions' => Contact::STATUS_LABELS,
+            'backUrl'       => $backUrl,
             'flash'         => $this->pullFlash(),
         ]);
     }
@@ -1193,6 +1311,16 @@ final class AdminController
     private function sanitizeContactStatusFilter(string $status): string
     {
         return isset(Contact::STATUS_LABELS[$status]) ? $status : '';
+    }
+
+    private function sanitizeAdminDeadlineFilter(string $deadline): string
+    {
+        return in_array($deadline, ['overdue', 'today', 'next_7_days'], true) ? $deadline : '';
+    }
+
+    private function sanitizeContactsView(string $view): string
+    {
+        return in_array($view, ['contacts', 'orders'], true) ? $view : 'contacts';
     }
 
     private function sanitizeDashboardSearchScope(string $scope): string

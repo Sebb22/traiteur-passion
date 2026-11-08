@@ -80,20 +80,17 @@
     </aside>
 
     <main class="adminSplit__panel">
+        <?php require dirname(__DIR__) . '/partials/admin-navigation.php'; ?>
         <header class="adminPanelHead">
             <div class="adminPanelHead__row">
                 <div>
-                    <h2 class="adminTitle">Editer la carte</h2>
-                    <p class="adminSubtitle">Organisez vos sections, mettez à jour vos produits et gérez leurs images depuis une interface plus directe.</p>
+                    <h2 class="adminTitle">Carte évènementielle</h2>
+                    <p class="adminSubtitle">Organisez les catégories, produits et visuels présentés aux clients.</p>
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
                         <a href="/carte-évènementielle" class="adminBtn adminBtn--primary">Voir la carte</a>
-                    </div>
-                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
-                        <a href="/admin" class="adminBtn">Dashboard</a>
-                        <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
-                        <a href="/admin/boutique" class="adminBtn">Boutique</a>
+                        <a href="#new-section" class="adminBtn">Nouvelle section</a>
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <form action="/admin/logout" method="post">
@@ -193,13 +190,8 @@
             </article>
         </section>
 
-        <section class="adminCard adminCatalogCreateSection">
-            <div class="adminCard__head">
-                <div class="adminCard__title">Ajouter une section</div>
-                <div class="adminCard__meta">
-                    <span class="adminHint">Le slug est auto-généré si vous le laissez vide.</span>
-                </div>
-            </div>
+        <details class="adminCard adminCatalogCreateSection" id="new-section">
+            <summary class="adminCard__head"><span class="adminCard__title">Nouvelle section</span></summary>
             <div class="adminCatalogBody">
                 <form action="/admin/catalog/sections/create" method="post" class="adminForm adminForm--create">
                     <div class="adminFieldGrid">
@@ -224,7 +216,7 @@
                     </div>
                 </form>
             </div>
-        </section>
+        </details>
 
         <form action="/admin/catalog/sections/reorder" method="post" id="catalogSectionOrderForm"
             class="adminReorderForm">

@@ -387,32 +387,45 @@ final class ShopOrder
         $summary = $this->db->query(
             "SELECT COUNT(*) AS total,
                     SUM(CASE WHEN status = 'new' THEN 1 ELSE 0 END) AS new_count,
+                    SUM(CASE WHEN status = 'new' AND DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) AS new_today_count,
                     SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) AS confirmed_count,
                     SUM(CASE WHEN status = 'preparing' THEN 1 ELSE 0 END) AS preparing_count,
                     SUM(CASE WHEN status = 'ready' THEN 1 ELSE 0 END) AS ready_count,
                     SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_count,
-                    SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count
+                    SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count,
+                    SUM(CASE WHEN status NOT IN ('completed', 'cancelled') AND pickup_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS fulfillments_next_7_days,
+                          SUM(CASE WHEN status NOT IN ('completed', 'cancelled') AND pickup_date < CURDATE() THEN 1 ELSE 0 END) AS overdue_fulfillments,
+                          SUM(CASE WHEN status NOT IN ('completed', 'cancelled') AND (status = 'new' OR pickup_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)) THEN 1 ELSE 0 END) AS priority_count
              FROM boutique_orders",
         )->fetch();
 
         return [
-            'total'           => (int) ($summary['total'] ?? 0),
-            'new_count'       => (int) ($summary['new_count'] ?? 0),
-            'confirmed_count' => (int) ($summary['confirmed_count'] ?? 0),
-            'preparing_count' => (int) ($summary['preparing_count'] ?? 0),
-            'ready_count'     => (int) ($summary['ready_count'] ?? 0),
-            'completed_count' => (int) ($summary['completed_count'] ?? 0),
-            'cancelled_count' => (int) ($summary['cancelled_count'] ?? 0),
+            'total'                    => (int) ($summary['total'] ?? 0),
+            'new_count'                => (int) ($summary['new_count'] ?? 0),
+            'new_today_count'          => (int) ($summary['new_today_count'] ?? 0),
+            'confirmed_count'          => (int) ($summary['confirmed_count'] ?? 0),
+            'preparing_count'          => (int) ($summary['preparing_count'] ?? 0),
+            'ready_count'              => (int) ($summary['ready_count'] ?? 0),
+            'completed_count'          => (int) ($summary['completed_count'] ?? 0),
+            'cancelled_count'          => (int) ($summary['cancelled_count'] ?? 0),
+            'fulfillments_next_7_days' => (int) ($summary['fulfillments_next_7_days'] ?? 0),
+            'overdue_fulfillments'     => (int) ($summary['overdue_fulfillments'] ?? 0),
+            'priority_count'           => (int) ($summary['priority_count'] ?? 0),
         ];
     }
 
-    public function getRecentOrders(int $limit = 12, ?string $query = null): array
+    public function getRecentOrders(int $limit = 12, ?string $query = null, string $deadline = '', int $offset = 0): array
     {
         $discountSelect = $this->hasOrderColumn('discount_cents')
             ? 'COALESCE(bo.discount_cents, 0)'
             : '0';
 
         [$whereSql, $params] = $this->buildAdminSearchClauses($query);
+        $deadlineSql         = $this->buildAdminDeadlineClause($deadline);
+        if ($deadlineSql !== '') {
+            $whereSql = $whereSql === '' ? 'WHERE ' . $deadlineSql : $whereSql . ' AND ' . $deadlineSql;
+        }
+        $orderBy = $deadlineSql !== '' ? 'bo.pickup_date ASC, bo.created_at DESC' : 'bo.created_at DESC';
 
         $stmt = $this->db->prepare(
             "SELECT bo.*, COUNT(boi.id) AS line_count,
@@ -424,21 +437,60 @@ final class ShopOrder
              LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
              {$whereSql}
              GROUP BY bo.id
-             ORDER BY bo.created_at DESC
-             LIMIT :limit",
+             ORDER BY {$orderBy}
+             LIMIT :limit OFFSET :offset",
         );
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', max(0, $offset), PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public function getDashboardQueue(int $limit = 5): array
+    {
+        $discountSelect = $this->hasOrderColumn('discount_cents')
+            ? 'COALESCE(bo.discount_cents, 0)'
+            : '0';
+
+        $stmt = $this->db->prepare(
+            "SELECT bo.*, COUNT(boi.id) AS line_count,
+                    COALESCE(SUM(boi.quantity), 0) AS item_count,
+                    COALESCE(SUM(boi.line_total_cents), 0) AS subtotal_cents,
+                    {$discountSelect} AS discount_cents,
+                    COALESCE(SUM(boi.line_total_cents), 0) - {$discountSelect} AS total_cents
+             FROM boutique_orders bo
+             LEFT JOIN boutique_order_items boi ON boi.order_id = bo.id
+             WHERE bo.status NOT IN ('completed', 'cancelled')
+             GROUP BY bo.id
+             ORDER BY
+                CASE
+                    WHEN bo.pickup_date < CURDATE() THEN 0
+                    WHEN bo.pickup_date = CURDATE() THEN 1
+                    WHEN bo.pickup_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 2
+                    WHEN bo.status = 'new' THEN 3
+                    ELSE 4
+                END,
+                bo.pickup_date ASC,
+                bo.created_at DESC
+             LIMIT :limit",
+        );
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();
     }
 
-    public function countFilteredOrders(?string $query = null): int
+    public function countFilteredOrders(?string $query = null, string $deadline = ''): int
     {
         [$whereSql, $params] = $this->buildAdminSearchClauses($query);
+        $deadlineSql         = $this->buildAdminDeadlineClause($deadline);
+        if ($deadlineSql !== '') {
+            $whereSql = $whereSql === '' ? 'WHERE ' . $deadlineSql : $whereSql . ' AND ' . $deadlineSql;
+        }
 
         $stmt = $this->db->prepare(
             "SELECT COUNT(*)
@@ -700,6 +752,21 @@ final class ShopOrder
             'WHERE (' . implode(' OR ', $searchParts) . ')',
             $params,
         ];
+    }
+
+    private function buildAdminDeadlineClause(string $deadline): string
+    {
+        if ($deadline === 'overdue') {
+            return "bo.status NOT IN ('completed', 'cancelled') AND bo.pickup_date < CURDATE()";
+        }
+        if ($deadline === 'today') {
+            return "bo.status NOT IN ('completed', 'cancelled') AND bo.pickup_date = CURDATE()";
+        }
+        if ($deadline === 'next_7_days') {
+            return "bo.status NOT IN ('completed', 'cancelled') AND bo.pickup_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
+        }
+
+        return '';
     }
 
     /**

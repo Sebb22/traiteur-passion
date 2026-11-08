@@ -111,11 +111,15 @@ final class Contact
     public function getFiltered(array $filters = [], int $limit = 100, int $offset = 0): array
     {
         [$whereSql, $params] = $this->buildFilterClauses($filters);
+        $deadline            = trim((string) ($filters['deadline'] ?? ''));
+        $orderBy             = in_array($deadline, ['overdue', 'today', 'next_7_days'], true)
+            ? 'cr.date ASC, cr.created_at DESC'
+            : 'cr.created_at DESC';
 
         $sql = "SELECT cr.*
                 FROM contact_requests cr
                 {$whereSql}
-                ORDER BY cr.created_at DESC
+                ORDER BY {$orderBy}
                 LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
@@ -148,11 +152,15 @@ final class Contact
         $sql = "SELECT
                     COUNT(*) AS total,
                     SUM(CASE WHEN status = 'new' THEN 1 ELSE 0 END) AS new_count,
+                    SUM(CASE WHEN status = 'new' AND DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) AS new_today_count,
                     SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) AS in_progress_count,
                     SUM(CASE WHEN status = 'quoted' THEN 1 ELSE 0 END) AS quoted_count,
                     SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_count,
                     SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count,
-                    SUM(CASE WHEN date IS NOT NULL AND date >= CURDATE() THEN 1 ELSE 0 END) AS upcoming_events
+                    SUM(CASE WHEN date IS NOT NULL AND date >= CURDATE() THEN 1 ELSE 0 END) AS upcoming_events,
+                    SUM(CASE WHEN status NOT IN ('completed', 'cancelled') AND date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS events_next_7_days,
+                    SUM(CASE WHEN status NOT IN ('completed', 'cancelled') AND date IS NOT NULL AND date < CURDATE() THEN 1 ELSE 0 END) AS overdue_events,
+                    SUM(CASE WHEN status NOT IN ('completed', 'cancelled') AND (status = 'new' OR (date IS NOT NULL AND date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY))) THEN 1 ELSE 0 END) AS priority_count
                 FROM contact_requests";
 
         $summary = $this->db->query($sql)->fetch();
@@ -165,14 +173,18 @@ final class Contact
         )->fetchColumn();
 
         return [
-            'total'             => (int) ($summary['total'] ?? 0),
-            'new_count'         => (int) ($summary['new_count'] ?? 0),
-            'in_progress_count' => (int) ($summary['in_progress_count'] ?? 0),
-            'quoted_count'      => (int) ($summary['quoted_count'] ?? 0),
-            'completed_count'   => (int) ($summary['completed_count'] ?? 0),
-            'cancelled_count'   => (int) ($summary['cancelled_count'] ?? 0),
-            'upcoming_events'   => (int) ($summary['upcoming_events'] ?? 0),
-            'with_menu_items'   => $withMenuItems,
+            'total'              => (int) ($summary['total'] ?? 0),
+            'new_count'          => (int) ($summary['new_count'] ?? 0),
+            'new_today_count'    => (int) ($summary['new_today_count'] ?? 0),
+            'in_progress_count'  => (int) ($summary['in_progress_count'] ?? 0),
+            'quoted_count'       => (int) ($summary['quoted_count'] ?? 0),
+            'completed_count'    => (int) ($summary['completed_count'] ?? 0),
+            'cancelled_count'    => (int) ($summary['cancelled_count'] ?? 0),
+            'upcoming_events'    => (int) ($summary['upcoming_events'] ?? 0),
+            'events_next_7_days' => (int) ($summary['events_next_7_days'] ?? 0),
+            'overdue_events'     => (int) ($summary['overdue_events'] ?? 0),
+            'priority_count'     => (int) ($summary['priority_count'] ?? 0),
+            'with_menu_items'    => $withMenuItems,
         ];
     }
 
@@ -184,6 +196,34 @@ final class Contact
                 LEFT JOIN contact_menu_items cmi ON cmi.contact_id = cr.id
                 GROUP BY cr.id
                 ORDER BY cr.created_at DESC
+                LIMIT :limit";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public function getDashboardQueue(int $limit = 8): array
+    {
+        $sql = "SELECT cr.*,
+                       COUNT(cmi.id) AS menu_items_count
+                FROM contact_requests cr
+                LEFT JOIN contact_menu_items cmi ON cmi.contact_id = cr.id
+                WHERE cr.status NOT IN ('completed', 'cancelled')
+                GROUP BY cr.id
+                ORDER BY
+                    CASE
+                        WHEN cr.date IS NOT NULL AND cr.date < CURDATE() THEN 0
+                        WHEN cr.date = CURDATE() THEN 1
+                        WHEN cr.date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 2
+                        WHEN cr.status = 'new' THEN 3
+                        ELSE 4
+                    END,
+                    CASE WHEN cr.date IS NULL THEN 1 ELSE 0 END,
+                    cr.date ASC,
+                    cr.created_at DESC
                 LIMIT :limit";
 
         $stmt = $this->db->prepare($sql);
@@ -354,6 +394,15 @@ final class Contact
             }
 
             $whereParts[] = '(' . implode(' OR ', $searchParts) . ')';
+        }
+
+        $deadline = trim((string) ($filters['deadline'] ?? ''));
+        if ($deadline === 'overdue') {
+            $whereParts[] = "cr.status NOT IN ('completed', 'cancelled') AND cr.date IS NOT NULL AND cr.date < CURDATE()";
+        } elseif ($deadline === 'today') {
+            $whereParts[] = "cr.status NOT IN ('completed', 'cancelled') AND cr.date = CURDATE()";
+        } elseif ($deadline === 'next_7_days') {
+            $whereParts[] = "cr.status NOT IN ('completed', 'cancelled') AND cr.date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
         }
 
         $whereSql = $whereParts !== [] ? 'WHERE ' . implode(' AND ', $whereParts) : '';

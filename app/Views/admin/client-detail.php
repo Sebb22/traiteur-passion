@@ -49,6 +49,7 @@
     </aside>
 
     <main class="adminSplit__panel">
+        <?php require dirname(__DIR__) . '/partials/admin-navigation.php'; ?>
         <header class="adminPanelHead">
             <div class="adminPanelHead__row">
                 <div>
@@ -57,11 +58,7 @@
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
-                        <a href="/admin" class="adminBtn adminBtn--primary">Retour au dashboard</a>
-                    </div>
-                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
-                        <a href="/admin/contacts" class="adminBtn">Demandes & commandes</a>
-                        <a href="/admin/boutique" class="adminBtn">Boutique</a>
+                        <a href="/admin/contacts" class="adminBtn adminBtn--primary">Retour aux demandes</a>
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <form action="/admin/logout" method="post">

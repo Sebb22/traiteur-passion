@@ -101,13 +101,16 @@
                         <span class="menuIntro__pill">Compiègne et Oise</span>
                         <span class="menuIntro__pill">Devis sur mesure</span>
                     </div>
+                    <?php if ($sections !== []): ?>
+                    <a class="btn btn--ghost menuIntro__catalogShortcut" href="#menu-categories">Parcourir la carte</a>
+                    <?php endif; ?>
                 </header>
 
                 <!-- Tabs de navigation générés depuis les sections BDD -->
-                <nav class="menuTabs" aria-label="Catégories" data-menu-tabs>
+                <nav class="menuTabs" id="menu-categories" aria-label="Catégories" data-menu-tabs>
                     <?php foreach ($sections as $index => $section): ?>
                     <a href="#<?php echo $e($section['slug']); ?>"
-                        class="menuTabs__tab <?php echo $index === 0 ? 'is-active' : ''; ?>"
+                        class="menuTabs__tab <?php echo empty($section['items']) ? 'is-empty' : ''; ?> <?php echo $index === 0 ? 'is-active' : ''; ?>"
                         <?php echo $index === 0 ? 'aria-current="location"' : ''; ?>><?php echo $e($section['name']); ?></a>
                     <?php endforeach; ?>
                 </nav>
@@ -120,7 +123,7 @@
                 <?php foreach ($sections as $sectionIndex => $section): ?>
                 <?php $editorial         = $sectionEditorial[$section['slug']] ?? null; ?>
                 <?php $sectionSearchHint = trim((string) ($section['description'] !== '' ? $section['description'] : ($editorial['searchHint'] ?? ''))); ?>
-                <section class="menuSection menuSection--tone-<?php echo($sectionIndex % 3) + 1; ?>"
+                <section class="menuSection menuSection--tone-<?php echo($sectionIndex % 3) + 1; ?><?php echo empty($section['items']) ? ' menuSection--empty' : ''; ?>"
                     id="<?php echo $e($section['slug']); ?>">
 
                     <header class="menuSectionTitle">

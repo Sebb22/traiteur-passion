@@ -429,6 +429,61 @@ final class Shop
         }
     }
 
+    public function duplicateItem(int $id): int
+    {
+        $item = $this->getItemById($id);
+        if (! is_array($item)) {
+            throw new \InvalidArgumentException('Produit boutique introuvable.');
+        }
+
+        $newItemId = $this->createItem((int) $item['section_id'], [
+            'name'                => trim((string) $item['name']) . ' — copie',
+            'short_description'   => $item['short_description'] ?? null,
+            'image_path'          => $item['image_path'] ?? null,
+            'image_alt'           => $item['image_alt'] ?? null,
+            'price_cents'         => $item['price_cents'] ?? 0,
+            'price_label'         => $item['price_label'] ?? null,
+            'stock_quantity'      => 0,
+            'stock_unit'          => $item['stock_unit'] ?? 'unit',
+            'low_stock_threshold' => $item['low_stock_threshold'] ?? 0,
+            'max_order_quantity'  => $item['max_order_quantity'] ?? 10,
+            'is_active'           => 0,
+        ]);
+
+        foreach ($this->getItemOptions($id) as $option) {
+            $this->createItemOption($newItemId, [
+                'label'          => $option['label'] ?? '',
+                'quantity'       => $option['quantity'] ?? 1,
+                'stock_quantity' => $option['stock_quantity'] ?? null,
+                'price_cents'    => $option['price_cents'] ?? 0,
+                'price_label'    => $option['price_label'] ?? null,
+                'is_active'      => ! empty($option['is_active']),
+            ]);
+        }
+
+        return $newItemId;
+    }
+
+    public function updateItemVisibility(int $id, bool $isActive): void
+    {
+        $stmt = $this->db->prepare('UPDATE boutique_items SET is_active = :is_active WHERE id = :id');
+        $stmt->execute([
+            'id'        => $id,
+            'is_active' => $isActive ? 1 : 0,
+        ]);
+    }
+
+    public function updateSectionItemsVisibility(int $sectionId, bool $isActive): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_items SET is_active = :is_active WHERE section_id = :section_id',
+        );
+        $stmt->execute([
+            'section_id' => $sectionId,
+            'is_active'  => $isActive ? 1 : 0,
+        ]);
+    }
+
     public function getItemById(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM boutique_items WHERE id = :id LIMIT 1');

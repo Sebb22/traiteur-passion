@@ -281,6 +281,30 @@
     margin-top: 8px;
 }
 
+.menuIntro__catalogShortcut {
+    grid-column: 1 / -1;
+    justify-self: center;
+    min-height: 42px;
+    margin-top: 16px;
+    padding: 12px 20px;
+    white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+    .menuIntro__catalogShortcut {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+
+.menuTabs__tab.is-empty {
+    opacity: 0.52;
+}
+
+.menuSection--empty {
+    opacity: 0.72;
+}
+
 .menuIntro__pill {
     display: inline-flex;
     align-items: center;

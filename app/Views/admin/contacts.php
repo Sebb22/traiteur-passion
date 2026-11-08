@@ -1,15 +1,24 @@
 <?php
-    $contacts           = isset($contacts) && is_array($contacts) ? $contacts : [];
-    $stats              = isset($stats) && is_array($stats) ? $stats : [];
-    $filters            = isset($filters) && is_array($filters) ? $filters : ['status' => '', 'q' => ''];
-    $statusOptions      = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
-    $orderStatusOptions = isset($orderStatusOptions) && is_array($orderStatusOptions) ? $orderStatusOptions : [];
-    $orderStats         = isset($orderStats) && is_array($orderStats) ? $orderStats : [];
-    $recentOrders       = isset($recentOrders) && is_array($recentOrders) ? $recentOrders : [];
-    $orderLoadError     = isset($orderLoadError) && is_string($orderLoadError) ? $orderLoadError : null;
-    $filteredCount      = (int) ($filteredCount ?? count($contacts));
-    $ordersCount        = (int) ($ordersCount ?? count($recentOrders));
-    $flash              = isset($flash) && is_array($flash) ? $flash : null;
+    $contacts               = isset($contacts) && is_array($contacts) ? $contacts : [];
+    $stats                  = isset($stats) && is_array($stats) ? $stats : [];
+    $filters                = isset($filters) && is_array($filters) ? $filters : ['status' => '', 'deadline' => '', 'q' => ''];
+    $statusOptions          = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
+    $orderStatusOptions     = isset($orderStatusOptions) && is_array($orderStatusOptions) ? $orderStatusOptions : [];
+    $orderStats             = isset($orderStats) && is_array($orderStats) ? $orderStats : [];
+    $recentOrders           = isset($recentOrders) && is_array($recentOrders) ? $recentOrders : [];
+    $orderLoadError         = isset($orderLoadError) && is_string($orderLoadError) ? $orderLoadError : null;
+    $filteredCount          = (int) ($filteredCount ?? count($contacts));
+    $ordersCount            = (int) ($ordersCount ?? count($recentOrders));
+    $displayedContactsCount = count($contacts);
+    $displayedOrdersCount   = count($recentOrders);
+    $pagination             = isset($pagination) && is_array($pagination) ? $pagination : [];
+    $contactsPage           = max(1, (int) ($pagination['contacts_page'] ?? 1));
+    $contactsPageCount      = max(1, (int) ($pagination['contacts_page_count'] ?? 1));
+    $ordersPage             = max(1, (int) ($pagination['orders_page'] ?? 1));
+    $ordersPageCount        = max(1, (int) ($pagination['orders_page_count'] ?? 1));
+    $activeView             = trim((string) ($view ?? 'contacts')) === 'orders' ? 'orders' : 'contacts';
+    $isOrdersView           = $activeView === 'orders';
+    $flash                  = isset($flash) && is_array($flash) ? $flash : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -27,11 +36,70 @@
     };
 
     $activeStatus    = trim((string) ($filters['status'] ?? ''));
+    $activeDeadline  = trim((string) ($filters['deadline'] ?? ''));
     $searchQuery     = trim((string) ($filters['q'] ?? ''));
-    $contactRedirect = '/admin/contacts' . (($activeStatus !== '' || $searchQuery !== '') ? '?' . http_build_query(['status' => $activeStatus, 'q' => $searchQuery]) : '');
+    $deadlineOptions = [
+    ''            => 'Toutes les échéances',
+    'overdue'     => 'Échéances dépassées',
+    'today'       => 'Aujourd’hui',
+    'next_7_days' => 'Dans les 7 prochains jours',
+    ];
+    $redirectFilters = [
+    'status'        => $activeStatus,
+    'deadline'      => $activeDeadline,
+    'q'             => $searchQuery,
+    'contacts_page' => $contactsPage > 1 ? $contactsPage : '',
+    'orders_page'   => $ordersPage > 1 ? $ordersPage : '',
+    'view'          => $activeView,
+    ];
+    $redirectFilters = array_filter($redirectFilters, static function ($value): bool {
+    return $value !== '';
+    });
+    $contactRedirect = '/admin/contacts' . ($redirectFilters !== [] ? '?' . http_build_query($redirectFilters) : '');
+
+    $getPageUrl = static function (string $pageKey, int $page) use ($activeStatus, $activeDeadline, $searchQuery, $contactsPage, $ordersPage, $activeView): string {
+    $query = [
+        'status'        => $activeStatus,
+        'deadline'      => $activeDeadline,
+        'q'             => $searchQuery,
+        'contacts_page' => $contactsPage > 1 ? $contactsPage : '',
+        'orders_page'   => $ordersPage > 1 ? $ordersPage : '',
+        'view'          => $activeView,
+    ];
+    $query[$pageKey] = max(1, $page);
+    $query           = array_filter($query, static function ($value): bool {
+        return $value !== '';
+    });
+
+    return '/admin/contacts?' . http_build_query($query);
+    };
 
     $formatPrice = static function ($value): string {
     return number_format(max(0, (int) $value) / 100, 2, ',', ' ') . ' €';
+    };
+
+    $getDeadlineMeta = static function ($value): ?array {
+    $timestamp = strtotime(trim((string) $value));
+    if ($timestamp === false) {
+        return null;
+    }
+
+    $daysUntil = (int) floor(($timestamp - strtotime('today')) / 86400);
+    if ($daysUntil < 0) {
+        $daysOverdue = abs($daysUntil);
+        return ['label' => 'Retard de ' . $daysOverdue . ' jour' . ($daysOverdue > 1 ? 's' : ''), 'state' => 'overdue'];
+    }
+    if ($daysUntil === 0) {
+        return ['label' => 'Aujourd’hui', 'state' => 'today'];
+    }
+    if ($daysUntil === 1) {
+        return ['label' => 'Demain', 'state' => 'soon'];
+    }
+    if ($daysUntil <= 7) {
+        return ['label' => 'Dans ' . $daysUntil . ' jours', 'state' => 'soon'];
+    }
+
+    return null;
     };
 ?>
 <div class="adminSplit adminSplit--contacts">
@@ -46,20 +114,19 @@
     </aside>
 
     <main class="adminSplit__panel">
+        <?php require dirname(__DIR__) . '/partials/admin-navigation.php'; ?>
         <header class="adminPanelHead">
             <div class="adminPanelHead__row">
                 <div>
-                    <h2 class="adminTitle">Demandes, devis et commandes</h2>
-                    <p class="adminSubtitle">Retrouvez les nouveaux besoins, les devis et les commandes boutique depuis un seul écran de suivi.</p>
+                    <h2 class="adminTitle"><?php echo $isOrdersView ? 'Commandes boutique' : 'Demandes et devis'; ?></h2>
+                    <p class="adminSubtitle"><?php echo $isOrdersView ? 'Suivez les retraits, livraisons et préparations à venir.' : 'Traitez les nouveaux besoins, devis et relances clients.'; ?></p>
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
-                        <a href="/admin/contacts/export" class="adminBtn adminBtn--primary">Exporter CSV</a>
-                        <a href="/admin/boutique#orders" class="adminBtn">Commandes boutique</a>
-                    </div>
-                    <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--modules">
-                        <a href="/admin" class="adminBtn">Dashboard</a>
-                        <a href="/admin/catalog" class="adminBtn">Carte</a>
+                        <a href="/admin/contacts?view=<?php echo $e($activeView); ?>&amp;deadline=overdue" class="adminBtn adminBtn--primary">Échéances dépassées</a>
+                        <?php if (! $isOrdersView): ?>
+                        <a href="/admin/contacts/export" class="adminBtn">Exporter CSV</a>
+                        <?php endif; ?>
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <a href="/" class="adminBtn">Retour au site</a>
@@ -78,6 +145,7 @@
         <?php endif; ?>
 
         <section class="adminStats adminStats--panel" aria-label="Statistiques">
+            <?php if (! $isOrdersView): ?>
             <div class="statCard">
                 <div class="statCard__label">Total</div>
                 <div class="statCard__value"><?php echo (int) ($stats['total'] ?? 0); ?></div>
@@ -97,29 +165,44 @@
                 <div class="statCard__label">Événements à venir</div>
                 <div class="statCard__value"><?php echo (int) ($stats['upcoming_events'] ?? 0); ?></div>
             </div>
-
+            <?php else: ?>
             <div class="statCard">
-                <div class="statCard__label">Commandes boutique</div>
-                <div class="statCard__value"><?php echo (int) ($orderStats['total'] ?? 0); ?></div>
+                <div class="statCard__label">À traiter</div>
+                <div class="statCard__value"><?php echo (int) ($orderStats['priority_count'] ?? 0); ?></div>
             </div>
+            <div class="statCard">
+                <div class="statCard__label">Nouvelles</div>
+                <div class="statCard__value"><?php echo (int) ($orderStats['new_count'] ?? 0); ?></div>
+            </div>
+            <div class="statCard">
+                <div class="statCard__label">À préparer</div>
+                <div class="statCard__value"><?php echo (int) ($orderStats['preparing_count'] ?? 0); ?></div>
+            </div>
+            <div class="statCard">
+                <div class="statCard__label">Prêtes</div>
+                <div class="statCard__value"><?php echo (int) ($orderStats['ready_count'] ?? 0); ?></div>
+            </div>
+            <?php endif; ?>
         </section>
 
         <section class="adminCatalogUtilityGrid" aria-label="Outils demandes, devis et commandes">
             <article class="adminCard adminCard--padded adminCatalogUtilityCard">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Filtrer l'ecran de suivi</div>
+                    <div class="adminCard__title">Filtres de suivi</div>
                     <div class="adminCard__meta">
-                        <span class="adminHint"><?php echo $filteredCount; ?> demande(s) / devis et <?php echo $ordersCount; ?> commande(s) affiché(s) sur cette page</span>
+                        <span class="adminHint"><?php echo $isOrdersView ? $displayedOrdersCount . ' commande(s) affichée(s) sur ' . $ordersCount : $displayedContactsCount . ' demande(s) affichée(s) sur ' . $filteredCount; ?></span>
                     </div>
                 </div>
 
                 <form action="/admin/contacts" method="get" class="adminCatalogToolbar">
+                    <input type="hidden" name="view" value="<?php echo $e($activeView); ?>">
                     <label class="adminField adminField--filter">
-                        <span class="adminField__label">Recherche dans cet ecran</span>
+                        <span class="adminField__label">Recherche</span>
                         <input class="adminInput" type="search" name="q" value="<?php echo $e($searchQuery); ?>"
-                            placeholder="Nom, email, telephone, lieu, message, ref commande...">
+                            placeholder="<?php echo $isOrdersView ? 'Référence, nom, email...' : 'Nom, email, téléphone, lieu...'; ?>">
                     </label>
 
+                    <?php if (! $isOrdersView): ?>
                     <label class="adminField adminField--filter">
                         <span class="adminField__label">Statut</span>
                         <select class="adminSelect" name="status">
@@ -132,23 +215,37 @@
                             <?php endforeach; ?>
                         </select>
                     </label>
+                    <?php endif; ?>
+
+                    <label class="adminField adminField--filter">
+                        <span class="adminField__label"><?php echo $isOrdersView ? 'Échéance de retrait / livraison' : 'Échéance de l’événement'; ?></span>
+                        <select class="adminSelect" name="deadline">
+                            <?php foreach ($deadlineOptions as $deadlineKey => $deadlineLabel): ?>
+                            <option value="<?php echo $e($deadlineKey); ?>"
+                                <?php echo $activeDeadline === (string) $deadlineKey ? 'selected' : ''; ?>>
+                                <?php echo $e($deadlineLabel); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
 
                     <div class="adminInlineActions adminInlineActions--filters">
                         <button type="submit" class="adminBtn adminBtn--primary">Filtrer</button>
-                        <a href="/admin/contacts" class="adminBtn">Réinitialiser</a>
+                        <a href="/admin/contacts?view=<?php echo $e($activeView); ?>" class="adminBtn">Réinitialiser</a>
                     </div>
                 </form>
             </article>
 
-            <article class="adminCard adminCard--padded adminCatalogUtilityCard">
+            <article class="adminCard adminCard--padded adminCatalogUtilityCard adminContactsPipeline">
                 <div class="adminCard__head">
-                    <div class="adminCard__title">Repères de suivi</div>
+                    <div class="adminCard__title"><?php echo $isOrdersView ? 'Préparation des commandes' : 'Suivi des demandes'; ?></div>
                     <div class="adminCard__meta">
-                        <span class="adminHint">Les contacts et les commandes boutique restent suivables ici, puis opérationnels dans l’espace boutique.</span>
+                        <span class="adminHint">État des dossiers ouverts</span>
                     </div>
                 </div>
 
                 <div class="adminDashboardStatus adminDashboardStatus--compact">
+                    <?php if (! $isOrdersView): ?>
                     <div class="adminStatusPill">
                         <div class="adminStatusPill__label">En cours</div>
                         <div class="adminStatusPill__value"><?php echo (int) ($stats['in_progress_count'] ?? 0); ?></div>
@@ -173,54 +270,44 @@
                         <div class="adminStatusPill__label">Commandes prêtes</div>
                         <div class="adminStatusPill__value"><?php echo (int) ($orderStats['ready_count'] ?? 0); ?></div>
                     </div>
+                    <?php else: ?>
+                    <div class="adminStatusPill">
+                        <div class="adminStatusPill__label">Nouvelles</div>
+                        <div class="adminStatusPill__value"><?php echo (int) ($orderStats['new_count'] ?? 0); ?></div>
+                    </div>
+                    <div class="adminStatusPill">
+                        <div class="adminStatusPill__label">À préparer</div>
+                        <div class="adminStatusPill__value"><?php echo (int) ($orderStats['preparing_count'] ?? 0); ?></div>
+                    </div>
+                    <div class="adminStatusPill">
+                        <div class="adminStatusPill__label">Prêtes</div>
+                        <div class="adminStatusPill__value"><?php echo (int) ($orderStats['ready_count'] ?? 0); ?></div>
+                    </div>
+                    <div class="adminStatusPill">
+                        <div class="adminStatusPill__label">À échéance</div>
+                        <div class="adminStatusPill__value"><?php echo (int) ($orderStats['priority_count'] ?? 0); ?></div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </article>
         </section>
 
-        <section class="adminCard adminCard--padded adminCatalogGuideCard">
-            <div class="adminCard__head">
-                <div class="adminCard__title">Mode d'emploi</div>
-                <div class="adminCard__meta">
-                    <span class="adminHint">Trois réflexes simples pour garder le suivi commercial propre et rapide</span>
-                </div>
-            </div>
-
-            <div class="adminCatalogGuideGrid">
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">1. Trier</div>
-                    <div class="adminQuickLinkCard__title">Nouveau puis en cours</div>
-                    <div class="adminQuickLinkCard__meta">Commencez par les demandes récentes, puis basculez-les en suivi dès qu'un échange a commencé.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">2. Deviser</div>
-                    <div class="adminQuickLinkCard__title">Qualifier avant d'envoyer</div>
-                    <div class="adminQuickLinkCard__meta">Vérifiez date, lieu, volume et sélection de carte avant de passer le dossier en devis envoyé.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">3. Clôturer</div>
-                    <div class="adminQuickLinkCard__title">Conserver l'historique</div>
-                    <div class="adminQuickLinkCard__meta">Terminez ou annulez le dossier pour garder un historique clair sans perdre les informations client.</div>
-                </div>
-                <div class="adminQuickLinkCard">
-                    <div class="adminQuickLinkCard__eyebrow">4. Préparer</div>
-                    <div class="adminQuickLinkCard__title">Traiter la commande boutique</div>
-                    <div class="adminQuickLinkCard__meta">Passez par le statut de commande dès qu’un panier validé entre, puis confirmez ou préparez le retrait.</div>
-                </div>
-            </div>
-        </section>
-
+        <?php if ($activeView === 'orders'): ?>
         <section class="adminCard adminCard--table" id="orders">
             <div class="adminCard__head">
-                <div class="adminCard__title">Commandes boutique récentes</div>
+                <div class="adminCard__title">Commandes boutique</div>
                 <div class="adminCard__meta">
-                    <span class="adminHint"><?php echo $ordersCount; ?> commande(s) correspondant au filtre<?php echo $searchQuery !== '' ? ' pour cette recherche' : ''; ?></span>
+                    <span class="adminHint"><?php echo $displayedOrdersCount; ?> commande(s) affichée(s) sur <?php echo $ordersCount; ?> correspondante(s)</span>
                 </div>
             </div>
 
             <?php if ($orderLoadError !== null): ?>
             <div class="adminEmptyState"><?php echo $e($orderLoadError); ?></div>
             <?php elseif ($recentOrders === []): ?>
-            <div class="adminEmptyState">Aucune commande boutique pour le moment</div>
+            <div class="adminEmptyState">
+                Aucune commande ne correspond aux critères actuels.
+                <a href="/admin/contacts?view=orders" class="adminLink">Réinitialiser les filtres</a>
+            </div>
             <?php else: ?>
             <div class="adminTableWrap">
                 <table class="adminTable">
@@ -247,7 +334,7 @@
                         <tr>
                             <td>
                                 <strong>
-                                    <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminLink">
+                                    <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>?redirect=<?php echo rawurlencode($contactRedirect); ?>" class="adminLink">
                                         <?php echo $e($orderReference); ?> · <?php echo $e($order['customer_name'] ?? ''); ?>
                                     </a>
                                 </strong><br>
@@ -276,7 +363,7 @@
                             </td>
                             <td>
                                 <form action="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>/status" method="post">
-                                    <input type="hidden" name="redirect" value="<?php echo $e($contactRedirect . '#orders'); ?>">
+                                    <input type="hidden" name="redirect" value="<?php echo $e($contactRedirect); ?>">
                                     <select class="adminSelect" name="status">
                                         <?php foreach ($orderStatusOptions as $statusKey => $statusLabel): ?>
                                         <option value="<?php echo $e($statusKey); ?>"
@@ -285,16 +372,9 @@
                                         </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label class="adminField adminField--checkbox">
-                                        <span class="adminField__label">Mail client</span>
-                                        <input type="checkbox" class="adminCheckbox" name="notify_client" value="1">
-                                    </label>
-                                    <input type="text" class="adminInput" name="client_message"
-                                        placeholder="Message optionnel au client">
-                                    <div class="adminInlineActions">
-                                        <button type="submit" class="adminBtn adminBtn--sm">Mettre à jour</button>
-                                        <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>" class="adminBtn">Détail</a>
-                                        <a href="/admin/boutique#orders" class="adminBtn">Ouvrir la boutique</a>
+                                    <div class="adminInlineActions adminInlineActions--orderQuick">
+                                        <button type="submit" class="adminBtn adminBtn--sm">Enregistrer</button>
+                                        <a href="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>?redirect=<?php echo rawurlencode($contactRedirect); ?>" class="adminBtn">Ouvrir</a>
                                     </div>
                                 </form>
                             </td>
@@ -304,8 +384,25 @@
                 </table>
             </div>
             <?php endif; ?>
+
+            <?php if ($ordersPageCount > 1): ?>
+            <nav class="adminPagination" aria-label="Pages des commandes">
+                <span class="adminPagination__label">Page <?php echo $ordersPage; ?> sur <?php echo $ordersPageCount; ?></span>
+                <div class="adminPagination__actions">
+                    <?php if ($ordersPage > 1): ?>
+                    <a href="<?php echo $e($getPageUrl('orders_page', $ordersPage - 1)); ?>#orders" class="adminBtn adminBtn--sm">Précédente</a>
+                    <?php endif; ?>
+                    <?php if ($ordersPage < $ordersPageCount): ?>
+                    <a href="<?php echo $e($getPageUrl('orders_page', $ordersPage + 1)); ?>#orders" class="adminBtn adminBtn--sm">Suivante</a>
+                    <?php endif; ?>
+                </div>
+            </nav>
+            <?php endif; ?>
         </section>
 
+        <?php endif; ?>
+
+        <?php if ($activeView === 'contacts'): ?>
         <section class="adminCard adminCard--table">
             <div class="adminCard__head">
                 <div class="adminCard__title">Liste des demandes et devis</div>
@@ -314,9 +411,34 @@
                 </div>
             </div>
 
+            <?php if ($contacts !== []): ?>
+            <form action="/admin/contacts/status" method="post" class="adminBulkActions" id="bulk-contact-status-form" data-bulk-contact-status>
+                <input type="hidden" name="redirect" value="<?php echo $e($contactRedirect); ?>">
+                <label class="adminSelectionControl">
+                    <input type="checkbox" class="adminCheckbox" data-select-all-contacts>
+                    <span>Tout sélectionner sur cette page</span>
+                </label>
+                <span class="adminHint" data-contact-selection-count>0 dossier sélectionné</span>
+                <label class="adminField adminField--filter">
+                    <span class="adminField__label">Statut pour les dossiers sélectionnés</span>
+                    <select class="adminSelect" name="status" required>
+                        <option value="">Choisir un statut</option>
+                        <?php foreach ($statusOptions as $statusKey => $statusLabel): ?>
+                        <option value="<?php echo $e($statusKey); ?>"><?php echo $e($statusLabel); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <button type="submit" class="adminBtn adminBtn--primary">Mettre à jour la sélection</button>
+                <span class="adminHint">Aucun message client n’est envoyé avec cette action.</span>
+            </form>
+            <?php endif; ?>
+
             <div class="adminRequestList" role="list" aria-label="Liste des demandes">
                 <?php if (empty($contacts)): ?>
-                <div class="adminEmptyState">Aucune demande pour le moment</div>
+                <div class="adminEmptyState">
+                    Aucune demande ou devis ne correspond aux critères actuels.
+                    <a href="/admin/contacts" class="adminLink">Réinitialiser les filtres</a>
+                </div>
                 <?php else: ?>
                 <?php foreach ($contacts as $contact): ?>
                 <?php
@@ -326,18 +448,29 @@
                         trim((string) ($contact['customer_address'] ?? '')),
                         trim((string) (($contact['customer_postal_code'] ?? '') . ' ' . ($contact['customer_city'] ?? ''))),
                     ])));
+                    $contactDeadline = $getDeadlineMeta($contact['date'] ?? null);
                 ?>
                 <article class="adminRequestCard" role="listitem">
                     <div class="adminRequestCard__head">
                         <div class="adminRequestCard__titleWrap">
                             <div class="adminRequestCard__eyebrow">Dossier #<?php echo $contactId; ?></div>
-                            <a href="/admin/contacts/<?php echo $contactId; ?>" class="adminRequestCard__title adminLink">
+                            <a href="/admin/contacts/<?php echo $contactId; ?>?redirect=<?php echo rawurlencode($contactRedirect); ?>" class="adminRequestCard__title adminLink">
                                 <?php echo $e($contact['name'] ?? 'Demande'); ?>
                             </a>
                         </div>
                         <span class="adminBadge adminBadge--<?php echo $e($statusKey); ?>">
                             <?php echo $e($statusOptions[$statusKey] ?? ucfirst($statusKey)); ?>
                         </span>
+                        <?php if ($contactDeadline !== null): ?>
+                        <span class="adminDeadlineBadge adminDeadlineBadge--<?php echo $e($contactDeadline['state']); ?>">
+                            <?php echo $e($contactDeadline['label']); ?>
+                        </span>
+                        <?php endif; ?>
+                        <label class="adminSelectionControl">
+                            <input type="checkbox" class="adminCheckbox" name="contact_ids[]" value="<?php echo $contactId; ?>"
+                                form="bulk-contact-status-form">
+                            <span>Sélectionner</span>
+                        </label>
                     </div>
 
                     <div class="adminRequestCard__grid">
@@ -394,22 +527,40 @@
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label class="adminField adminField--checkbox">
-                                    <span class="adminField__label">Mail client</span>
-                                    <input type="checkbox" class="adminCheckbox" name="notify_client" value="1">
-                                </label>
-                                <input type="text" class="adminInput" name="client_message"
-                                    placeholder="Message optionnel au client">
                                 <button type="submit" class="adminBtn adminBtn--sm">Mettre à jour</button>
+                                <details class="adminInlineNotification">
+                                    <summary>Notifier le client</summary>
+                                    <label class="adminField adminField--checkbox">
+                                        <span class="adminField__label">Envoyer un mail</span>
+                                        <input type="checkbox" class="adminCheckbox" name="notify_client" value="1">
+                                    </label>
+                                    <input type="text" class="adminInput" name="client_message"
+                                        placeholder="Message optionnel au client">
+                                </details>
                             </div>
                         </form>
 
-                        <a href="/admin/contacts/<?php echo $contactId; ?>" class="adminBtn">Ouvrir le dossier</a>
+                        <a href="/admin/contacts/<?php echo $contactId; ?>?redirect=<?php echo rawurlencode($contactRedirect); ?>" class="adminBtn">Ouvrir le dossier</a>
                     </div>
                 </article>
                 <?php endforeach; ?>
                 <?php endif; ?>
             </div>
+
+            <?php if ($contactsPageCount > 1): ?>
+            <nav class="adminPagination" aria-label="Pages des demandes et devis">
+                <span class="adminPagination__label">Page <?php echo $contactsPage; ?> sur <?php echo $contactsPageCount; ?></span>
+                <div class="adminPagination__actions">
+                    <?php if ($contactsPage > 1): ?>
+                    <a href="<?php echo $e($getPageUrl('contacts_page', $contactsPage - 1)); ?>" class="adminBtn adminBtn--sm">Précédente</a>
+                    <?php endif; ?>
+                    <?php if ($contactsPage < $contactsPageCount): ?>
+                    <a href="<?php echo $e($getPageUrl('contacts_page', $contactsPage + 1)); ?>" class="adminBtn adminBtn--sm">Suivante</a>
+                    <?php endif; ?>
+                </div>
+            </nav>
+            <?php endif; ?>
         </section>
+        <?php endif; ?>
     </main>
 </div>

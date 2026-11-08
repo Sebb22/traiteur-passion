@@ -13,10 +13,13 @@ import { initAdminCatalog } from "./admin/catalog";
 import { initAdminBlog } from "./admin/blog";
 import { initAdminLogin } from "./admin/login";
 import { initAdminMailPreview } from "./admin/mailPreview";
+import { initAdminContacts } from "./admin/contacts";
 
 import { enableWheelRedirect } from "./generic/enableWheelRedirect";
 import { initLocationCards } from "./generic/locationCard";
 import { initShopPromoBanner } from "./generic/shopPromoBanner";
+import { initEventCampaignPopup } from "./generic/eventCampaignPopup";
+import { initSeasonalSnowfall, initSeasonalSnowfallPreview } from "./generic/seasonalSnowfall";
 import { initToastSystem } from "./generic/toast";
 document.addEventListener("DOMContentLoaded", () => {
     initToastSystem();
@@ -34,9 +37,13 @@ document.addEventListener("DOMContentLoaded", () => {
     initAdminBlog();
     initAdminLogin();
     initAdminMailPreview();
+    initAdminContacts();
     initLocationCards();
     initShopPromoBanner();
+    initEventCampaignPopup();
+    initSeasonalSnowfall();
+    initSeasonalSnowfallPreview();
 
     enableWheelRedirect();
-    console.log("Traiteur Passion ready 🔥");
+    //console.log("Traiteur Passion ready 🔥");
 });

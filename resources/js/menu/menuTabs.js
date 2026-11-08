@@ -130,8 +130,9 @@ function initMenuTabsInstance(nav) {
             stickyTop = Math.max(fallback, Math.round(rect.bottom + 8));
         }
 
+        const navHeight = Math.max(0, Math.round(nav.getBoundingClientRect().height));
         nav.style.setProperty("--menu-tabs-sticky-top", `${stickyTop}px`);
-        panel.style.setProperty("--menu-section-scroll-margin", `${stickyTop + 24}px`);
+        panel.style.setProperty("--menu-section-scroll-margin", `${stickyTop + navHeight + 16}px`);
     };
 
     updateStickyOffsets();
@@ -237,7 +238,8 @@ function initMenuTabsInstance(nav) {
             if (!isMobileViewport()) {
                 scrollActiveTabIntoView(active.link);
             }
-        }, {
+        },
+        {
             root: resolveScrollContainer(),
             rootMargin: "-18% 0px -60% 0px",
             threshold: [0.15, 0.35, 0.6],

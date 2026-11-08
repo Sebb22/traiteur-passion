@@ -1,6 +1,8 @@
 <?php
     use App\Core\Navigation;
     use App\Core\Vite;
+    use App\Models\EventCampaign;
+    use App\Models\SeasonalAmbience;
     use App\Services\ShopPromoService;
 
     $defaultTitle = 'Traiteur Passion – Traiteur événementiel à Compiègne';
@@ -19,12 +21,26 @@
     ? []
     : Navigation::getBreadcrumbs($currentPath, $pageTitle);
     $shopPromoBanner = null;
+    $eventCampaign   = null;
+    $seasonalAmbience = null;
 
     if (strpos($currentPath, '/admin') !== 0) {
     try {
         $shopPromoBanner = (new ShopPromoService())->getPublicPromo();
     } catch (\Throwable $e) {
         $shopPromoBanner = null;
+    }
+    if (strpos($currentPath, '/admin') !== 0) {
+        try {
+            $eventCampaign = (new EventCampaign())->getPublicCampaign($currentPath);
+        } catch (\Throwable $e) {
+            $eventCampaign = null;
+        }
+        try {
+            $seasonalAmbience = (new SeasonalAmbience())->getPublic();
+        } catch (\Throwable $e) {
+            $seasonalAmbience = null;
+        }
     }
     }
 ?>
@@ -76,12 +92,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Forum&family=Inter:wght@400;500;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Forum&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
         rel="stylesheet">
     <?php echo Vite::styles() ?>
 </head>
 
 <body class="<?php echo htmlspecialchars($resolvedBodyClass, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php if (is_array($seasonalAmbience)): ?>
+    <div data-seasonal-ambience
+        data-snowflake-count="<?php echo (int) ($seasonalAmbience['snowflake_count'] ?? 35); ?>"
+        data-color="<?php echo htmlspecialchars((string) ($seasonalAmbience['color'] ?? '#ffffff'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-opacity-min="<?php echo htmlspecialchars((string) ($seasonalAmbience['opacity_min'] ?? '0.25'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-opacity-max="<?php echo htmlspecialchars((string) ($seasonalAmbience['opacity_max'] ?? '0.75'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-speed-min="<?php echo htmlspecialchars((string) ($seasonalAmbience['speed_min'] ?? '0.35'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-speed-max="<?php echo htmlspecialchars((string) ($seasonalAmbience['speed_max'] ?? '1.10'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-wind-min="<?php echo htmlspecialchars((string) ($seasonalAmbience['wind_min'] ?? '-0.20'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-wind-max="<?php echo htmlspecialchars((string) ($seasonalAmbience['wind_max'] ?? '0.60'), ENT_QUOTES, 'UTF-8'); ?>"
+        data-mobile-enabled="<?php echo ! empty($seasonalAmbience['mobile_enabled']) ? '1' : '0'; ?>"></div>
+    <?php endif; ?>
     <?php if (is_array($shopPromoBanner)): ?>
     <div class="sitePromoSticky" data-countdown-root>
         <div class="sitePromoSticky__inner">
@@ -113,6 +141,10 @@
 
 
     <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
+
+    <?php if (is_array($eventCampaign)): ?>
+    <?php require dirname(__DIR__) . '/partials/event-campaign-popup.php'; ?>
+    <?php endif; ?>
 
     <?php echo Vite::scripts() ?>
 </body>

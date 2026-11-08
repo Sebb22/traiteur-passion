@@ -96,6 +96,52 @@
     gap: 16px;
 }
 
+.adminToolNav {
+    display: flex;
+    gap: 6px;
+    padding: 0 12px 12px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    scrollbar-width: thin;
+}
+
+.adminToolNav__link {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    border-radius: 10px;
+    color: rgba(229, 229, 229, 0.78);
+    text-decoration: none;
+    font:
+        600 12px/1.2 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+    &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(239, 231, 210, 0.96);
+    }
+}
+
+.adminToolNav__link--active {
+    background: rgba(239, 231, 210, 0.12);
+    color: rgba(239, 231, 210, 0.98);
+}
+
+.adminToolNav__link:focus-visible,
+.adminBtn:focus-visible,
+.adminLink:focus-visible,
+.adminFilterButton:focus-visible,
+.adminInput:focus-visible,
+.adminSelect:focus-visible,
+.adminTextarea:focus-visible,
+.adminCheckbox:focus-visible {
+    outline: 2px solid rgba(239, 231, 210, 0.96);
+    outline-offset: 3px;
+}
+
 /* Header */
 
 .adminPanelHead {
@@ -312,8 +358,57 @@
         -apple-system,
         sans-serif;
     font-size: 12px;
-    opacity: 0.6;
+    opacity: 0.76;
     color: rgba(229, 229, 229, 0.92);
+}
+
+.adminPagination {
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminPagination__label {
+    color: rgba(239, 231, 210, 0.84);
+    font:
+        600 12px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminPagination__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.adminBulkActions {
+    margin: 0 14px;
+    padding: 14px 0;
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminBulkActions .adminField {
+    min-width: min(100%, 260px);
+}
+
+.adminSelectionControl {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(239, 231, 210, 0.84);
+    font:
+        600 12px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
 }
 
 .adminTableWrap {
@@ -458,6 +553,39 @@
     background: rgba(255, 193, 82, 0.16);
     border-color: rgba(255, 193, 82, 0.28);
     color: #ffe5aa;
+}
+
+.adminDeadlineBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    font:
+        700 10px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.adminDeadlineBadge--overdue {
+    background: rgba(255, 107, 107, 0.16);
+    border-color: rgba(255, 107, 107, 0.32);
+    color: #ffd2d2;
+}
+
+.adminDeadlineBadge--today {
+    background: rgba(255, 193, 82, 0.16);
+    border-color: rgba(255, 193, 82, 0.32);
+    color: #ffe5aa;
+}
+
+.adminDeadlineBadge--soon {
+    background: rgba(82, 164, 255, 0.16);
+    border-color: rgba(82, 164, 255, 0.3);
+    color: #cfe2ff;
 }
 
 /* Empty */
@@ -714,6 +842,114 @@
 
 .adminCatalogCreateSection {
     margin: 0 12px;
+    summary {
+        cursor: pointer;
+        list-style: none;
+        &::-webkit-details-marker {
+            display: none;
+        }
+    }
+}
+
+.adminShopAlerts {
+    margin: 0 12px;
+    padding: 14px;
+    border: 1px solid rgba(216, 177, 72, 0.3);
+    border-radius: 16px;
+    background: rgba(216, 177, 72, 0.08);
+}
+
+.adminShopAlerts__head,
+.adminShopAlerts__list {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.adminShopAlerts__head {
+    justify-content: space-between;
+    color: rgba(255, 231, 164, 0.95);
+    font:
+        700 12px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.adminShopAlerts__head span {
+    color: rgba(255, 231, 164, 0.78);
+    font-size: 11px;
+}
+
+.adminShopAlerts__list {
+    margin-top: 12px;
+}
+
+.adminShopAlert {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 9px;
+    border: 1px solid rgba(216, 177, 72, 0.22);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.16);
+    color: rgba(239, 231, 210, 0.9);
+    font:
+        600 12px/1.2 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    text-decoration: none;
+}
+
+.adminShopAlert span:last-child {
+    color: rgba(255, 231, 164, 0.82);
+}
+
+.adminCreateDialog {
+    width: min(440px, calc(100vw - 32px));
+    border: 1px solid rgba(239, 231, 210, 0.18);
+    border-radius: 18px;
+    padding: 0;
+    color: rgba(239, 231, 210, 0.94);
+    background: #171718;
+}
+
+.adminCreateDialog::backdrop {
+    background: rgba(0, 0, 0, 0.66);
+    backdrop-filter: blur(3px);
+}
+
+.adminCreateDialog__form {
+    display: grid;
+    gap: 18px;
+    padding: 20px;
+}
+
+.adminCreateDialog h3,
+.adminCreateDialog p {
+    margin: 0;
+}
+
+.adminCreateDialog h3 {
+    font:
+        400 26px/1.1 "Forum",
+        serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.adminCreateDialog p {
+    margin-top: 7px;
+    color: rgba(229, 229, 229, 0.72);
+    font:
+        13px/1.5 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
 }
 
 .adminCatalogUtilityGrid {
@@ -728,6 +964,16 @@
     margin: 0 12px;
 }
 
+.adminFilterScopeHint {
+    margin: 0 14px;
+    color: rgba(229, 229, 229, 0.72);
+    font:
+        400 12px/1.6 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
 .adminCatalogToolbar {
     padding: 14px;
     display: grid;
@@ -736,9 +982,74 @@
     align-items: end;
 }
 
+.adminSplit--contacts .adminCatalogToolbar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .adminCatalogToolbar .adminInlineActions--filters {
     grid-column: 1 / -1;
     justify-content: flex-start;
+}
+
+.adminCatalogFilterGroup {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 14px;
+}
+
+.adminCatalogResults {
+    min-height: 18px;
+    margin: -4px 14px 14px;
+    color: rgba(229, 229, 229, 0.68);
+    font:
+        12px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminCatalogNoResults {
+    margin: 0 12px;
+    padding: 18px;
+    border: 1px dashed rgba(239, 231, 210, 0.18);
+    border-radius: 14px;
+    color: rgba(229, 229, 229, 0.76);
+    font:
+        13px/1.5 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminCatalogNoResults .adminLink {
+    margin-left: 6px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+}
+
+.adminFilterButton {
+    border: 1px solid rgba(239, 231, 210, 0.14);
+    border-radius: 999px;
+    padding: 7px 10px;
+    background: transparent;
+    color: rgba(229, 229, 229, 0.76);
+    cursor: pointer;
+    font:
+        600 12px/1 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminFilterButton:hover,
+.adminFilterButton.is-active {
+    border-color: rgba(239, 231, 210, 0.32);
+    background: rgba(239, 231, 210, 0.1);
+    color: rgba(239, 231, 210, 0.96);
 }
 
 .adminDashboardStatus--compact {
@@ -933,6 +1244,68 @@
     background:
         linear-gradient(180deg, rgba(239, 231, 210, 0.035), rgba(255, 255, 255, 0.018)),
         rgba(255, 255, 255, 0.02);
+}
+
+.adminItemActions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.adminItemMenu {
+    position: relative;
+}
+
+.adminItemMenu > summary {
+    list-style: none;
+    &::-webkit-details-marker {
+        display: none;
+    }
+}
+
+.adminItemMenu__content {
+    position: absolute;
+    z-index: 8;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 210px;
+    overflow: hidden;
+    border: 1px solid rgba(239, 231, 210, 0.18);
+    border-radius: 12px;
+    background: #1a1a1b;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+}
+
+.adminItemMenu__content form {
+    margin: 0;
+}
+
+.adminItemMenu__action {
+    display: flex;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    background: transparent;
+    color: rgba(239, 231, 210, 0.9);
+    cursor: pointer;
+    font:
+        600 12px/1.3 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    text-align: left;
+}
+
+.adminItemMenu__action:hover,
+.adminItemMenu__action:focus-visible {
+    background: rgba(239, 231, 210, 0.1);
+}
+
+.adminItemMenu__action--danger {
+    color: rgba(255, 185, 185, 0.94);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .adminDragHandle {
@@ -1395,6 +1768,25 @@
     gap: 14px;
 }
 
+.adminCatalogItems.is-visual-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    align-items: start;
+}
+
+.adminCatalogItems.is-visual-view .adminCatalogItem__summary {
+    flex-direction: column;
+}
+
+.adminCatalogItems.is-visual-view .adminCatalogItem__thumb {
+    width: 100%;
+    height: 150px;
+}
+
+.adminCatalogItems.is-visual-view .adminCatalogItem__summaryText {
+    display: none;
+}
+
 .adminCatalogList.is-reorder-active,
 .adminCatalogItems.is-reorder-active {
     position: relative;
@@ -1480,6 +1872,37 @@
     }
 }
 
+.adminCatalogItem__thumb {
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgba(239, 231, 210, 0.12);
+    border-radius: 12px;
+    background: rgba(239, 231, 210, 0.06);
+}
+
+.adminCatalogItem__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.adminCatalogItem__thumb span {
+    padding: 5px;
+    color: rgba(239, 231, 210, 0.58);
+    font:
+        700 9px/1.2 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 .adminCatalogItem:hover .adminCatalogItem__summary {
     background: rgba(255, 255, 255, 0.032);
 }
@@ -1490,6 +1913,101 @@
     flex-direction: column;
     gap: 4px;
     flex: 1;
+}
+
+.adminSectionAlert,
+.adminImageMissingBadge {
+    display: inline-flex;
+    width: fit-content;
+    border-radius: 999px;
+    padding: 3px 6px;
+    color: rgba(255, 231, 164, 0.92) !important;
+    border: 1px solid rgba(216, 177, 72, 0.25);
+    background: rgba(216, 177, 72, 0.1);
+    font-weight: 700;
+}
+
+.adminImageMissingBadge {
+    color: rgba(239, 231, 210, 0.68) !important;
+    border-color: rgba(239, 231, 210, 0.16);
+    background: rgba(239, 231, 210, 0.06);
+}
+
+.adminFormDirtyNotice {
+    margin-right: auto;
+    color: rgba(255, 231, 164, 0.94);
+    font:
+        700 11px/1.3 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminInlineSuccess {
+    margin: 10px 12px 0;
+    padding: 9px 10px;
+    border: 1px solid rgba(82, 143, 94, 0.3);
+    border-radius: 10px;
+    background: rgba(82, 143, 94, 0.14);
+    color: rgba(194, 235, 199, 0.95);
+    font:
+        700 12px/1.3 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminStickySave {
+    position: fixed;
+    z-index: 20;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100vw - 32px);
+    padding: 10px;
+    border: 1px solid rgba(216, 177, 72, 0.32);
+    border-radius: 14px;
+    background: rgba(27, 27, 28, 0.96);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
+    color: rgba(255, 231, 164, 0.94);
+    font:
+        700 12px/1.3 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminStickySave[hidden] {
+    display: none;
+}
+
+.adminStockBadge {
+    display: inline-flex;
+    width: fit-content;
+    padding: 3px 6px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-weight: 700;
+}
+
+.adminStockBadge--available {
+    color: rgba(177, 224, 185, 0.92);
+    background: rgba(82, 143, 94, 0.15);
+    border-color: rgba(82, 143, 94, 0.26);
+}
+
+.adminStockBadge--low-stock {
+    color: rgba(255, 231, 164, 0.96);
+    background: rgba(216, 177, 72, 0.14);
+    border-color: rgba(216, 177, 72, 0.28);
+}
+
+.adminStockBadge--sold-out {
+    color: rgba(255, 185, 185, 0.94);
+    background: rgba(194, 98, 98, 0.15);
+    border-color: rgba(194, 98, 98, 0.28);
 }
 
 .adminCatalogItem__summaryText {
@@ -1943,6 +2461,37 @@
     .adminStats--panel {
         grid-template-columns: 1fr;
     }
+    .adminCatalogItemsHead--item {
+        align-items: stretch;
+    }
+    .adminItemActions {
+        width: 100%;
+        margin-left: 0;
+    }
+    .adminItemActions .adminBtn {
+        flex: 1;
+    }
+    .adminItemMenu {
+        flex: 1;
+    }
+    .adminItemMenu > .adminBtn {
+        width: 100%;
+    }
+    .adminItemMenu__content {
+        width: 100%;
+    }
+    .adminStickySave {
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        flex-wrap: wrap;
+    }
+    .adminStickySave > span {
+        width: 100%;
+    }
+    .adminStickySave .adminBtn {
+        flex: 1;
+    }
 }
 
 /* Actions : même hauteur, alignés sur une ligne */
@@ -2124,6 +2673,20 @@
     padding: 14px;
 }
 
+.adminStatusPill--link {
+    color: inherit;
+    text-decoration: none;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    &:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(239, 231, 210, 0.24);
+    }
+}
+
 .adminStatusPill__label {
     font-family:
         "Inter",
@@ -2208,6 +2771,30 @@
 
 .adminDashboardPromoMeta strong {
     color: rgba(239, 231, 210, 0.96);
+}
+
+.adminDisclosure {
+    margin: 0 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.adminDisclosure__summary {
+    padding: 14px 0;
+    cursor: pointer;
+    color: rgba(239, 231, 210, 0.94);
+    font:
+        600 13px/1.4 "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+
+.adminDisclosure__summary::marker {
+    color: rgba(239, 231, 210, 0.72);
+}
+
+.adminDisclosure__content {
+    padding-bottom: 14px;
 }
 
 .adminMiniList {
@@ -2313,6 +2900,94 @@
 
 .adminCard--padded {
     padding-bottom: 14px;
+}
+
+.adminCard__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+}
+
+.adminEditorGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 20px 20px;
+}
+
+.adminField--full,
+.adminForm__actions,
+.adminEditorBlock__title {
+    grid-column: 1 / -1;
+}
+
+.adminField--checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adminForm__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 6px;
+}
+
+.adminTable__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.adminStatus {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.adminStatus--active {
+    background: rgba(96, 153, 111, 0.18);
+    color: #a7d6ae;
+}
+
+.adminStatus--scheduled {
+    background: rgba(202, 158, 73, 0.18);
+    color: #e7c47b;
+}
+
+.adminStatus--ended,
+.adminStatus--draft {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.campaignPreviewPage {
+    min-height: 100vh;
+    padding: 24px;
+    background: #f7f4ef;
+}
+
+.campaignPreviewPage > .eventCampaign {
+    position: relative;
+    min-height: calc(100vh - 80px);
+}
+
+@media (max-width: 720px) {
+    .adminEditorGrid {
+        grid-template-columns: 1fr;
+    }
+    .adminField--full,
+    .adminForm__actions,
+    .adminEditorBlock__title {
+        grid-column: auto;
+    }
+    .adminTable__actions {
+        min-width: 220px;
+    }
 }
 
 .adminDetailGrid {
@@ -2534,6 +3209,49 @@
 
 .adminInlineForm--requestStatus .adminSelect--compact {
     min-width: 0;
+}
+
+.adminInlineNotification {
+    position: relative;
+}
+
+.adminInlineNotification > summary {
+    cursor: pointer;
+    list-style: none;
+    color: rgba(239, 231, 210, 0.72);
+    font:
+        600 12px/38px "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    &::-webkit-details-marker {
+        display: none;
+    }
+}
+
+.adminInlineNotification[open] {
+    flex: 1 1 100%;
+    display: grid;
+    grid-template-columns: auto minmax(200px, 1fr);
+    align-items: end;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgba(239, 231, 210, 0.12);
+    border-radius: 12px;
+    background: rgba(239, 231, 210, 0.04);
+}
+
+.adminInlineNotification[open] > summary {
+    grid-column: 1 / -1;
+    line-height: 1.3;
+    color: rgba(239, 231, 210, 0.9);
+    text-decoration: none;
+}
+
+.adminInlineActions--orderQuick {
+    margin-top: 8px;
 }
 
 .adminSplit--contacts .adminPanelHead__actions,
