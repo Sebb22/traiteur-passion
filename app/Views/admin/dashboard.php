@@ -83,7 +83,7 @@
     [
         'label' => 'Commandes à confirmer',
         'value' => (int) ($orderStats['new_count'] ?? 0),
-        'href'  => '/admin/contacts#orders',
+        'href'  => '/admin/boutique/orders?status=new',
     ],
     [
         'label' => 'Événements sous 7 jours',
@@ -93,11 +93,17 @@
     [
         'label' => 'Retraits / livraisons sous 7 jours',
         'value' => (int) ($orderStats['fulfillments_next_7_days'] ?? 0),
-        'href'  => '/admin/contacts?deadline=next_7_days#orders',
+        'href'  => '/admin/boutique/orders?deadline=next_7_days',
     ],
     ];
 
     $businessCards = [
+    [
+        'label' => 'Commandes réglées sur place',
+        'value' => (int) ($orderStats['paid_count'] ?? 0),
+        'meta'  => number_format(max(0, (int) ($orderStats['paid_revenue_cents'] ?? 0)) / 100, 2, ',', ' ') . ' € encaissés',
+        'href'  => '/admin/boutique/orders',
+    ],
     [
         'label' => 'Catalogue visible',
         'value' => (int) ($catalogStats['items'] ?? 0),
@@ -171,7 +177,8 @@
                     <div class="adminOverviewHero__summaryValue"><?php echo $actionTotal; ?></div>
                     <div class="adminOverviewHero__summaryMeta">
                         <?php echo $newTodayTotal; ?> nouvelle(s) entrée(s) aujourd’hui •
-                        <?php echo (int) ($contactStats['overdue_events'] ?? 0) + (int) ($orderStats['overdue_fulfillments'] ?? 0); ?> échéance(s) dépassée(s)
+                        <?php echo (int) ($contactStats['overdue_events'] ?? 0) + (int) ($orderStats['overdue_fulfillments'] ?? 0); ?>
+                        échéance(s) dépassée(s)
                     </div>
                 </div>
             </div>
@@ -179,7 +186,7 @@
             <div class="adminPanelHead__actions adminPanelHead__actions--dashboard">
                 <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
                     <a href="/admin/contacts?status=new" class="adminBtn adminBtn--primary">Traiter les demandes</a>
-                    <a href="/admin/contacts#orders" class="adminBtn">Suivre les commandes</a>
+                    <a href="/admin/boutique/orders" class="adminBtn">Suivre les commandes</a>
                     <a href="#admin-search" class="adminBtn">Rechercher un dossier</a>
                 </div>
                 <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
@@ -245,7 +252,7 @@
                     <a href="/admin" class="adminBtn">Effacer</a>
                     <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>"
                         class="adminBtn">Voir les demandes</a>
-                    <a href="/admin/contacts?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>#orders"
+                    <a href="/admin/boutique/orders?<?php echo $e(http_build_query(['q' => $searchQuery])); ?>"
                         class="adminBtn">Voir les commandes</a>
                     <?php endif; ?>
                 </div>
@@ -346,7 +353,8 @@
                                         <?php echo $e(ucfirst((string) ($contact['status'] ?? 'new'))); ?>
                                     </span>
                                     <?php if ($contactDeadline !== null): ?>
-                                    <span class="adminDeadlineBadge adminDeadlineBadge--<?php echo $e($contactDeadline['state']); ?>">
+                                    <span
+                                        class="adminDeadlineBadge adminDeadlineBadge--<?php echo $e($contactDeadline['state']); ?>">
                                         <?php echo $e($contactDeadline['label']); ?>
                                     </span>
                                     <?php endif; ?>
@@ -416,7 +424,8 @@
                                         <?php echo $e($orderStatusLabels[(string) ($order['status'] ?? 'new')] ?? (string) ($order['status'] ?? 'new')); ?>
                                     </span>
                                     <?php if ($orderDeadline !== null): ?>
-                                    <span class="adminDeadlineBadge adminDeadlineBadge--<?php echo $e($orderDeadline['state']); ?>">
+                                    <span
+                                        class="adminDeadlineBadge adminDeadlineBadge--<?php echo $e($orderDeadline['state']); ?>">
                                         <?php echo $e($orderDeadline['label']); ?>
                                     </span>
                                     <?php endif; ?>
@@ -478,55 +487,57 @@
 
                     <details class="adminDisclosure" id="shop-promo">
                         <summary class="adminDisclosure__summary">Modifier la promotion</summary>
-                        <form action="/admin/dashboard/shop-promo" method="post" class="adminForm adminInlineForm--stack adminDisclosure__content">
-                        <div class="adminFieldGrid">
-                            <label class="adminField adminField--checkbox">
-                                <span class="adminField__label">Activer l'offre</span>
-                                <input class="adminCheckbox" type="checkbox" name="is_enabled" value="1"
-                                    <?php echo ! empty($shopPromo['is_enabled']) ? 'checked' : ''; ?>>
-                            </label>
-                            <label class="adminField">
-                                <span class="adminField__label">Titre</span>
-                                <input class="adminInput" type="text" name="title"
-                                    value="<?php echo $e($shopPromo['title'] ?? 'Offre de lancement'); ?>">
-                            </label>
-                            <label class="adminField adminField--sm">
-                                <span class="adminField__label">Remise (%)</span>
-                                <input class="adminInput" type="number" name="discount_percent" min="1" max="90"
-                                    value="<?php echo (int) ($shopPromo['discount_percent'] ?? 10); ?>">
-                            </label>
-                            <label class="adminField">
-                                <span class="adminField__label">Code promo</span>
-                                <input class="adminInput" type="text" name="promo_code"
-                                    value="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>" placeholder="LANCEMENT10">
-                            </label>
-                            <label class="adminField">
-                                <span class="adminField__label">Début</span>
-                                <input class="adminInput" type="datetime-local" name="starts_at"
-                                    value="<?php echo $e($shopPromo['starts_at_input'] ?? ''); ?>">
-                            </label>
-                            <label class="adminField">
-                                <span class="adminField__label">Fin</span>
-                                <input class="adminInput" type="datetime-local" name="ends_at"
-                                    value="<?php echo $e($shopPromo['ends_at_input'] ?? ''); ?>">
-                            </label>
-                            <label class="adminField adminField--full">
-                                <span class="adminField__label">Texte bannière</span>
-                                <input class="adminInput" type="text" name="banner_text"
-                                    value="<?php echo $e($shopPromo['banner_text'] ?? ''); ?>"
-                                    placeholder="-10% sur les articles de la boutique pendant l'offre de lancement.">
-                            </label>
-                            <label class="adminField">
-                                <span class="adminField__label">Libellé bouton</span>
-                                <input class="adminInput" type="text" name="cta_label"
-                                    value="<?php echo $e($shopPromo['cta_label'] ?? 'Voir la boutique'); ?>">
-                            </label>
-                        </div>
+                        <form action="/admin/dashboard/shop-promo" method="post"
+                            class="adminForm adminInlineForm--stack adminDisclosure__content">
+                            <div class="adminFieldGrid">
+                                <label class="adminField adminField--checkbox">
+                                    <span class="adminField__label">Activer l'offre</span>
+                                    <input class="adminCheckbox" type="checkbox" name="is_enabled" value="1"
+                                        <?php echo ! empty($shopPromo['is_enabled']) ? 'checked' : ''; ?>>
+                                </label>
+                                <label class="adminField">
+                                    <span class="adminField__label">Titre</span>
+                                    <input class="adminInput" type="text" name="title"
+                                        value="<?php echo $e($shopPromo['title'] ?? 'Offre de lancement'); ?>">
+                                </label>
+                                <label class="adminField adminField--sm">
+                                    <span class="adminField__label">Remise (%)</span>
+                                    <input class="adminInput" type="number" name="discount_percent" min="1" max="90"
+                                        value="<?php echo (int) ($shopPromo['discount_percent'] ?? 10); ?>">
+                                </label>
+                                <label class="adminField">
+                                    <span class="adminField__label">Code promo</span>
+                                    <input class="adminInput" type="text" name="promo_code"
+                                        value="<?php echo $e($shopPromo['promo_code'] ?? ''); ?>"
+                                        placeholder="LANCEMENT10">
+                                </label>
+                                <label class="adminField">
+                                    <span class="adminField__label">Début</span>
+                                    <input class="adminInput" type="datetime-local" name="starts_at"
+                                        value="<?php echo $e($shopPromo['starts_at_input'] ?? ''); ?>">
+                                </label>
+                                <label class="adminField">
+                                    <span class="adminField__label">Fin</span>
+                                    <input class="adminInput" type="datetime-local" name="ends_at"
+                                        value="<?php echo $e($shopPromo['ends_at_input'] ?? ''); ?>">
+                                </label>
+                                <label class="adminField adminField--full">
+                                    <span class="adminField__label">Texte bannière</span>
+                                    <input class="adminInput" type="text" name="banner_text"
+                                        value="<?php echo $e($shopPromo['banner_text'] ?? ''); ?>"
+                                        placeholder="-10% sur les articles de la boutique pendant l'offre de lancement.">
+                                </label>
+                                <label class="adminField">
+                                    <span class="adminField__label">Libellé bouton</span>
+                                    <input class="adminInput" type="text" name="cta_label"
+                                        value="<?php echo $e($shopPromo['cta_label'] ?? 'Voir la boutique'); ?>">
+                                </label>
+                            </div>
 
-                        <div class="adminInlineActions">
-                            <button type="submit" class="adminBtn adminBtn--primary">Enregistrer la promo
-                                boutique</button>
-                        </div>
+                            <div class="adminInlineActions">
+                                <button type="submit" class="adminBtn adminBtn--primary">Enregistrer la promo
+                                    boutique</button>
+                            </div>
                         </form>
                     </details>
                 </section>
@@ -541,7 +552,8 @@
 
                     <div class="adminDashboardQuickGrid">
                         <?php foreach ($businessCards as $card): ?>
-                        <a href="<?php echo $e($card['href']); ?>" class="adminQuickLinkCard adminQuickLinkCard--metric adminLink">
+                        <a href="<?php echo $e($card['href']); ?>"
+                            class="adminQuickLinkCard adminQuickLinkCard--metric adminLink">
                             <div class="adminQuickLinkCard__eyebrow"><?php echo $e($card['label']); ?></div>
                             <div class="adminQuickLinkCard__title"><?php echo (int) $card['value']; ?></div>
                             <div class="adminQuickLinkCard__meta"><?php echo $e($card['meta']); ?></div>

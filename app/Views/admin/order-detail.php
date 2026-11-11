@@ -1,8 +1,10 @@
 <?php
-    $order         = isset($order) && is_array($order) ? $order : [];
-    $statusOptions = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
-    $backUrl       = is_string($backUrl ?? null) ? $backUrl : '/admin/contacts?view=orders';
-    $flash         = isset($flash) && is_array($flash) ? $flash : null;
+    $order                = isset($order) && is_array($order) ? $order : [];
+    $statusOptions        = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
+    $paymentStatusOptions = isset($paymentStatusOptions) && is_array($paymentStatusOptions) ? $paymentStatusOptions : [];
+    $csrfToken            = is_string($csrfToken ?? null) ? $csrfToken : '';
+    $backUrl              = is_string($backUrl ?? null) ? $backUrl : '/admin/boutique/orders';
+    $flash                = isset($flash) && is_array($flash) ? $flash : null;
 
     $e = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -83,11 +85,13 @@
             <div class="adminPanelHead__row">
                 <div>
                     <h2 class="adminTitle"><?php echo $e($order['customer_name'] ?? 'Commande boutique'); ?></h2>
-                    <p class="adminSubtitle">Lecture complète du panier, du mode de retrait ou de livraison, puis suivi opérationnel depuis une fiche dédiée.</p>
+                    <p class="adminSubtitle">Lecture complète du panier, du mode de retrait ou de livraison, puis suivi
+                        opérationnel depuis une fiche dédiée.</p>
                 </div>
                 <div class="adminPanelHead__actions">
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--primary">
-                        <a href="<?php echo $e($backUrl); ?>" class="adminBtn adminBtn--primary">Retour aux commandes</a>
+                        <a href="<?php echo $e($backUrl); ?>" class="adminBtn adminBtn--primary">Retour aux
+                            commandes</a>
                     </div>
                     <div class="adminPanelHead__actionsGroup adminPanelHead__actionsGroup--utility">
                         <form action="/admin/logout" method="post">
@@ -118,11 +122,13 @@
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Mode</span>
-                            <span class="adminInfoItem__value"><?php echo $fulfillmentMethod === 'delivery' ? 'Livraison demandée' : 'Retrait demandé'; ?></span>
+                            <span
+                                class="adminInfoItem__value"><?php echo $fulfillmentMethod === 'delivery' ? 'Livraison demandée' : 'Retrait demandé'; ?></span>
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Date souhaitée</span>
-                            <span class="adminInfoItem__value"><?php echo $formatDate($order['pickup_date'] ?? null); ?></span>
+                            <span
+                                class="adminInfoItem__value"><?php echo $formatDate($order['pickup_date'] ?? null); ?></span>
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Créneau</span>
@@ -134,7 +140,8 @@
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Total</span>
-                            <span class="adminInfoItem__value"><?php echo $formatPrice($order['total_cents'] ?? 0); ?></span>
+                            <span
+                                class="adminInfoItem__value"><?php echo $formatPrice($order['total_cents'] ?? 0); ?></span>
                         </div>
                         <?php if ($discountCents > 0): ?>
                         <div class="adminInfoItem">
@@ -165,13 +172,16 @@
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Email</span>
-                            <span class="adminInfoItem__value"><a href="mailto:<?php echo $e($order['customer_email'] ?? ''); ?>" class="adminLink"><?php echo $e($order['customer_email'] ?? '-'); ?></a></span>
+                            <span class="adminInfoItem__value"><a
+                                    href="mailto:<?php echo $e($order['customer_email'] ?? ''); ?>"
+                                    class="adminLink"><?php echo $e($order['customer_email'] ?? '-'); ?></a></span>
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Telephone</span>
                             <span class="adminInfoItem__value">
                                 <?php if (! empty($order['customer_phone'])): ?>
-                                <a href="tel:<?php echo $e($order['customer_phone']); ?>" class="adminLink"><?php echo $e($order['customer_phone']); ?></a>
+                                <a href="tel:<?php echo $e($order['customer_phone']); ?>"
+                                    class="adminLink"><?php echo $e($order['customer_phone']); ?></a>
                                 <?php else: ?>
                                 -
                                 <?php endif; ?>
@@ -179,24 +189,28 @@
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Créée le</span>
-                            <span class="adminInfoItem__value"><?php echo $formatDate($order['created_at'] ?? null, 'd/m/Y H:i'); ?></span>
+                            <span
+                                class="adminInfoItem__value"><?php echo $formatDate($order['created_at'] ?? null, 'd/m/Y H:i'); ?></span>
                         </div>
                     </div>
                 </section>
 
                 <section class="adminCard adminCard--padded">
                     <div class="adminCard__head">
-                        <div class="adminCard__title"><?php echo $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'; ?></div>
+                        <div class="adminCard__title">
+                            <?php echo $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'; ?></div>
                     </div>
 
                     <div class="adminInfoGrid">
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Mode demandé</span>
-                            <span class="adminInfoItem__value"><?php echo $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'; ?></span>
+                            <span
+                                class="adminInfoItem__value"><?php echo $fulfillmentMethod === 'delivery' ? 'Livraison' : 'Retrait'; ?></span>
                         </div>
                         <div class="adminInfoItem">
                             <span class="adminInfoItem__label">Adresse</span>
-                            <span class="adminInfoItem__value"><?php echo $e($fulfillmentMethod === 'delivery' ? ($deliveryAddress !== '' ? $deliveryAddress : '-') : 'Retrait sur créneau'); ?></span>
+                            <span
+                                class="adminInfoItem__value"><?php echo $e($fulfillmentMethod === 'delivery' ? ($deliveryAddress !== '' ? $deliveryAddress : '-') : 'Retrait sur créneau'); ?></span>
                         </div>
                     </div>
 
@@ -255,10 +269,16 @@
                         <span class="adminBadge adminBadge--<?php echo $e($order['status'] ?? 'new'); ?>">
                             <?php echo $e($statusOptions[$order['status'] ?? ''] ?? ucfirst((string) ($order['status'] ?? 'new'))); ?>
                         </span>
+                        <span
+                            class="adminBadge adminBadge--<?php echo($order['payment_status'] ?? 'unpaid') === 'paid_on_site' ? 'completed' : 'new'; ?>">
+                            <?php echo $e($paymentStatusOptions[$order['payment_status'] ?? 'unpaid'] ?? 'À régler sur place'); ?>
+                        </span>
 
-                        <form action="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>/status" method="post"
-                            class="adminInlineForm adminInlineForm--stack">
-                            <input type="hidden" name="redirect" value="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>?redirect=<?php echo rawurlencode($backUrl); ?>">
+                        <form action="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>/status"
+                            method="post" class="adminInlineForm adminInlineForm--stack">
+                            <input type="hidden" name="_csrf" value="<?php echo $e($csrfToken); ?>">
+                            <input type="hidden" name="redirect"
+                                value="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>?redirect=<?php echo rawurlencode($backUrl); ?>">
                             <label class="adminField">
                                 <span class="adminField__label">Mettre a jour</span>
                                 <select name="status" class="adminSelect">
@@ -267,6 +287,16 @@
                                         <?php echo($order['status'] ?? '') === $statusKey ? 'selected' : ''; ?>>
                                         <?php echo $e($statusLabel); ?>
                                     </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                            <label class="adminField">
+                                <span class="adminField__label">Règlement sur place</span>
+                                <select name="payment_status" class="adminSelect">
+                                    <?php foreach ($paymentStatusOptions as $paymentKey => $paymentLabel): ?>
+                                    <option value="<?php echo $e($paymentKey); ?>"
+                                        <?php echo (string) ($order['payment_status'] ?? 'unpaid') === (string) $paymentKey ? 'selected' : ''; ?>>
+                                        <?php echo $e($paymentLabel); ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </label>
@@ -279,16 +309,17 @@
                                 <div class="adminMailPreview__subjectRow">
                                     <input type="text" name="client_subject" class="adminInput"
                                         value="<?php echo $e($defaultMailSubject); ?>" data-mail-subject>
-                                    <button type="button" class="adminBtn adminBtn--sm" data-mail-subject-reset>Objet auto</button>
+                                    <button type="button" class="adminBtn adminBtn--sm" data-mail-subject-reset>Objet
+                                        auto</button>
                                 </div>
                             </label>
                             <label class="adminField">
                                 <span class="adminField__label">Message complementaire pour le client</span>
                                 <textarea name="client_message" class="adminTextarea" rows="4"
-                                    placeholder="Confirmation, precision de retrait, ajustement logistique..." data-mail-message></textarea>
+                                    placeholder="Confirmation, precision de retrait, ajustement logistique..."
+                                    data-mail-message></textarea>
                             </label>
-                            <div class="adminMailPreview" data-mail-preview-root
-                                data-mail-kind="order"
+                            <div class="adminMailPreview" data-mail-preview-root data-mail-kind="order"
                                 data-reference="<?php echo $e($orderReference); ?>"
                                 data-client-name="<?php echo $e($order['customer_name'] ?? 'Client'); ?>"
                                 data-status-labels="<?php echo $e((string) json_encode($statusOptions, JSON_UNESCAPED_UNICODE)); ?>">
@@ -323,8 +354,10 @@
                                             <div class="adminMailPreview__summaryGrid">
                                                 <?php foreach ($previewSummary as $summaryItem): ?>
                                                 <div class="adminMailPreview__summaryItem">
-                                                    <span class="adminMailPreview__summaryLabel"><?php echo $e($summaryItem['label']); ?></span>
-                                                    <span class="adminMailPreview__summaryValue"><?php echo $e($summaryItem['value']); ?></span>
+                                                    <span
+                                                        class="adminMailPreview__summaryLabel"><?php echo $e($summaryItem['label']); ?></span>
+                                                    <span
+                                                        class="adminMailPreview__summaryValue"><?php echo $e($summaryItem['value']); ?></span>
                                                 </div>
                                                 <?php endforeach; ?>
                                             </div>
@@ -336,17 +369,23 @@
                                                 <?php foreach ($orderItems as $item): ?>
                                                 <article class="adminMailPreview__itemCard">
                                                     <?php if (! empty($item['image_path'])): ?>
-                                                    <img class="adminMailPreview__itemThumb" src="<?php echo $e($item['image_path']); ?>"
-                                                        alt="<?php echo $e($item['image_alt'] ?? ($item['item_name_snapshot'] ?? 'Produit')); ?>" loading="lazy">
+                                                    <img class="adminMailPreview__itemThumb"
+                                                        src="<?php echo $e($item['image_path']); ?>"
+                                                        alt="<?php echo $e($item['image_alt'] ?? ($item['item_name_snapshot'] ?? 'Produit')); ?>"
+                                                        loading="lazy">
                                                     <?php endif; ?>
                                                     <div class="adminMailPreview__itemBody">
-                                                        <p class="adminMailPreview__itemCategory"><?php echo $e($item['section_name_snapshot'] ?? '-'); ?></p>
-                                                        <p class="adminMailPreview__itemTitle"><?php echo $e($item['item_name_snapshot'] ?? '-'); ?></p>
+                                                        <p class="adminMailPreview__itemCategory">
+                                                            <?php echo $e($item['section_name_snapshot'] ?? '-'); ?></p>
+                                                        <p class="adminMailPreview__itemTitle">
+                                                            <?php echo $e($item['item_name_snapshot'] ?? '-'); ?></p>
                                                         <?php if (! empty($item['item_description'])): ?>
-                                                        <p class="adminMailPreview__itemDetail"><?php echo $e($item['item_description']); ?></p>
+                                                        <p class="adminMailPreview__itemDetail">
+                                                            <?php echo $e($item['item_description']); ?></p>
                                                         <?php endif; ?>
                                                         <p class="adminMailPreview__itemMeta">
-                                                            Prix <?php echo $e($formatPrice($item['unit_price_cents'] ?? 0)); ?>
+                                                            Prix
+                                                            <?php echo $e($formatPrice($item['unit_price_cents'] ?? 0)); ?>
                                                             <span>•</span>
                                                             Qte <?php echo (int) ($item['quantity'] ?? 0); ?>
                                                         </p>
@@ -359,7 +398,8 @@
                                         <p class="adminMailPreview__closing" data-mail-preview-closing></p>
                                     </div>
                                 </div>
-                                <p class="adminHint">Le mail part avec cet objet et ce contenu si la case d'envoi est cochée.</p>
+                                <p class="adminHint">Le mail part avec cet objet et ce contenu si la case d'envoi est
+                                    cochée.</p>
                             </div>
                             <button type="submit" class="adminBtn adminBtn--primary">Enregistrer le statut</button>
                         </form>
@@ -372,7 +412,8 @@
                     </div>
 
                     <div class="adminDetailActionsBar">
-                        <a href="mailto:<?php echo $e($order['customer_email'] ?? ''); ?>" class="adminBtn">Repondre par email</a>
+                        <a href="mailto:<?php echo $e($order['customer_email'] ?? ''); ?>" class="adminBtn">Repondre par
+                            email</a>
                         <?php if (! empty($order['customer_phone'])): ?>
                         <a href="tel:<?php echo $e($order['customer_phone']); ?>" class="adminBtn">Appeler</a>
                         <?php endif; ?>

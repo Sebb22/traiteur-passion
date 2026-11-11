@@ -4,6 +4,9 @@
     $filters                = isset($filters) && is_array($filters) ? $filters : ['status' => '', 'deadline' => '', 'q' => ''];
     $statusOptions          = isset($statusOptions) && is_array($statusOptions) ? $statusOptions : [];
     $orderStatusOptions     = isset($orderStatusOptions) && is_array($orderStatusOptions) ? $orderStatusOptions : [];
+    $paymentStatusOptions   = isset($paymentStatusOptions) && is_array($paymentStatusOptions) ? $paymentStatusOptions : [];
+    $csrfToken              = is_string($csrfToken ?? null) ? $csrfToken : '';
+    $paymentStatusFilter    = is_string($paymentStatusFilter ?? null) ? $paymentStatusFilter : '';
     $orderStats             = isset($orderStats) && is_array($orderStats) ? $orderStats : [];
     $recentOrders           = isset($recentOrders) && is_array($recentOrders) ? $recentOrders : [];
     $orderLoadError         = isset($orderLoadError) && is_string($orderLoadError) ? $orderLoadError : null;
@@ -45,26 +48,28 @@
     'next_7_days' => 'Dans les 7 prochains jours',
     ];
     $redirectFilters = [
-    'status'        => $activeStatus,
-    'deadline'      => $activeDeadline,
-    'q'             => $searchQuery,
-    'contacts_page' => $contactsPage > 1 ? $contactsPage : '',
-    'orders_page'   => $ordersPage > 1 ? $ordersPage : '',
-    'view'          => $activeView,
+    'status'         => $activeStatus,
+    'deadline'       => $activeDeadline,
+    'q'              => $searchQuery,
+    'contacts_page'  => $contactsPage > 1 ? $contactsPage : '',
+    'orders_page'    => $ordersPage > 1 ? $ordersPage : '',
+    'payment_status' => $paymentStatusFilter,
+    'view'           => $activeView,
     ];
     $redirectFilters = array_filter($redirectFilters, static function ($value): bool {
     return $value !== '';
     });
     $contactRedirect = '/admin/contacts' . ($redirectFilters !== [] ? '?' . http_build_query($redirectFilters) : '');
 
-    $getPageUrl = static function (string $pageKey, int $page) use ($activeStatus, $activeDeadline, $searchQuery, $contactsPage, $ordersPage, $activeView): string {
+    $getPageUrl = static function (string $pageKey, int $page) use ($activeStatus, $activeDeadline, $searchQuery, $contactsPage, $ordersPage, $activeView, $paymentStatusFilter): string {
     $query = [
-        'status'        => $activeStatus,
-        'deadline'      => $activeDeadline,
-        'q'             => $searchQuery,
-        'contacts_page' => $contactsPage > 1 ? $contactsPage : '',
-        'orders_page'   => $ordersPage > 1 ? $ordersPage : '',
-        'view'          => $activeView,
+        'status'         => $activeStatus,
+        'deadline'       => $activeDeadline,
+        'q'              => $searchQuery,
+        'contacts_page'  => $contactsPage > 1 ? $contactsPage : '',
+        'orders_page'    => $ordersPage > 1 ? $ordersPage : '',
+        'view'           => $activeView,
+        'payment_status' => $paymentStatusFilter,
     ];
     $query[$pageKey] = max(1, $page);
     $query           = array_filter($query, static function ($value): bool {
@@ -217,6 +222,27 @@
                     </label>
                     <?php endif; ?>
 
+                    <?php if ($isOrdersView): ?>
+                        <label class="adminField adminField--filter">
+                            <span class="adminField__label">Statut commande</span>
+                            <select class="adminSelect" name="status">
+                                <option value="">Tous les statuts</option>
+                                <?php foreach ($orderStatusOptions as $statusKey => $statusLabel): ?>
+                                <option value="<?php echo $e($statusKey); ?>" <?php echo $activeStatus === (string) $statusKey ? 'selected' : ''; ?>><?php echo $e($statusLabel); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    <label class="adminField adminField--filter">
+                        <span class="adminField__label">Règlement</span>
+                        <select class="adminSelect" name="payment_status">
+                            <option value="">Tous les règlements</option>
+                            <?php foreach ($paymentStatusOptions as $paymentKey => $paymentLabel): ?>
+                            <option value="<?php echo $e($paymentKey); ?>" <?php echo $paymentStatusFilter === (string) $paymentKey ? 'selected' : ''; ?>><?php echo $e($paymentLabel); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <?php endif; ?>
+
                     <label class="adminField adminField--filter">
                         <span class="adminField__label"><?php echo $isOrdersView ? 'Échéance de retrait / livraison' : 'Échéance de l’événement'; ?></span>
                         <select class="adminSelect" name="deadline">
@@ -306,7 +332,7 @@
             <?php elseif ($recentOrders === []): ?>
             <div class="adminEmptyState">
                 Aucune commande ne correspond aux critères actuels.
-                <a href="/admin/contacts?view=orders" class="adminLink">Réinitialiser les filtres</a>
+                <a href="/admin/boutique/orders" class="adminLink">Réinitialiser les filtres</a>
             </div>
             <?php else: ?>
             <div class="adminTableWrap">
@@ -363,6 +389,7 @@
                             </td>
                             <td>
                                 <form action="/admin/boutique/orders/<?php echo (int) ($order['id'] ?? 0); ?>/status" method="post">
+                                    <input type="hidden" name="_csrf" value="<?php echo $e($csrfToken); ?>">
                                     <input type="hidden" name="redirect" value="<?php echo $e($contactRedirect); ?>">
                                     <select class="adminSelect" name="status">
                                         <?php foreach ($orderStatusOptions as $statusKey => $statusLabel): ?>
@@ -370,6 +397,11 @@
                                             <?php echo (string) ($order['status'] ?? '') === (string) $statusKey ? 'selected' : ''; ?>>
                                             <?php echo $e($statusLabel); ?>
                                         </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <select class="adminSelect" name="payment_status">
+                                        <?php foreach ($paymentStatusOptions as $paymentKey => $paymentLabel): ?>
+                                        <option value="<?php echo $e($paymentKey); ?>" <?php echo (string) ($order['payment_status'] ?? 'unpaid') === (string) $paymentKey ? 'selected' : ''; ?>><?php echo $e($paymentLabel); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <div class="adminInlineActions adminInlineActions--orderQuick">
@@ -413,6 +445,7 @@
 
             <?php if ($contacts !== []): ?>
             <form action="/admin/contacts/status" method="post" class="adminBulkActions" id="bulk-contact-status-form" data-bulk-contact-status>
+                <input type="hidden" name="_csrf" value="<?php echo $e($csrfToken); ?>">
                 <input type="hidden" name="redirect" value="<?php echo $e($contactRedirect); ?>">
                 <label class="adminSelectionControl">
                     <input type="checkbox" class="adminCheckbox" data-select-all-contacts>
@@ -516,6 +549,7 @@
                     <div class="adminRequestCard__actions">
                         <form action="/admin/contacts/<?php echo $contactId; ?>/status"
                             method="post" class="adminInlineForm adminInlineForm--stack adminInlineForm--full">
+                            <input type="hidden" name="_csrf" value="<?php echo $e($csrfToken); ?>">
                             <input type="hidden" name="redirect"
                                 value="<?php echo $e($contactRedirect); ?>">
                             <div class="adminInlineForm adminInlineForm--requestStatus">

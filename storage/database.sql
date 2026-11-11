@@ -200,12 +200,15 @@ CREATE TABLE IF NOT EXISTS boutique_orders (
     discount_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
     discount_cents INT NOT NULL DEFAULT 0,
     status ENUM('new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled') NOT NULL DEFAULT 'new',
+    payment_status ENUM('unpaid', 'paid_on_site') NOT NULL DEFAULT 'unpaid',
+    payment_status_updated_at TIMESTAMP NULL DEFAULT NULL,
     stock_restored_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE KEY uq_boutique_orders_reference (order_reference),
     INDEX idx_boutique_orders_status (status),
+    INDEX idx_boutique_orders_payment_status (payment_status),
     INDEX idx_boutique_orders_created (created_at),
     INDEX idx_boutique_orders_pickup (pickup_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -4,8 +4,8 @@
     $adminContactsView    = trim((string) ($_GET['view'] ?? 'contacts'));
     $adminNavigationItems = [
     ['href' => '/admin', 'label' => 'Tableau de bord', 'active' => $adminNavigationPath === '/admin' || $adminNavigationPath === '/admin/dashboard'],
-    ['href' => '/admin/contacts?view=contacts', 'label' => 'Demandes', 'active' => (strpos($adminNavigationPath, '/admin/contacts') === 0 && $adminContactsView !== 'orders') || strpos($adminNavigationPath, '/admin/clients') === 0],
-    ['href' => '/admin/contacts?view=orders', 'label' => 'Commandes', 'active' => (strpos($adminNavigationPath, '/admin/contacts') === 0 && $adminContactsView === 'orders') || strpos($adminNavigationPath, '/admin/boutique/orders') === 0],
+    ['href' => '/admin/contacts?view=contacts', 'label' => 'Demandes de contact & devis', 'active' => (strpos($adminNavigationPath, '/admin/contacts') === 0 && $adminContactsView !== 'orders') || strpos($adminNavigationPath, '/admin/clients') === 0],
+    ['href' => '/admin/boutique/orders', 'label' => 'Commandes boutique', 'active' => (strpos($adminNavigationPath, '/admin/boutique/orders') === 0) || (strpos($adminNavigationPath, '/admin/contacts') === 0 && $adminContactsView === 'orders')],
     ['href' => '/admin/catalog', 'label' => 'Carte', 'active' => strpos($adminNavigationPath, '/admin/catalog') === 0],
     ['href' => '/admin/boutique', 'label' => 'Boutique', 'active' => $adminNavigationPath === '/admin/boutique'],
     ['href' => '/admin/blog', 'label' => 'Blog', 'active' => strpos($adminNavigationPath, '/admin/blog') === 0],

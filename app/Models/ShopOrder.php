@@ -20,6 +20,11 @@ final class ShopOrder
         'cancelled' => 'Annulée',
     ];
 
+    public const PAYMENT_STATUS_LABELS = [
+        'unpaid'       => 'À régler sur place',
+        'paid_on_site' => 'Réglée sur place',
+    ];
+
     private PDO $db;
 
     /** @var list<string>|null */
@@ -384,8 +389,16 @@ final class ShopOrder
 
     public function getAdminSummary(): array
     {
+        $paymentSelect = $this->hasOrderColumn('payment_status')
+            ? "SUM(CASE WHEN payment_status = 'paid_on_site' THEN 1 ELSE 0 END)"
+            : '0';
+        $paidRevenueSelect = $this->hasOrderColumn('payment_status')
+            ? "SUM(CASE WHEN payment_status = 'paid_on_site' THEN (SELECT COALESCE(SUM(boi.line_total_cents), 0) FROM boutique_order_items boi WHERE boi.order_id = boutique_orders.id) - discount_cents ELSE 0 END)"
+            : '0';
         $summary = $this->db->query(
             "SELECT COUNT(*) AS total,
+                    {$paymentSelect} AS paid_count,
+                    {$paidRevenueSelect} AS paid_revenue_cents,
                     SUM(CASE WHEN status = 'new' THEN 1 ELSE 0 END) AS new_count,
                     SUM(CASE WHEN status = 'new' AND DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) AS new_today_count,
                     SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) AS confirmed_count,
@@ -401,6 +414,8 @@ final class ShopOrder
 
         return [
             'total'                    => (int) ($summary['total'] ?? 0),
+            'paid_count'               => (int) ($summary['paid_count'] ?? 0),
+            'paid_revenue_cents'       => (int) ($summary['paid_revenue_cents'] ?? 0),
             'new_count'                => (int) ($summary['new_count'] ?? 0),
             'new_today_count'          => (int) ($summary['new_today_count'] ?? 0),
             'confirmed_count'          => (int) ($summary['confirmed_count'] ?? 0),
@@ -414,7 +429,7 @@ final class ShopOrder
         ];
     }
 
-    public function getRecentOrders(int $limit = 12, ?string $query = null, string $deadline = '', int $offset = 0): array
+    public function getRecentOrders(int $limit = 12, ?string $query = null, string $deadline = '', int $offset = 0, string $status = '', string $paymentStatus = ''): array
     {
         $discountSelect = $this->hasOrderColumn('discount_cents')
             ? 'COALESCE(bo.discount_cents, 0)'
@@ -425,7 +440,8 @@ final class ShopOrder
         if ($deadlineSql !== '') {
             $whereSql = $whereSql === '' ? 'WHERE ' . $deadlineSql : $whereSql . ' AND ' . $deadlineSql;
         }
-        $orderBy = $deadlineSql !== '' ? 'bo.pickup_date ASC, bo.created_at DESC' : 'bo.created_at DESC';
+        $whereSql = $this->appendOrderFilter($whereSql, $params, $status, $paymentStatus);
+        $orderBy  = $deadlineSql !== '' ? 'bo.pickup_date ASC, bo.created_at DESC' : 'bo.created_at DESC';
 
         $stmt = $this->db->prepare(
             "SELECT bo.*, COUNT(boi.id) AS line_count,
@@ -484,13 +500,14 @@ final class ShopOrder
         return $stmt->fetchAll();
     }
 
-    public function countFilteredOrders(?string $query = null, string $deadline = ''): int
+    public function countFilteredOrders(?string $query = null, string $deadline = '', string $status = '', string $paymentStatus = ''): int
     {
         [$whereSql, $params] = $this->buildAdminSearchClauses($query);
         $deadlineSql         = $this->buildAdminDeadlineClause($deadline);
         if ($deadlineSql !== '') {
             $whereSql = $whereSql === '' ? 'WHERE ' . $deadlineSql : $whereSql . ' AND ' . $deadlineSql;
         }
+        $whereSql = $this->appendOrderFilter($whereSql, $params, $status, $paymentStatus);
 
         $stmt = $this->db->prepare(
             "SELECT COUNT(*)
@@ -688,6 +705,29 @@ final class ShopOrder
         }
     }
 
+    public function updatePaymentStatus(int $orderId, string $paymentStatus): bool
+    {
+        if (! $this->hasOrderColumn('payment_status')) {
+            return true;
+        }
+
+        if (! isset(self::PAYMENT_STATUS_LABELS[$paymentStatus])) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare(
+            'UPDATE boutique_orders
+             SET payment_status = :payment_status,
+                 payment_status_updated_at = NOW()
+             WHERE id = :id',
+        );
+
+        return $stmt->execute([
+            'id'             => $orderId,
+            'payment_status' => $paymentStatus,
+        ]);
+    }
+
     private function nullableTrim($value): ?string
     {
         $value = trim((string) ($value ?? ''));
@@ -767,6 +807,24 @@ final class ShopOrder
         }
 
         return '';
+    }
+
+    private function appendOrderFilter(string $whereSql, array &$params, string $status, string $paymentStatus): string
+    {
+        $parts = [];
+        if (isset(self::STATUS_LABELS[$status])) {
+            $parts[]                 = 'bo.status = :order_status';
+            $params[':order_status'] = $status;
+        }
+        if ($this->hasOrderColumn('payment_status') && isset(self::PAYMENT_STATUS_LABELS[$paymentStatus])) {
+            $parts[]                          = 'bo.payment_status = :payment_status_filter';
+            $params[':payment_status_filter'] = $paymentStatus;
+        }
+        if ($parts === []) {
+            return $whereSql;
+        }
+
+        return $whereSql === '' ? 'WHERE ' . implode(' AND ', $parts) : $whereSql . ' AND ' . implode(' AND ', $parts);
     }
 
     /**

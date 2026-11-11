@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace App\Controllers;
 
 use App\Core\AdminAuth;
+use App\Core\Csrf;
 use App\Core\HttpError;
 use App\Core\View;
 use App\Models\Blog;
@@ -119,6 +120,8 @@ final class AdminController
         $typeBreakdown = $contactModel->getTypeBreakdown(6);
         $orderStats    = [
             'total'                    => 0,
+            'paid_count'               => 0,
+            'paid_revenue_cents'       => 0,
             'new_count'                => 0,
             'new_today_count'          => 0,
             'confirmed_count'          => 0,
@@ -592,10 +595,12 @@ final class AdminController
     public function updateShopOrderStatus(string $id): void
     {
         AdminAuth::requireAuth();
+        Csrf::requireValid();
 
-        $orderId  = (int) $id;
-        $status   = trim((string) ($_POST['status'] ?? ''));
-        $redirect = $this->safeAdminRedirect((string) ($_POST['redirect'] ?? '/admin/boutique#orders'));
+        $orderId       = (int) $id;
+        $status        = trim((string) ($_POST['status'] ?? ''));
+        $paymentStatus = trim((string) ($_POST['payment_status'] ?? 'unpaid'));
+        $redirect      = $this->safeAdminRedirect((string) ($_POST['redirect'] ?? '/admin/boutique#orders'));
 
         $orderModel = new ShopOrder();
         $order      = $orderModel->getByIdWithItems($orderId);
@@ -609,6 +614,12 @@ final class AdminController
         $previousStatus = (string) ($order['status'] ?? 'new');
         if (! $orderModel->updateStatus($orderId, $status)) {
             $this->pushFlash('error', 'Impossible de mettre à jour ce statut de commande boutique.');
+            header('Location: ' . $redirect);
+            exit;
+        }
+
+        if (! $orderModel->updatePaymentStatus($orderId, $paymentStatus)) {
+            $this->pushFlash('error', 'Le statut du règlement sur place est invalide ou indisponible.');
             header('Location: ' . $redirect);
             exit;
         }
@@ -649,7 +660,7 @@ final class AdminController
     {
         AdminAuth::requireAuth();
 
-        $backUrl = $this->safeAdminRedirect((string) ($_GET['redirect'] ?? '/admin/contacts?view=orders'));
+        $backUrl = $this->safeAdminRedirect((string) ($_GET['redirect'] ?? '/admin/boutique/orders'));
 
         $orderModel = new ShopOrder();
         $order      = $orderModel->getByIdWithItems((int) $id);
@@ -665,7 +676,7 @@ final class AdminController
                     'label' => 'Retour aux commandes',
                 ],
                 'secondaryAction' => [
-                    'href'  => '/admin/contacts#orders',
+                    'href'  => '/admin/boutique/orders',
                     'label' => 'Voir les demandes',
                 ],
                 'hints'           => [
@@ -678,11 +689,13 @@ final class AdminController
         }
 
         View::render('admin/order-detail', [
-            'title'         => 'Administration — Détail commande boutique',
-            'order'         => $order,
-            'statusOptions' => ShopOrder::STATUS_LABELS,
-            'backUrl'       => $backUrl,
-            'flash'         => $this->pullFlash(),
+            'title'                => 'Administration — Détail commande boutique',
+            'order'                => $order,
+            'statusOptions'        => ShopOrder::STATUS_LABELS,
+            'paymentStatusOptions' => ShopOrder::PAYMENT_STATUS_LABELS,
+            'backUrl'              => $backUrl,
+            'flash'                => $this->pullFlash(),
+            'csrfToken'            => Csrf::token(),
         ]);
     }
 
@@ -1001,7 +1014,7 @@ final class AdminController
     /**
      * Display all contact requests
      */
-    public function contacts(): void
+    public function contacts(?string $forcedView = null): void
     {
         AdminAuth::requireAuth();
 
@@ -1010,10 +1023,16 @@ final class AdminController
             'deadline' => $this->sanitizeAdminDeadlineFilter((string) ($_GET['deadline'] ?? '')),
             'q'        => trim((string) ($_GET['q'] ?? '')),
         ];
-        $perPage      = 25;
-        $contactsPage = max(1, (int) ($_GET['contacts_page'] ?? 1));
-        $ordersPage   = max(1, (int) ($_GET['orders_page'] ?? 1));
-        $view         = $this->sanitizeContactsView((string) ($_GET['view'] ?? 'contacts'));
+        $perPage              = 25;
+        $contactsPage         = max(1, (int) ($_GET['contacts_page'] ?? 1));
+        $ordersPage           = max(1, (int) ($_GET['orders_page'] ?? 1));
+        $view                 = $this->sanitizeContactsView($forcedView ?? (string) ($_GET['view'] ?? 'contacts'));
+        $requestedOrderStatus = trim((string) ($_GET['status'] ?? ''));
+        $orderStatusFilter    = isset(ShopOrder::STATUS_LABELS[$requestedOrderStatus]) ? $requestedOrderStatus : '';
+        if ($view === 'orders') {
+            $filters['status'] = $orderStatusFilter;
+        }
+        $paymentStatusFilter = isset(ShopOrder::PAYMENT_STATUS_LABELS[$_GET['payment_status'] ?? '']) ? (string) $_GET['payment_status'] : '';
 
         $contactModel      = new Contact();
         $stats             = $contactModel->getAdminSummary();
@@ -1022,13 +1041,15 @@ final class AdminController
         $contactsPage      = min($contactsPage, $contactsPageCount);
         $contacts          = $contactModel->getFiltered($filters, $perPage, ($contactsPage - 1) * $perPage);
         $orderStats        = [
-            'total'           => 0,
-            'new_count'       => 0,
-            'confirmed_count' => 0,
-            'preparing_count' => 0,
-            'ready_count'     => 0,
-            'completed_count' => 0,
-            'cancelled_count' => 0,
+            'total'              => 0,
+            'paid_count'         => 0,
+            'paid_revenue_cents' => 0,
+            'new_count'          => 0,
+            'confirmed_count'    => 0,
+            'preparing_count'    => 0,
+            'ready_count'        => 0,
+            'completed_count'    => 0,
+            'cancelled_count'    => 0,
         ];
         $recentOrders   = [];
         $ordersCount    = 0;
@@ -1037,41 +1058,50 @@ final class AdminController
         try {
             $orderModel      = new ShopOrder();
             $orderStats      = $orderModel->getAdminSummary();
-            $ordersCount     = $orderModel->countFilteredOrders($filters['q'], $filters['deadline']);
+            $ordersCount     = $orderModel->countFilteredOrders($filters['q'], $filters['deadline'], $orderStatusFilter, $paymentStatusFilter);
             $ordersPageCount = max(1, (int) ceil($ordersCount / $perPage));
             $ordersPage      = min($ordersPage, $ordersPageCount);
-            $recentOrders    = $orderModel->getRecentOrders($perPage, $filters['q'], $filters['deadline'], ($ordersPage - 1) * $perPage);
+            $recentOrders    = $orderModel->getRecentOrders($perPage, $filters['q'], $filters['deadline'], ($ordersPage - 1) * $perPage, $orderStatusFilter, $paymentStatusFilter);
         } catch (\Throwable $e) {
             error_log('Admin contacts order load error: ' . $e->getMessage());
             $orderLoadError = 'Les commandes boutique sont temporairement indisponibles sur cet écran.';
         }
 
         View::render('admin/contacts', [
-            'title'              => 'Administration — Demandes, devis et commandes',
-            'contacts'           => $contacts,
-            'stats'              => $stats,
-            'orderStats'         => $orderStats,
-            'recentOrders'       => $recentOrders,
-            'ordersCount'        => $ordersCount,
-            'orderLoadError'     => $orderLoadError,
-            'filteredCount'      => $filteredCount,
-            'pagination'         => [
+            'title'                => 'Administration — Demandes, devis et commandes',
+            'contacts'             => $contacts,
+            'stats'                => $stats,
+            'orderStats'           => $orderStats,
+            'recentOrders'         => $recentOrders,
+            'ordersCount'          => $ordersCount,
+            'orderLoadError'       => $orderLoadError,
+            'filteredCount'        => $filteredCount,
+            'pagination'           => [
                 'contacts_page'       => $contactsPage,
                 'contacts_page_count' => $contactsPageCount,
                 'orders_page'         => $ordersPage,
                 'orders_page_count'   => $ordersPageCount ?? 1,
             ],
-            'filters'            => $filters,
-            'view'               => $view,
-            'statusOptions'      => Contact::STATUS_LABELS,
-            'orderStatusOptions' => ShopOrder::STATUS_LABELS,
-            'flash'              => $this->pullFlash(),
+            'filters'              => $filters,
+            'view'                 => $view,
+            'statusOptions'        => Contact::STATUS_LABELS,
+            'orderStatusOptions'   => ShopOrder::STATUS_LABELS,
+            'paymentStatusOptions' => ShopOrder::PAYMENT_STATUS_LABELS,
+            'paymentStatusFilter'  => $paymentStatusFilter,
+            'flash'                => $this->pullFlash(),
+            'csrfToken'            => Csrf::token(),
         ]);
+    }
+
+    public function shopOrders(): void
+    {
+        $this->contacts('orders');
     }
 
     public function updateContactStatus(string $id): void
     {
         AdminAuth::requireAuth();
+        Csrf::requireValid();
 
         $contactId     = (int) $id;
         $status        = trim((string) ($_POST['status'] ?? ''));
@@ -1129,6 +1159,7 @@ final class AdminController
     public function updateContactsStatus(): void
     {
         AdminAuth::requireAuth();
+        Csrf::requireValid();
 
         $status     = trim((string) ($_POST['status'] ?? ''));
         $redirect   = $this->safeAdminRedirect((string) ($_POST['redirect'] ?? '/admin/contacts'));

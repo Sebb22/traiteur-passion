@@ -616,7 +616,7 @@ final class ShopOrderNotificationService
             return null;
         }
 
-        return $appUrl . '/admin/contacts#orders';
+        return $appUrl . '/admin/boutique/orders';
     }
 
     /**

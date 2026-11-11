@@ -59,6 +59,7 @@ $router->post('/admin/catalog/items/{id}/options/create', 'AdminController@creat
 $router->post('/admin/catalog/options/{id}', 'AdminController@updateCatalogOption');
 $router->post('/admin/catalog/options/{id}/delete', 'AdminController@deleteCatalogOption');
 $router->get('/admin/boutique', 'AdminController@shop');
+$router->get('/admin/boutique/orders', 'AdminController@shopOrders');
 $router->post('/admin/boutique/sections/create', 'AdminController@createShopSection');
 $router->post('/admin/boutique/sections/reorder', 'AdminController@reorderShopSections');
 $router->post('/admin/boutique/sections/{id}', 'AdminController@updateShopSection');

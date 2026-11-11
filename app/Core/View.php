@@ -5,10 +5,10 @@ namespace App\Core;
 
 final class View
 {
-    public static function render(string $view, array $data = []): void
+    public static function render(string $viewName, array $data = []): void
     {
         $base       = dirname(__DIR__) . '/Views';
-        $viewFile   = $base . '/' . $view . '.php';
+        $viewFile   = $base . '/' . $viewName . '.php';
         $layoutFile = $base . '/layouts/main.php';
 
         if (! file_exists($viewFile)) {
